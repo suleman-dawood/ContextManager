@@ -177,6 +177,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// CORS must be THE FIRST middleware - before everything else
+// This ensures CORS headers are added to ALL responses, including errors
+app.UseCors("AllowFrontend");
+
 // Enable Swagger in all environments (helpful for testing)
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -184,10 +188,6 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Context Manager API v1");
     c.RoutePrefix = string.Empty; // Swagger at root URL
 });
-
-// CORS must be very early in the pipeline - before UseAuthentication/UseAuthorization
-// This ensures CORS headers are added even to error responses
-app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
