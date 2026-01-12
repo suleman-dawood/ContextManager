@@ -24,7 +24,7 @@ namespace ContextManager.API.DTOs
         public string Description { get; set; } = string.Empty;
         public int EstimatedMinutes { get; set; }
         public Priority Priority { get; set; }
-        public TaskStatus Status { get; set; }
+        public Models.TaskStatus Status { get; set; }
         public DateTime? DueDate { get; set; }
     }
 
@@ -42,7 +42,7 @@ namespace ContextManager.API.DTOs
         public string Description { get; set; } = string.Empty;
         public int EstimatedMinutes { get; set; }
         public Priority Priority { get; set; }
-        public TaskStatus Status { get; set; }
+        public Models.TaskStatus Status { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? CompletedAt { get; set; }

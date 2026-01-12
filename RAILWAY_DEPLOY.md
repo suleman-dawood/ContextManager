@@ -148,32 +148,37 @@ Railway will:
 
 ---
 
-## 🎨 Part 3: Deploy Frontend (Vercel/Netlify)
+## 🎨 Part 3: Deploy Frontend on Railway
 
-### Option A: Vercel (Recommended)
+Railway can also host static sites! Deploy your frontend as a separate service:
 
-1. Go to [vercel.com](https://vercel.com)
-2. Import your GitHub repo
-3. Set Root Directory: `frontend`
-4. Framework: Vite
+### Option 1: Railway Static Site (Recommended)
+
+1. In your Railway project, click "New" → "GitHub Repo"
+2. Select the same repository: `suleman-dawood/ContextManager`
+3. Railway detects the frontend folder
+4. Configure the service:
+   - **Root Directory:** `frontend`
+   - **Build Command:** `npm run build`
+   - **Start Command:** `npx serve dist -s -l 3000`
+   - **Publish Directory:** `dist`
 5. Add environment variable:
    ```
-   VITE_API_URL=https://your-railway-api.railway.app/api
+   VITE_API_URL=https://your-backend-service.railway.app/api
    ```
 6. Deploy!
 
-### Option B: Netlify
+### Option 2: Serve from Backend (Simple)
 
-1. Go to [netlify.com](https://netlify.com)
-2. Import from Git
-3. Base directory: `frontend`
-4. Build command: `npm run build`
-5. Publish directory: `frontend/dist`
-6. Environment variable:
+You can also serve the built frontend from your .NET backend:
+
+1. After `npm run build` in frontend, copy `frontend/dist` to `ContextManager.API/wwwroot`
+2. Update `Program.cs` to serve static files:
+   ```csharp
+   app.UseStaticFiles();
+   app.MapFallbackToFile("index.html");
    ```
-   VITE_API_URL=https://your-railway-api.railway.app/api
-   ```
-7. Deploy!
+3. Single Railway service serves both!
 
 ---
 
@@ -191,7 +196,7 @@ curl https://your-app.railway.app/health
 Visit: `https://your-app.railway.app/`
 
 ### Check Frontend
-Visit your Vercel/Netlify URL and:
+Visit your Railway frontend URL and:
 1. ✅ Register account
 2. ✅ Create tasks
 3. ✅ Test AI suggestions
@@ -216,12 +221,13 @@ Visit your Vercel/Netlify URL and:
 - Ensure key starts with `sk-ant-api03-`
 
 ### "CORS Error" in Frontend
-- Update `Program.cs` CORS settings with your Vercel domain
+- Update `Program.cs` CORS settings with your Railway frontend domain
 - Add to `AllowedHosts` in appsettings.json
 
 ### Frontend Can't Connect to API
-- Check `VITE_API_URL` in Vercel/Netlify settings
+- Check `VITE_API_URL` in Railway environment variables
 - Ensure URL ends with `/api`
+- Verify backend service is running and accessible
 - Check Railway API is running (green status)
 
 ---
@@ -233,9 +239,9 @@ Visit your Vercel/Netlify URL and:
 - Includes: 500 hours runtime, PostgreSQL database
 - Starter bonus: $5 free credit
 
-**Vercel/Netlify:**
-- Free tier: Perfect for this project
-- Unlimited bandwidth for hobby projects
+**Railway Frontend:**
+- Same pricing as backend ($5/month)
+- Or serve static files from backend (free)
 
 **Anthropic API:**
 - Pay as you go
@@ -254,7 +260,7 @@ Visit your Vercel/Netlify URL and:
 - [ ] ✅ PostgreSQL added to Railway
 - [ ] ✅ Environment variables configured
 - [ ] ✅ Backend deployed and healthy
-- [ ] ✅ Frontend deployed on Vercel/Netlify
+- [ ] ✅ Frontend deployed on Railway
 - [ ] ✅ Can register and login
 - [ ] ✅ Can create tasks
 - [ ] ✅ AI suggestions work

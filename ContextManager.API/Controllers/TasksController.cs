@@ -33,7 +33,7 @@ namespace ContextManager.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<TaskResponse>>> GetTasks(
             [FromQuery] Guid? contextId, 
-            [FromQuery] TaskStatus? status)
+            [FromQuery] Models.TaskStatus? status)
         {
             var userId = _authService.GetUserIdFromClaims(User);
 
@@ -140,7 +140,7 @@ namespace ContextManager.API.Controllers
                 Description = request.Description,
                 EstimatedMinutes = request.EstimatedMinutes,
                 Priority = request.Priority,
-                Status = TaskStatus.Todo,
+                Status = Models.TaskStatus.Todo,
                 DueDate = request.DueDate,
                 CreatedAt = DateTime.UtcNow
             };
@@ -199,12 +199,12 @@ namespace ContextManager.API.Controllers
             task.DueDate = request.DueDate;
 
             // If status changed to Completed, set completion time
-            if (request.Status == TaskStatus.Completed && task.CompletedAt == null)
+            if (request.Status == Models.TaskStatus.Completed && task.CompletedAt == null)
             {
                 task.CompletedAt = DateTime.UtcNow;
             }
             // If status changed from Completed to something else, clear completion time
-            else if (request.Status != TaskStatus.Completed && task.CompletedAt != null)
+            else if (request.Status != Models.TaskStatus.Completed && task.CompletedAt != null)
             {
                 task.CompletedAt = null;
             }

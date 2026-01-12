@@ -70,7 +70,7 @@ namespace ContextManager.API.Controllers
                 {
                     var date = DateTime.UtcNow.AddDays(-6 + offset).Date;
                     var dayTasks = tasks.Where(t => t.CreatedAt.Date == date).ToList();
-                    var completedCount = dayTasks.Count(t => t.Status == TaskStatus.Completed);
+                    var completedCount = dayTasks.Count(t => t.Status == Models.TaskStatus.Completed);
                     var totalCount = dayTasks.Count;
                     var rate = totalCount > 0 ? (double)completedCount / totalCount * 100 : 0;
 

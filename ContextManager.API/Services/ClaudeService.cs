@@ -39,7 +39,7 @@ namespace ContextManager.API.Services
             var tasks = await _db.Tasks
                 .Where(t => t.UserId == userId 
                          && t.ContextId == contextId 
-                         && t.Status != TaskStatus.Completed)
+                         && t.Status != Models.TaskStatus.Completed)
                 .OrderBy(t => t.DueDate)
                 .ThenByDescending(t => t.Priority)
                 .ToListAsync();
