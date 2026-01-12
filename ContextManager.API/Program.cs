@@ -68,20 +68,47 @@ builder.Services.AddHttpClient(); // For ClaudeService HTTP requests
 // 4. Configure CORS (for React frontend)
 // ========================================
 
+var allowedOrigins = new List<string>
+{
+    "http://localhost:3000",   // Local development
+    "http://localhost:5173"    // Vite default port
+};
+
+// Add Railway frontend URL from environment variable if set
+var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
+if (!string.IsNullOrEmpty(frontendUrl))
+{
+    allowedOrigins.Add(frontendUrl);
+}
+
+// Add common Railway patterns (wildcard doesn't work, so we allow all origins in production)
+var isProduction = builder.Configuration["ASPNETCORE_ENVIRONMENT"] == "Production";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:3000",  // Local development
-            "http://localhost:5173",  // Vite default port
-            "https://*.vercel.app",   // Vercel deployment
-            "https://*.netlify.app"   // Netlify deployment
-        )
-        .SetIsOriginAllowedToAllowWildcardSubdomains()
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
+        if (isProduction)
+        {
+            // In production, allow any Railway domain
+            policy.SetIsOriginAllowed(origin =>
+            {
+                return origin.Contains("railway.app") || 
+                       origin.Contains("localhost") ||
+                       origin.Contains("127.0.0.1") ||
+                       allowedOrigins.Contains(origin) ||
+                       (frontendUrl != null && origin == frontendUrl);
+            });
+        }
+        else
+        {
+            // In development, use specific origins
+            policy.WithOrigins(allowedOrigins.ToArray());
+        }
+        
+        policy.AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
