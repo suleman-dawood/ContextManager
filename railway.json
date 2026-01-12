@@ -1,11 +1,11 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
+    "builder": "RAILPACK",
     "buildCommand": "cd ContextManager.API && dotnet publish --no-restore -c Release -o out"
   },
   "deploy": {
-    "startCommand": "cd ContextManager.API && dotnet out/ContextManager.API.dll --urls=http://0.0.0.0:$PORT",
+    "startCommand": "cd ContextManager.API/out && dotnet ContextManager.API.dll --urls=http://0.0.0.0:$PORT",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
