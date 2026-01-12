@@ -8,5 +8,5 @@ cmds = ["cd ContextManager.API && dotnet restore"]
 cmds = ["cd ContextManager.API && dotnet publish --no-restore -c Release -o out"]
 
 [start]
-cmd = "cd ContextManager.API/out && ./ContextManager.API --urls=http://0.0.0.0:$PORT || dotnet ContextManager.API.dll --urls=http://0.0.0.0:$PORT"
+cmd = "cd ContextManager.API/out && dotnet ContextManager.API.dll --urls=http://0.0.0.0:$PORT"
 
