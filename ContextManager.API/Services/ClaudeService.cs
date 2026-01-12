@@ -20,8 +20,10 @@ namespace ContextManager.API.Services
         public ClaudeService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ApplicationDbContext db)
         {
             _httpClient = httpClientFactory.CreateClient();
-            _apiKey = configuration["Anthropic:ApiKey"] 
-                ?? throw new InvalidOperationException("Anthropic API key not configured");
+            // Try environment variable first (Railway), then configuration
+            _apiKey = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
+                ?? configuration["Anthropic:ApiKey"] 
+                ?? throw new InvalidOperationException("Anthropic API key not configured. Set ANTHROPIC_API_KEY environment variable or configure in appsettings.json");
             _db = db;
             
             // Set up HTTP client for Claude API
