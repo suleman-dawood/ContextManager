@@ -16,14 +16,29 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 if (!string.IsNullOrEmpty(connectionString))
 {
-    // Railway format: postgresql://user:pass@host:5432/db
-    // Convert to EF Core format: Host=host;Database=db;Username=user;Password=pass
-    connectionString = ConvertRailwayConnectionString(connectionString);
+    Console.WriteLine($"📦 Found DATABASE_URL environment variable");
+    try
+    {
+        // Railway format: postgresql://user:pass@host:5432/db
+        // Convert to EF Core format: Host=host;Database=db;Username=user;Password=pass
+        connectionString = ConvertRailwayConnectionString(connectionString);
+        Console.WriteLine($"✅ Converted DATABASE_URL successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Failed to convert DATABASE_URL: {ex.Message}");
+        throw;
+    }
 }
 else
 {
+    Console.WriteLine($"⚠️  DATABASE_URL not found, using appsettings.json");
     // Use local connection string from appsettings.json
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        Console.WriteLine($"❌ No connection string found in appsettings.json either!");
+    }
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -119,7 +134,12 @@ builder.Services.AddCors(options =>
 // 5. Add Controllers and Swagger
 // ========================================
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Ensure JSON responses work properly
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -168,18 +188,62 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     try
     {
-        db.Database.Migrate();
-        Console.WriteLine("✅ Database migrations applied successfully");
+        Console.WriteLine("🔄 Attempting database connection...");
+        var canConnect = await db.Database.CanConnectAsync();
+        if (canConnect)
+        {
+            Console.WriteLine("✅ Database connection successful!");
+            db.Database.Migrate();
+            Console.WriteLine("✅ Database migrations applied successfully");
+        }
+        else
+        {
+            Console.WriteLine("❌ Cannot connect to database");
+        }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Database migration failed: {ex.Message}");
+        Console.WriteLine($"❌ Database connection/migration failed:");
+        Console.WriteLine($"   Error: {ex.Message}");
+        Console.WriteLine($"   Type: {ex.GetType().Name}");
+        if (ex.InnerException != null)
+        {
+            Console.WriteLine($"   Inner: {ex.InnerException.Message}");
+        }
+        // Don't throw - let the app start anyway (migrations might just be up to date)
     }
 }
 
 // CORS must be THE FIRST middleware - before everything else
 // This ensures CORS headers are added to ALL responses, including errors
 app.UseCors("AllowFrontend");
+
+// Global exception handler to ensure CORS headers on errors
+app.UseExceptionHandler(appBuilder =>
+{
+    appBuilder.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        
+        var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+        var errorMessage = exception?.Message ?? "An internal server error occurred";
+        
+        // Log the error
+        Console.WriteLine($"❌ Unhandled exception: {errorMessage}");
+        if (exception != null)
+        {
+            Console.WriteLine($"   Stack trace: {exception.StackTrace}");
+        }
+        
+        // Response already has CORS headers from UseCors middleware above
+        await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            message = errorMessage,
+            error = app.Environment.IsDevelopment() ? exception?.ToString() : null
+        }));
+    });
+});
 
 // Enable Swagger in all environments (helpful for testing)
 app.UseSwagger();
@@ -212,8 +276,28 @@ app.Run();
 /// </summary>
 string ConvertRailwayConnectionString(string railwayUrl)
 {
-    var uri = new Uri(railwayUrl);
-    var userInfo = uri.UserInfo.Split(':');
-    return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+    try
+    {
+        var uri = new Uri(railwayUrl);
+        var userInfo = uri.UserInfo.Split(':');
+        
+        // Handle URL-encoded passwords (common in Railway)
+        var username = Uri.UnescapeDataString(userInfo[0]);
+        var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+        
+        var database = uri.AbsolutePath.TrimStart('/');
+        
+        var connectionString = $"Host={uri.Host};Port={uri.Port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        
+        Console.WriteLine($"🔗 Connecting to database: {uri.Host}:{uri.Port}/{database} as {username}");
+        
+        return connectionString;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error parsing DATABASE_URL: {ex.Message}");
+        Console.WriteLine($"   DATABASE_URL format: postgresql://user:pass@host:port/dbname");
+        throw;
+    }
 }
 
