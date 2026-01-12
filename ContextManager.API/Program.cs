@@ -33,7 +33,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // 2. Configure JWT Authentication
 // ========================================
 
-var jwtSecret = builder.Configuration["JwtSettings:Secret"] ?? "development-secret-key-minimum-32-chars-long";
+// Get JWT settings from environment variables (Railway) or configuration
+var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") 
+    ?? builder.Configuration["JwtSettings:Secret"] 
+    ?? "development-secret-key-minimum-32-chars-long";
 var jwtIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "ContextManager";
 var jwtAudience = builder.Configuration["JwtSettings:Audience"] ?? "ContextManager";
 
@@ -182,6 +185,8 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty; // Swagger at root URL
 });
 
+// CORS must be very early in the pipeline - before UseAuthentication/UseAuthorization
+// This ensures CORS headers are added even to error responses
 app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
