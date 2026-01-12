@@ -6,6 +6,11 @@ obj/
 *.cache
 .vs/
 
+# Sensitive Configuration Files - NEVER COMMIT THESE!
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Local.json
+
 # Database
 *.db
 *.db-shm
@@ -16,6 +21,7 @@ node_modules/
 dist/
 .env
 .env.local
+.env.production
 
 # OS
 .DS_Store
