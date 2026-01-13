@@ -8,47 +8,22 @@ using ContextManager.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ========================================
-// 1. Configure Database Connection
-// ========================================
-
-// Get connection string (Railway or local)
+// Database Configuration
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 if (!string.IsNullOrEmpty(connectionString))
 {
-    Console.WriteLine($"📦 Found DATABASE_URL environment variable");
-    try
-    {
-        // Railway format: postgresql://user:pass@host:5432/db
-        // Convert to EF Core format: Host=host;Database=db;Username=user;Password=pass
-        connectionString = ConvertRailwayConnectionString(connectionString);
-        Console.WriteLine($"✅ Converted DATABASE_URL successfully");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"❌ Failed to convert DATABASE_URL: {ex.Message}");
-        throw;
-    }
+    connectionString = ConvertRailwayConnectionString(connectionString);
 }
 else
 {
-    Console.WriteLine($"⚠️  DATABASE_URL not found, using appsettings.json");
-    // Use local connection string from appsettings.json
-    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (string.IsNullOrEmpty(connectionString))
-    {
-        Console.WriteLine($"❌ No connection string found in appsettings.json either!");
-    }
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Database connection string not configured");
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// ========================================
-// 2. Configure JWT Authentication
-// ========================================
-
-// Get JWT settings from environment variables (Railway) or configuration
+// JWT Authentication
 var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") 
     ?? builder.Configuration["JwtSettings:Secret"] 
     ?? "development-secret-key-minimum-32-chars-long";
@@ -74,32 +49,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ========================================
-// 3. Register Services
-// ========================================
-
+// Services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ClaudeService>();
-builder.Services.AddHttpClient(); // For ClaudeService HTTP requests
+builder.Services.AddHttpClient();
 
-// ========================================
-// 4. Configure CORS (for React frontend)
-// ========================================
-
-var allowedOrigins = new List<string>
-{
-    "http://localhost:3000",   // Local development
-    "http://localhost:5173"    // Vite default port
-};
-
-// Add Railway frontend URL from environment variable if set
+// CORS Configuration
+var allowedOrigins = new List<string> { "http://localhost:3000", "http://localhost:5173" };
 var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
 if (!string.IsNullOrEmpty(frontendUrl))
 {
     allowedOrigins.Add(frontendUrl);
 }
 
-// Add common Railway patterns (wildcard doesn't work, so we allow all origins in production)
 var isProduction = builder.Configuration["ASPNETCORE_ENVIRONMENT"] == "Production";
 
 builder.Services.AddCors(options =>
@@ -108,38 +70,25 @@ builder.Services.AddCors(options =>
     {
         if (isProduction)
         {
-            // In production, allow any Railway domain
             policy.SetIsOriginAllowed(origin =>
-            {
-                return origin.Contains("railway.app") || 
-                       origin.Contains("localhost") ||
-                       origin.Contains("127.0.0.1") ||
-                       allowedOrigins.Contains(origin) ||
-                       (frontendUrl != null && origin == frontendUrl);
-            });
+                origin.Contains("railway.app") || 
+                origin.Contains("localhost") ||
+                origin.Contains("127.0.0.1") ||
+                allowedOrigins.Contains(origin) ||
+                (frontendUrl != null && origin == frontendUrl));
         }
         else
         {
-            // In development, use specific origins
             policy.WithOrigins(allowedOrigins.ToArray());
         }
         
-        policy.AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        policy.AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     });
 });
 
-// ========================================
-// 5. Add Controllers and Swagger
-// ========================================
-
+// Controllers and Swagger
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        // Ensure JSON responses work properly
-        options.JsonSerializerOptions.PropertyNamingPolicy = null;
-    });
+    .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -150,10 +99,9 @@ builder.Services.AddSwaggerGen(c =>
         Description = "AI-powered task management with mental context classification"
     });
 
-    // Add JWT authentication to Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token.",
+        Description = "JWT Authorization header using the Bearer scheme.",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -165,163 +113,47 @@ builder.Services.AddSwaggerGen(c =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             Array.Empty<string>()
         }
     });
 });
 
-// ========================================
-// 6. Build and Configure App
-// ========================================
-
 var app = builder.Build();
 
-// Initialize database using direct SQL script (simpler and more reliable)
+// Initialize database
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
     try
     {
-        Console.WriteLine("🔄 Attempting database connection...");
-        var canConnect = await db.Database.CanConnectAsync();
-        if (canConnect)
+        await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
+    }
+    catch
+    {
+        // Database not initialized - run SQL script
+        var sqlPath = Path.Combine(AppContext.BaseDirectory, "Scripts", "init.sql");
+        if (!File.Exists(sqlPath))
         {
-            Console.WriteLine("✅ Database connection successful!");
-            
-            // Check if Users table exists
-            bool usersTableExists = false;
-            try
-            {
-                await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
-                usersTableExists = true;
-                Console.WriteLine("✅ Users table exists - database already initialized");
-            }
-            catch
-            {
-                usersTableExists = false;
-                Console.WriteLine("⚠️  Users table does not exist - initializing database...");
-            }
-            
-            if (!usersTableExists)
-            {
-                // Read and execute the SQL initialization script
-                Console.WriteLine("🔄 Creating database tables using SQL script...");
-                try
-                {
-                    // Try multiple possible paths for the SQL script
-                    // Railway: AppContext.BaseDirectory (usually /app/out)
-                    // Local dev: Directory.GetCurrentDirectory() or AppContext.BaseDirectory
-                    var possiblePaths = new[]
-                    {
-                        Path.Combine(AppContext.BaseDirectory, "Scripts", "init.sql"),
-                        Path.Combine(Directory.GetCurrentDirectory(), "Scripts", "init.sql"),
-                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "init.sql"),
-                        // Also try without Scripts subdirectory (in case it's in root)
-                        Path.Combine(AppContext.BaseDirectory, "init.sql"),
-                    };
-                    
-                    string? sqlScriptPath = null;
-                    foreach (var path in possiblePaths)
-                    {
-                        if (File.Exists(path))
-                        {
-                            sqlScriptPath = path;
-                            break;
-                        }
-                    }
-                    
-                    // If file exists, read and execute it
-                    if (sqlScriptPath != null && File.Exists(sqlScriptPath))
-                    {
-                        Console.WriteLine($"📄 Reading SQL script from: {sqlScriptPath}");
-                        var sqlScript = await File.ReadAllTextAsync(sqlScriptPath);
-                        
-                        // Execute the SQL script
-                        // PostgreSQL allows multiple statements in one ExecuteSqlRawAsync call
-                        await db.Database.ExecuteSqlRawAsync(sqlScript);
-                        Console.WriteLine("✅ Database tables created successfully!");
-                        
-                        // Verify Users table was created
-                        try
-                        {
-                            await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
-                            Console.WriteLine("✅ Verified: Users table exists");
-                        }
-                        catch (Exception verifyEx)
-                        {
-                            Console.WriteLine($"⚠️  Warning: Could not verify Users table: {verifyEx.Message}");
-                        }
-                    }
-                    else
-                    {
-                        // Fallback to EnsureCreated if SQL file doesn't exist
-                        Console.WriteLine($"⚠️  SQL script not found. Tried paths:");
-                        foreach (var path in possiblePaths)
-                        {
-                            Console.WriteLine($"     - {path}");
-                        }
-                        Console.WriteLine("   Falling back to EF Core EnsureCreated...");
-                        await db.Database.EnsureCreatedAsync();
-                        Console.WriteLine("✅ Database created using EnsureCreated (fallback)");
-                    }
-                }
-                catch (Exception sqlEx)
-                {
-                    Console.WriteLine($"❌ ERROR executing SQL script:");
-                    Console.WriteLine($"   Error: {sqlEx.Message}");
-                    Console.WriteLine($"   Type: {sqlEx.GetType().Name}");
-                    if (sqlEx.InnerException != null)
-                    {
-                        Console.WriteLine($"   Inner: {sqlEx.InnerException.Message}");
-                    }
-                    
-                    // Fallback to EnsureCreated
-                    Console.WriteLine("   Trying EnsureCreated as fallback...");
-                    try
-                    {
-                        await db.Database.EnsureCreatedAsync();
-                        Console.WriteLine("✅ Database created using EnsureCreated (fallback)");
-                    }
-                    catch (Exception ensureEx)
-                    {
-                        Console.WriteLine($"❌ EnsureCreated also failed: {ensureEx.Message}");
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("✅ Database is already initialized and up to date");
-            }
+            sqlPath = Path.Combine(Directory.GetCurrentDirectory(), "Scripts", "init.sql");
+        }
+        
+        if (File.Exists(sqlPath))
+        {
+            var sql = await File.ReadAllTextAsync(sqlPath);
+            await db.Database.ExecuteSqlRawAsync(sql);
         }
         else
         {
-            Console.WriteLine("❌ Cannot connect to database");
+            await db.Database.EnsureCreatedAsync();
         }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"❌ Database initialization failed:");
-        Console.WriteLine($"   Error: {ex.Message}");
-        Console.WriteLine($"   Type: {ex.GetType().Name}");
-        if (ex.InnerException != null)
-        {
-            Console.WriteLine($"   Inner: {ex.InnerException.Message}");
-        }
-        // Don't throw - let the app start anyway (might be a temporary connection issue)
     }
 }
 
-// CORS must be THE FIRST middleware - before everything else
-// This ensures CORS headers are added to ALL responses, including errors
 app.UseCors("AllowFrontend");
 
-// Global exception handler to ensure CORS headers on errors
 app.UseExceptionHandler(appBuilder =>
 {
     appBuilder.Run(async context =>
@@ -332,14 +164,6 @@ app.UseExceptionHandler(appBuilder =>
         var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
         var errorMessage = exception?.Message ?? "An internal server error occurred";
         
-        // Log the error
-        Console.WriteLine($"❌ Unhandled exception: {errorMessage}");
-        if (exception != null)
-        {
-            Console.WriteLine($"   Stack trace: {exception.StackTrace}");
-        }
-        
-        // Response already has CORS headers from UseCors middleware above
         await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
         {
             message = errorMessage,
@@ -348,12 +172,11 @@ app.UseExceptionHandler(appBuilder =>
     });
 });
 
-// Enable Swagger in all environments (helpful for testing)
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Context Manager API v1");
-    c.RoutePrefix = string.Empty; // Swagger at root URL
+    c.RoutePrefix = string.Empty;
 });
 
 app.UseAuthentication();
@@ -361,46 +184,18 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Health check endpoint
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
-
-Console.WriteLine($"🚀 Context Manager API starting...");
-Console.WriteLine($"📊 Environment: {app.Environment.EnvironmentName}");
-Console.WriteLine($"🗄️  Database: {(connectionString?.Contains("railway") == true ? "Railway PostgreSQL" : "Local PostgreSQL")}");
 
 app.Run();
 
-// ========================================
-// Helper Method for Railway Connection
-// ========================================
-
-/// <summary>
-/// Converts Railway's DATABASE_URL format to Entity Framework connection string
-/// </summary>
 string ConvertRailwayConnectionString(string railwayUrl)
 {
-    try
-    {
-        var uri = new Uri(railwayUrl);
-        var userInfo = uri.UserInfo.Split(':');
-        
-        // Handle URL-encoded passwords (common in Railway)
-        var username = Uri.UnescapeDataString(userInfo[0]);
-        var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
-        
-        var database = uri.AbsolutePath.TrimStart('/');
-        
-        var connectionString = $"Host={uri.Host};Port={uri.Port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
-        
-        Console.WriteLine($"🔗 Connecting to database: {uri.Host}:{uri.Port}/{database} as {username}");
-        
-        return connectionString;
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"❌ Error parsing DATABASE_URL: {ex.Message}");
-        Console.WriteLine($"   DATABASE_URL format: postgresql://user:pass@host:port/dbname");
-        throw;
-    }
+    var uri = new Uri(railwayUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    var username = Uri.UnescapeDataString(userInfo[0]);
+    var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+    var database = uri.AbsolutePath.TrimStart('/');
+    
+    return $"Host={uri.Host};Port={uri.Port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
 }
 
