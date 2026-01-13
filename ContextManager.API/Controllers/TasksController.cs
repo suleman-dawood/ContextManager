@@ -149,7 +149,7 @@ namespace ContextManager.API.Controllers
                     EstimatedMinutes = request.EstimatedMinutes,
                     Priority = request.Priority,
                     Status = Models.TaskStatus.Todo,
-                    DueDate = request.DueDate,
+                    DueDate = request.DueDate.HasValue ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc) : null,
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -206,7 +206,7 @@ namespace ContextManager.API.Controllers
             task.EstimatedMinutes = request.EstimatedMinutes;
             task.Priority = request.Priority;
             task.Status = request.Status;
-            task.DueDate = request.DueDate;
+            task.DueDate = request.DueDate.HasValue ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc) : null;
 
             // If status changed to Completed, set completion time
             if (request.Status == Models.TaskStatus.Completed && task.CompletedAt == null)
