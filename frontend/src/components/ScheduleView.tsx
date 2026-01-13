@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { TaskStatus } from '../types';
 import {
   DndContext,
   closestCenter,
@@ -68,8 +69,27 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
         <div className="task-details">
           <div className="task-header-row">
             <div>
-              <h4 style={{ color: 'var(--black)' }}>{item.task.title}</h4>
-              {item.startTime && (
+              <h4 style={{ 
+                color: 'var(--black)', 
+                textDecoration: item.task.status === TaskStatus.Completed ? 'line-through' : 'none',
+                opacity: item.task.status === TaskStatus.Completed ? 0.6 : 1
+              }}>
+                {item.task.title}
+                {item.task.status === TaskStatus.Completed && (
+                  <span style={{ 
+                    marginLeft: '8px', 
+                    fontSize: '0.75rem', 
+                    padding: '2px 6px', 
+                    background: 'var(--success)', 
+                    color: 'var(--black)', 
+                    border: '1px solid var(--black)',
+                    fontWeight: '600'
+                  }}>
+                    ✓ Completed
+                  </span>
+                )}
+              </h4>
+              {item.startTime && item.endTime && (
                 <span className="task-time-range">
                   {item.startTime} - {item.endTime}
                 </span>
@@ -402,10 +422,28 @@ export default function ScheduleView() {
               strategy={verticalListSortingStrategy}
             >
               <div className="schedule-tasks">
-                {sessionPlan.items.map((item, index) => {
-                  const isFirstInGroup =
-                    index === 0 ||
-                    item.groupNumber !== sessionPlan.items[index - 1].groupNumber;
+                {/* Sort items: active tasks first, completed tasks at bottom */}
+                {sessionPlan.items
+                  .sort((a, b) => {
+                    // If one is completed and one isn't, completed goes last
+                    const aCompleted = a.task.status === TaskStatus.Completed;
+                    const bCompleted = b.task.status === TaskStatus.Completed;
+                    if (aCompleted && !bCompleted) return 1;
+                    if (!aCompleted && bCompleted) return -1;
+                    // Otherwise maintain original order
+                    return a.order - b.order;
+                  })
+                  .map((item, index, sortedItems) => {
+                    // Check if this is the first item in its group
+                    // (completed tasks don't group, they're at the bottom)
+                    const isCompleted = item.task.status === TaskStatus.Completed;
+                    const isFirstInGroup =
+                      index === 0 ||
+                      (!isCompleted && (
+                        item.groupNumber !== sortedItems[index - 1].groupNumber ||
+                        sortedItems[index - 1].task.status === TaskStatus.Completed
+                      )) ||
+                      (isCompleted && sortedItems[index - 1].task.status !== TaskStatus.Completed);
 
                   return (
                     <SortableTaskItem

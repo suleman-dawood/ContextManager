@@ -106,7 +106,7 @@ namespace ContextManager.API.Services
         /// <summary>
         /// Retrieves an existing session plan for a specific date
         /// Returns null if no plan exists
-        /// Automatically filters out completed tasks
+        /// Completed tasks are kept at the bottom and don't count towards time
         /// </summary>
         public async Task<SessionPlanResponse?> GetSessionPlanAsync(Guid userId, DateTime planDate)
         {
@@ -124,69 +124,22 @@ namespace ContextManager.API.Services
                 return null;
             }
             
-            // Filter out completed tasks and remove them from the plan
-            var completedItems = sessionPlan.Items
-                .Where(spi => spi.Task.Status == Models.TaskStatus.Completed)
-                .ToList();
+            // Separate completed and active tasks
+            var allItems = sessionPlan.Items.OrderBy(spi => spi.Order).ToList();
+            var activeItems = allItems.Where(spi => spi.Task.Status != Models.TaskStatus.Completed).ToList();
+            var completedItems = allItems.Where(spi => spi.Task.Status == Models.TaskStatus.Completed).ToList();
             
-            if (completedItems.Any())
-            {
-                // Remove completed tasks from the plan
-                foreach (var item in completedItems)
-                {
-                    _context.SessionPlanItems.Remove(item);
-                    sessionPlan.Items.Remove(item);
-                }
-                
-                // If all tasks were completed, delete the entire plan
-                if (!sessionPlan.Items.Any())
-                {
-                    _context.SessionPlans.Remove(sessionPlan);
-                    await _context.SaveChangesAsync();
-                    return null;
-                }
-                
-                // Reorder remaining items
-                var remainingItems = sessionPlan.Items.OrderBy(spi => spi.Order).ToList();
-                for (int i = 0; i < remainingItems.Count; i++)
-                {
-                    remainingItems[i].Order = i;
-                }
-                
-                // Recalculate group numbers
-                int groupNumber = 0;
-                Guid? lastContextId = null;
-                foreach (var item in remainingItems.OrderBy(spi => spi.Order))
-                {
-                    if (lastContextId.HasValue && lastContextId.Value != item.Task.ContextId)
-                    {
-                        groupNumber++;
-                    }
-                    item.GroupNumber = groupNumber;
-                    lastContextId = item.Task.ContextId;
-                }
-                
-                sessionPlan.IsCustomized = true;
-                sessionPlan.LastModifiedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-            }
-            
-            // Map to response DTO with calculated start/end times (only non-completed tasks)
-            var orderedItems = sessionPlan.Items
-                .Where(spi => spi.Task.Status != Models.TaskStatus.Completed)
-                .OrderBy(spi => spi.Order)
-                .ToList();
-            
+            // Calculate start/end times only for active tasks (completed tasks don't get times)
             var currentTime = new TimeSpan(9, 0, 0); // Start at 9 AM
+            var itemsWithTimes = new List<SessionPlanItemResponse>();
             
-            var itemsWithTimes = orderedItems.Select(spi =>
+            // Process active tasks first (with time calculations)
+            foreach (var spi in activeItems)
             {
                 var startTime = currentTime;
                 var endTime = currentTime.Add(TimeSpan.FromMinutes(spi.Task.EstimatedMinutes));
                 
-                // Ensure we don't exceed 5 PM (17:00 = 17 hours = 1020 minutes from midnight)
-                // 9 AM = 9 * 60 = 540 minutes from midnight
-                // 5 PM = 17 * 60 = 1020 minutes from midnight
+                // Ensure we don't exceed 5 PM
                 var maxTime = new TimeSpan(17, 0, 0);
                 if (endTime > maxTime)
                 {
@@ -195,7 +148,7 @@ namespace ContextManager.API.Services
                 
                 currentTime = endTime;
                 
-                return new SessionPlanItemResponse
+                itemsWithTimes.Add(new SessionPlanItemResponse
                 {
                     Id = spi.Id,
                     Task = MapTaskToDTO(spi.Task),
@@ -204,8 +157,26 @@ namespace ContextManager.API.Services
                     Reasoning = spi.Reasoning,
                     StartTime = FormatTime(startTime),
                     EndTime = FormatTime(endTime)
-                };
-            }).ToList();
+                });
+            }
+            
+            // Add completed tasks at the bottom (no start/end times)
+            foreach (var spi in completedItems)
+            {
+                itemsWithTimes.Add(new SessionPlanItemResponse
+                {
+                    Id = spi.Id,
+                    Task = MapTaskToDTO(spi.Task),
+                    Order = spi.Order,
+                    GroupNumber = spi.GroupNumber,
+                    Reasoning = spi.Reasoning,
+                    StartTime = string.Empty, // No start time for completed tasks
+                    EndTime = string.Empty    // No end time for completed tasks
+                });
+            }
+            
+            // Calculate total time only from active (non-completed) tasks
+            var totalEstimatedMinutes = activeItems.Sum(spi => spi.Task.EstimatedMinutes);
             
             var response = new SessionPlanResponse
             {
@@ -215,7 +186,7 @@ namespace ContextManager.API.Services
                 LastModifiedAt = sessionPlan.LastModifiedAt,
                 IsCustomized = sessionPlan.IsCustomized,
                 Items = itemsWithTimes,
-                TotalEstimatedMinutes = itemsWithTimes.Sum(item => item.Task.EstimatedMinutes)
+                TotalEstimatedMinutes = totalEstimatedMinutes // Only count active tasks
             };
             
             return response;
