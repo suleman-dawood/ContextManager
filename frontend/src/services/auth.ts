@@ -11,7 +11,6 @@ export const saveAuth = (authData: AuthResponse | any): void => {
   const name = authData.name || authData.Name;
   
   if (!token) {
-    console.error('No token found in auth response:', authData);
     throw new Error('Invalid authentication response');
   }
   
@@ -21,10 +20,6 @@ export const saveAuth = (authData: AuthResponse | any): void => {
     email: email,
     name: name
   }));
-  
-  // Verify token was saved
-  const savedToken = localStorage.getItem('token');
-  console.log('Token saved to localStorage:', savedToken ? 'Yes' : 'No', savedToken?.substring(0, 20) + '...');
 };
 
 /**

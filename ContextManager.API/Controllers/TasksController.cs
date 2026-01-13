@@ -149,7 +149,11 @@ namespace ContextManager.API.Controllers
             await _db.SaveChangesAsync();
 
             // Load context for response
-            await _db.Entry(task).Reference(t => t.Context).LoadAsync();
+            var context = await _db.Contexts.FindAsync(task.ContextId);
+            if (context == null)
+            {
+                return BadRequest(new { message = "Context not found" });
+            }
 
             return CreatedAtAction(
                 nameof(GetTask),
@@ -159,8 +163,8 @@ namespace ContextManager.API.Controllers
                     Id = task.Id,
                     UserId = task.UserId,
                     ContextId = task.ContextId,
-                    ContextName = task.Context.Name,
-                    ContextColor = task.Context.Color,
+                    ContextName = context.Name,
+                    ContextColor = context.Color,
                     Title = task.Title,
                     Description = task.Description,
                     EstimatedMinutes = task.EstimatedMinutes,

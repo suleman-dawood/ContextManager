@@ -31,7 +31,6 @@ export const Login = () => {
     setError('');
     try {
       const response = await authApi.login(loginData);
-      console.log('Login response:', response); // Debug log
       if (response && response.token) {
         saveAuth(response);
         navigate('/dashboard');
@@ -39,7 +38,6 @@ export const Login = () => {
         setError('Invalid response from server');
       }
     } catch (err: any) {
-      console.error('Login error:', err); // Debug log
       const errorMessage = err.response?.data?.message || err.message || 'Login failed';
       setError(errorMessage);
     } finally {

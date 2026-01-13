@@ -36,16 +36,13 @@ export const Dashboard = () => {
   }, [navigate, user]);
 
   const loadData = async () => {
-    // Verify token exists before making requests
     const token = localStorage.getItem('token');
     if (!token) {
-      console.error('No token found, redirecting to login');
       navigate('/login');
       return;
     }
     
     try {
-      console.log('Loading data with token:', token.substring(0, 20) + '...');
       const [contextsData, tasksData] = await Promise.all([
         contextsApi.getContexts(),
         tasksApi.getTasks()
@@ -53,7 +50,6 @@ export const Dashboard = () => {
       setContexts(contextsData);
       setTasks(tasksData);
     } catch (error) {
-      console.error('Failed to load data:', error);
       // If 401, token might be invalid - clear and redirect
       if ((error as any).response?.status === 401) {
         localStorage.removeItem('token');
