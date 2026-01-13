@@ -36,6 +36,12 @@ namespace ContextManager.API.Services
             // Get AI-generated session plan from Claude
             var aiPlan = await _claudeService.GetSessionPlanAsync(userId);
             
+            // Check if there are any tasks to plan
+            if (aiPlan.Items == null || !aiPlan.Items.Any())
+            {
+                throw new InvalidOperationException("No pending tasks available to create a session plan");
+            }
+            
             // Delete existing plan for this date if it exists
             var existingPlan = await _context.SessionPlans
                 .Include(sp => sp.Items)

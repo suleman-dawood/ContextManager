@@ -95,6 +95,8 @@ export default function ScheduleView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [pendingTasksCount, setPendingTasksCount] = useState<number>(0);
+  const [loadingCount, setLoadingCount] = useState(true);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -104,10 +106,32 @@ export default function ScheduleView() {
     })
   );
 
+  // Load pending tasks count on mount
+  useEffect(() => {
+    loadPendingTasksCount();
+  }, []);
+
   // Load session plan for selected date
   useEffect(() => {
     loadSessionPlan();
   }, [selectedDate]);
+
+  const loadPendingTasksCount = async () => {
+    setLoadingCount(true);
+    try {
+      const response = await fetch('/api/tasks/count', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const data = await response.json();
+      setPendingTasksCount(data.count || 0);
+    } catch (err) {
+      console.error('Failed to load pending tasks count', err);
+    } finally {
+      setLoadingCount(false);
+    }
+  };
 
   const loadSessionPlan = async () => {
     setLoading(true);
@@ -130,12 +154,22 @@ export default function ScheduleView() {
 
   // Generate new session plan
   const handleGeneratePlan = async () => {
+    // Refresh task count before generating
+    await loadPendingTasksCount();
+    
+    if (pendingTasksCount === 0) {
+      setError('No pending tasks available to create a session plan');
+      return;
+    }
+
     setGenerating(true);
     setError(null);
     try {
       const dateStr = selectedDate.toISOString().split('T')[0];
       const plan = await sessionPlanApi.generateSessionPlan({ planDate: dateStr });
       setSessionPlan(plan);
+      // Refresh task count after generating
+      await loadPendingTasksCount();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to generate session plan');
       console.error(err);
@@ -194,14 +228,18 @@ export default function ScheduleView() {
     setSelectedDate(new Date());
   };
 
-  // Format date for display
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+  // Handle date change from input
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = new Date(e.target.value + 'T00:00:00');
+    setSelectedDate(newDate);
+  };
+
+  // Format date for input value (YYYY-MM-DD)
+  const formatDateForInput = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   // Calculate total time
@@ -216,10 +254,12 @@ export default function ScheduleView() {
           <button className="btn btn-icon" onClick={handlePreviousDay}>
             ←
           </button>
-          <div className="date-display">
-            <Calendar size={20} />
-            <span>{formatDate(selectedDate)}</span>
-          </div>
+          <input
+            type="date"
+            className="date-picker"
+            value={formatDateForInput(selectedDate)}
+            onChange={handleDateChange}
+          />
           <button className="btn btn-icon" onClick={handleNextDay}>
             →
           </button>
@@ -228,14 +268,25 @@ export default function ScheduleView() {
           </button>
         </div>
 
-        <button
-          className="btn btn-primary"
-          onClick={handleGeneratePlan}
-          disabled={generating}
-        >
-          <RefreshCw size={18} className={generating ? 'spinning' : ''} />
-          {generating ? 'Generating...' : 'Generate Plan'}
-        </button>
+        <div className="header-actions">
+          <div className="task-count-badge">
+            {loadingCount ? (
+              <span>Loading...</span>
+            ) : (
+              <span>
+                {pendingTasksCount} {pendingTasksCount === 1 ? 'task' : 'tasks'} available
+              </span>
+            )}
+          </div>
+          <button
+            className="btn btn-primary"
+            onClick={handleGeneratePlan}
+            disabled={generating || pendingTasksCount === 0}
+          >
+            <RefreshCw size={18} className={generating ? 'spinning' : ''} />
+            {generating ? 'Generating...' : 'Generate Plan'}
+          </button>
+        </div>
       </div>
 
       {error && <div className="error-message">{error}</div>}

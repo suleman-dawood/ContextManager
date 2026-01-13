@@ -21,16 +21,42 @@
   gap: 0.5rem;
 }
 
-.date-display {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+.date-picker {
+  padding: 0.75rem 1rem;
   background: var(--white);
   border: 2px solid var(--border-color);
   color: var(--black);
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.date-picker:hover {
+  border-color: var(--black);
+}
+
+.date-picker:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.task-count-badge {
+  padding: 0.75rem 1.5rem;
+  background: var(--accent-yellow);
+  border: 2px solid var(--black);
+  color: var(--black);
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .btn-icon {

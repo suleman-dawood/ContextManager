@@ -38,6 +38,14 @@ namespace ContextManager.API.Controllers
                 var sessionPlan = await _sessionPlanService.GenerateSessionPlanAsync(userId, request.PlanDate);
                 return Ok(sessionPlan);
             }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(502, new { message = "AI service unavailable", error = ex.Message });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Failed to generate session plan", error = ex.Message });
