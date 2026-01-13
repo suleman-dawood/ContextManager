@@ -30,8 +30,8 @@ namespace ContextManager.API.Services
         /// </summary>
         public async Task<SessionPlanResponse> GenerateSessionPlanAsync(Guid userId, DateTime planDate)
         {
-            // Normalize date to start of day (remove time component)
-            planDate = planDate.Date;
+            // Normalize date to start of day in UTC (remove time component and ensure UTC)
+            planDate = DateTime.SpecifyKind(planDate.Date, DateTimeKind.Utc);
             
             // Delete existing plan for this date if it exists
             // This returns tasks back to the available pool
@@ -109,7 +109,8 @@ namespace ContextManager.API.Services
         /// </summary>
         public async Task<SessionPlanResponse?> GetSessionPlanAsync(Guid userId, DateTime planDate)
         {
-            planDate = planDate.Date;
+            // Normalize date to start of day in UTC
+            planDate = DateTime.SpecifyKind(planDate.Date, DateTimeKind.Utc);
             
             var sessionPlan = await _context.SessionPlans
                 .Include(sp => sp.Items)
@@ -204,8 +205,9 @@ namespace ContextManager.API.Services
         /// </summary>
         public async Task<List<SessionPlanResponse>> GetSessionPlansInRangeAsync(Guid userId, DateTime startDate, DateTime endDate)
         {
-            startDate = startDate.Date;
-            endDate = endDate.Date;
+            // Normalize dates to start of day in UTC
+            startDate = DateTime.SpecifyKind(startDate.Date, DateTimeKind.Utc);
+            endDate = DateTime.SpecifyKind(endDate.Date, DateTimeKind.Utc);
             
             var sessionPlans = await _context.SessionPlans
                 .Include(sp => sp.Items)

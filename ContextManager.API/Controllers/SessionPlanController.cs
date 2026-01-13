@@ -35,7 +35,11 @@ namespace ContextManager.API.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                var sessionPlan = await _sessionPlanService.GenerateSessionPlanAsync(userId, request.PlanDate);
+                // Ensure date is treated as UTC
+                var planDate = request.PlanDate.Kind == DateTimeKind.Unspecified 
+                    ? DateTime.SpecifyKind(request.PlanDate, DateTimeKind.Utc)
+                    : request.PlanDate.ToUniversalTime();
+                var sessionPlan = await _sessionPlanService.GenerateSessionPlanAsync(userId, planDate);
                 return Ok(sessionPlan);
             }
             catch (InvalidOperationException ex)
@@ -62,7 +66,11 @@ namespace ContextManager.API.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                var sessionPlan = await _sessionPlanService.GetSessionPlanAsync(userId, date);
+                // Ensure date is treated as UTC
+                var planDate = date.Kind == DateTimeKind.Unspecified 
+                    ? DateTime.SpecifyKind(date, DateTimeKind.Utc)
+                    : date.ToUniversalTime();
+                var sessionPlan = await _sessionPlanService.GetSessionPlanAsync(userId, planDate);
                 
                 if (sessionPlan == null)
                 {
@@ -89,7 +97,14 @@ namespace ContextManager.API.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                var sessionPlans = await _sessionPlanService.GetSessionPlansInRangeAsync(userId, startDate, endDate);
+                // Ensure dates are treated as UTC
+                var start = startDate.Kind == DateTimeKind.Unspecified 
+                    ? DateTime.SpecifyKind(startDate, DateTimeKind.Utc)
+                    : startDate.ToUniversalTime();
+                var end = endDate.Kind == DateTimeKind.Unspecified 
+                    ? DateTime.SpecifyKind(endDate, DateTimeKind.Utc)
+                    : endDate.ToUniversalTime();
+                var sessionPlans = await _sessionPlanService.GetSessionPlansInRangeAsync(userId, start, end);
                 return Ok(sessionPlans);
             }
             catch (Exception ex)

@@ -181,7 +181,9 @@ namespace ContextManager.API.Controllers
                     EstimatedMinutes = request.EstimatedMinutes,
                     Priority = request.Priority,
                     Status = TaskStatus.Todo,
-                    DueDate = request.DueDate,
+                    DueDate = request.DueDate.HasValue 
+                        ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc) 
+                        : (DateTime?)null,
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -210,9 +212,21 @@ namespace ContextManager.API.Controllers
                 
                 return CreatedAtAction(nameof(GetTask), new { id = task.Id }, response);
             }
+            catch (DbUpdateException dbEx)
+            {
+                // Extract inner exception details for better error messages
+                var innerException = dbEx.InnerException?.Message ?? dbEx.Message;
+                return StatusCode(500, new { message = "Failed to create task", error = innerException, details = dbEx.ToString() });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Failed to create task", error = ex.Message });
+                // Include inner exception if available
+                var errorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    errorMessage += $" Inner: {ex.InnerException.Message}";
+                }
+                return StatusCode(500, new { message = "Failed to create task", error = errorMessage });
             }
         }
 
@@ -240,7 +254,9 @@ namespace ContextManager.API.Controllers
             task.EstimatedMinutes = request.EstimatedMinutes;
             task.Priority = request.Priority;
             task.Status = request.Status;
-            task.DueDate = request.DueDate;
+            task.DueDate = request.DueDate.HasValue 
+                ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc) 
+                : (DateTime?)null;
 
             if (request.Status == TaskStatus.Completed && task.CompletedAt == null)
             {

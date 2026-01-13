@@ -121,7 +121,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
             }}>
               <Sparkles size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
               AI is analyzing your task...
-            </div>
+          </div>
           )}
           
           {error && (

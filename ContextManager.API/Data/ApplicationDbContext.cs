@@ -22,6 +22,53 @@ namespace ContextManager.API.Data
         public DbSet<SessionPlanItem> SessionPlanItems { get; set; } = null!;
 
         /// <summary>
+        /// Override SaveChanges to ensure all DateTime values are UTC before saving to PostgreSQL
+        /// </summary>
+        public override int SaveChanges()
+        {
+            EnsureUtcDates();
+            return base.SaveChanges();
+        }
+
+        /// <summary>
+        /// Override SaveChangesAsync to ensure all DateTime values are UTC before saving to PostgreSQL
+        /// </summary>
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            EnsureUtcDates();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Ensures all DateTime properties are set to UTC before saving
+        /// </summary>
+        private void EnsureUtcDates()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.State == Microsoft.EntityFrameworkCore.EntityState.Added || 
+                           e.State == Microsoft.EntityFrameworkCore.EntityState.Modified);
+
+            foreach (var entry in entries)
+            {
+                foreach (var property in entry.Properties)
+                {
+                    if (property.Metadata.ClrType == typeof(DateTime) || property.Metadata.ClrType == typeof(DateTime?))
+                    {
+                        if (property.CurrentValue != null && property.CurrentValue is DateTime dateTime)
+                        {
+                            if (dateTime.Kind != DateTimeKind.Utc)
+                            {
+                                property.CurrentValue = dateTime.Kind == DateTimeKind.Unspecified
+                                    ? DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)
+                                    : dateTime.ToUniversalTime();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Configures entity relationships and seeds initial data
         /// </summary>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
