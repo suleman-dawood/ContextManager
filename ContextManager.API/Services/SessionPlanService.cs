@@ -26,23 +26,15 @@ namespace ContextManager.API.Services
 
         /// <summary>
         /// Generates a new AI-powered session plan for a specific date
-        /// If a plan already exists for that date, it will be replaced
+        /// If a plan already exists for that date, it will be replaced and its tasks returned to the pool
         /// </summary>
         public async Task<SessionPlanResponse> GenerateSessionPlanAsync(Guid userId, DateTime planDate)
         {
             // Normalize date to start of day (remove time component)
             planDate = planDate.Date;
             
-            // Get AI-generated session plan from Claude
-            var aiPlan = await _claudeService.GetSessionPlanAsync(userId);
-            
-            // Check if there are any tasks to plan
-            if (aiPlan.Items == null || !aiPlan.Items.Any())
-            {
-                throw new InvalidOperationException("No pending tasks available to create a session plan");
-            }
-            
             // Delete existing plan for this date if it exists
+            // This returns tasks back to the available pool
             var existingPlan = await _context.SessionPlans
                 .Include(sp => sp.Items)
                 .FirstOrDefaultAsync(sp => sp.UserId == userId && sp.PlanDate == planDate);
@@ -50,6 +42,17 @@ namespace ContextManager.API.Services
             if (existingPlan != null)
             {
                 _context.SessionPlans.Remove(existingPlan);
+                await _context.SaveChangesAsync();
+            }
+            
+            // Get AI-generated session plan from Claude
+            // This will now include tasks that were in the deleted plan
+            var aiPlan = await _claudeService.GetSessionPlanAsync(userId);
+            
+            // Check if there are any tasks to plan
+            if (aiPlan.Items == null || !aiPlan.Items.Any())
+            {
+                throw new InvalidOperationException("No pending tasks available to create a session plan");
             }
             
             // Create new session plan

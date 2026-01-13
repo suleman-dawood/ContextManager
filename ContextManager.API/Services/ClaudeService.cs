@@ -60,14 +60,30 @@ namespace ContextManager.API.Services
         /// AI-powered session planning - Plans an entire work session across all contexts
         /// This is the star feature: intelligently orders tasks for the day with context grouping
         /// Returns a structured plan with tasks and reasoning
+        /// Excludes completed, overdue, and already assigned tasks
         /// </summary>
         public async Task<SessionPlanResponse> GetSessionPlanAsync(Guid userId)
         {
-            // Get all pending tasks across ALL contexts
+            var now = DateTime.UtcNow;
+            
+            // Get tasks that are already assigned to any session plan
+            var assignedTaskIds = await _db.SessionPlanItems
+                .Where(spi => spi.SessionPlan.UserId == userId)
+                .Select(spi => spi.TaskId)
+                .Distinct()
+                .ToListAsync();
+            
+            // Get available tasks:
+            // - Not completed
+            // - Not overdue
+            // - Not already in a session plan
             var tasks = await _db.Tasks
                 .Include(t => t.Context)
                 .Include(t => t.User)
-                .Where(t => t.UserId == userId && t.Status != Models.TaskStatus.Completed)
+                .Where(t => t.UserId == userId 
+                    && t.Status != Models.TaskStatus.Completed
+                    && (t.DueDate == null || t.DueDate >= now)
+                    && !assignedTaskIds.Contains(t.Id))
                 .OrderBy(t => t.DueDate)
                 .ThenByDescending(t => t.Priority)
                 .ToListAsync();
@@ -309,7 +325,7 @@ Important:
                             ContextColor = task.Context?.Color ?? "",
                             Title = task.Title,
                             Description = task.Description,
-                            EstimatedMinutes = task.EstimatedMinutes,
+                        EstimatedMinutes = task.EstimatedMinutes,
                             Priority = task.Priority,
                             Status = task.Status,
                             DueDate = task.DueDate,

@@ -51,5 +51,5 @@ namespace ContextManager.API.Controllers
                 return StatusCode(500, new { message = "Failed to categorize task", error = ex.Message });
             }
         }
+        }
     }
-}

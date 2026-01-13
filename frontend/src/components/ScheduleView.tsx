@@ -27,9 +27,10 @@ interface SortableTaskItemProps {
   isFirstInGroup: boolean;
   contextName: string;
   contextColor: string;
+  onRemove: (taskId: string) => void;
 }
 
-function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor }: SortableTaskItemProps) {
+function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onRemove }: SortableTaskItemProps) {
   const {
     attributes,
     listeners,
@@ -65,7 +66,16 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor }: S
         )}
         
         <div className="task-details">
-          <h4>{item.task.title}</h4>
+          <div className="task-header-row">
+            <h4>{item.task.title}</h4>
+            <button 
+              className="btn-remove-task" 
+              onClick={() => onRemove(item.task.id)}
+              title="Remove from plan"
+            >
+              ×
+            </button>
+          </div>
           {item.task.description && (
             <p className="task-description">{item.task.description}</p>
           )}
@@ -159,7 +169,7 @@ export default function ScheduleView() {
     await loadPendingTasksCount();
     
     if (pendingTasksCount === 0) {
-      setError('No pending tasks available to create a session plan');
+      setError('No available tasks to create a session plan');
       return;
     }
 
@@ -176,6 +186,34 @@ export default function ScheduleView() {
       console.error(err);
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Remove task from session plan
+  const handleRemoveTask = async (taskId: string) => {
+    if (!sessionPlan) return;
+    
+    try {
+      // Remove task from the plan by filtering it out
+      const updatedItems = sessionPlan.items.filter(item => item.task.id !== taskId);
+      
+      if (updatedItems.length === 0) {
+        // If no tasks left, delete the entire plan
+        setSessionPlan(null);
+        await loadPendingTasksCount();
+        return;
+      }
+      
+      // Update the order in the backend
+      const taskIds = updatedItems.map(item => item.task.id);
+      await sessionPlanApi.updateSessionPlanOrder(sessionPlan.id, { taskIds });
+      
+      // Reload the plan to get updated state
+      await loadSessionPlan();
+      await loadPendingTasksCount();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to remove task from plan');
+      console.error(err);
     }
   };
 
@@ -349,6 +387,7 @@ export default function ScheduleView() {
                       isFirstInGroup={isFirstInGroup}
                       contextName={item.task.contextName}
                       contextColor={item.task.contextColor}
+                      onRemove={handleRemoveTask}
                     />
                   );
                 })}

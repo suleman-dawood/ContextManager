@@ -93,7 +93,7 @@ Context_Manager/
    dotnet run
    ```
 
-   The API will start at `http://localhost:5000`
+   The API will start at `http://localhost:5000`  
    Database migrations run automatically on startup
    Swagger UI available at `http://localhost:5000`
 
@@ -186,7 +186,7 @@ POST /api/sessionplan/generate
 Authorization: Bearer <token>
 Content-Type: application/json
 
-{
+  {
   "planDate": "2024-01-15"
 }
 ```
@@ -200,7 +200,7 @@ Content-Type: application/json
 {
   "title": "Review design mockups",
   "description": "Feedback on new UI designs"
-}
+  }
 ```
 
 ## API Endpoints
