@@ -26,10 +26,14 @@ export const Dashboard = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load contexts and tasks on mount
+  // Redirect if not authenticated
   useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     loadData();
-  }, []);
+  }, [navigate, user]);
 
   const loadData = async () => {
     try {

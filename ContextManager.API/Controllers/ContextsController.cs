@@ -12,7 +12,6 @@ namespace ContextManager.API.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ContextsController : ControllerBase
     {
         private readonly ApplicationDbContext _db;

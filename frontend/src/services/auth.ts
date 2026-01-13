@@ -3,12 +3,23 @@ import type { AuthResponse, User } from '../types';
 /**
  * Save authentication data to localStorage
  */
-export const saveAuth = (authData: AuthResponse): void => {
-  localStorage.setItem('token', authData.token);
+export const saveAuth = (authData: AuthResponse | any): void => {
+  // Handle both camelCase (token) and PascalCase (Token) for compatibility
+  const token = authData.token || authData.Token;
+  const userId = authData.userId || authData.UserId;
+  const email = authData.email || authData.Email;
+  const name = authData.name || authData.Name;
+  
+  if (!token) {
+    console.error('No token found in auth response:', authData);
+    throw new Error('Invalid authentication response');
+  }
+  
+  localStorage.setItem('token', token);
   localStorage.setItem('user', JSON.stringify({
-    id: authData.userId,
-    email: authData.email,
-    name: authData.name
+    id: userId,
+    email: email,
+    name: name
   }));
 };
 
