@@ -193,8 +193,74 @@ using (var scope = app.Services.CreateScope())
         if (canConnect)
         {
             Console.WriteLine("✅ Database connection successful!");
-            db.Database.Migrate();
-            Console.WriteLine("✅ Database migrations applied successfully");
+            
+            // Get pending migrations
+            var pendingMigrations = await db.Database.GetPendingMigrationsAsync();
+            var pendingList = pendingMigrations.ToList();
+            
+            if (pendingList.Any())
+            {
+                Console.WriteLine($"📦 Found {pendingList.Count} pending migration(s):");
+                foreach (var migration in pendingList)
+                {
+                    Console.WriteLine($"   - {migration}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("✅ No pending migrations");
+            }
+            
+            // Get applied migrations
+            var appliedMigrations = await db.Database.GetAppliedMigrationsAsync();
+            var appliedList = appliedMigrations.ToList();
+            
+            if (appliedList.Any())
+            {
+                Console.WriteLine($"📋 Applied migrations ({appliedList.Count}):");
+                foreach (var migration in appliedList)
+                {
+                    Console.WriteLine($"   - {migration}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("⚠️  No migrations have been applied yet!");
+            }
+            
+            // Check if tables exist by trying to query Users table
+            bool usersTableExists = false;
+            try
+            {
+                await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
+                usersTableExists = true;
+                Console.WriteLine("✅ Users table exists");
+            }
+            catch
+            {
+                usersTableExists = false;
+                Console.WriteLine("⚠️  Users table does not exist");
+            }
+            
+            if (!usersTableExists)
+            {
+                // If tables don't exist, create them using EnsureCreated
+                // This will create all tables based on DbContext models
+                Console.WriteLine("🔄 Creating database tables (no migrations found)...");
+                await db.Database.EnsureCreatedAsync();
+                Console.WriteLine("✅ Database tables created successfully");
+            }
+            else if (pendingList.Any())
+            {
+                // Tables exist but there are pending migrations - apply them
+                Console.WriteLine("🔄 Applying pending migrations...");
+                await db.Database.MigrateAsync();
+                Console.WriteLine("✅ Migrations applied successfully");
+            }
+            else
+            {
+                Console.WriteLine("✅ Database is up to date");
+            }
         }
         else
         {
@@ -210,7 +276,7 @@ using (var scope = app.Services.CreateScope())
         {
             Console.WriteLine($"   Inner: {ex.InnerException.Message}");
         }
-        // Don't throw - let the app start anyway (migrations might just be up to date)
+        // Don't throw - let the app start anyway
     }
 }
 
