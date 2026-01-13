@@ -1,59 +1,40 @@
-/* Create Task Modal component styles - extends base classes from index.css */
+/* Create Task Modal - Task creation form */
 
-.modal-header {
-  margin-bottom: 24px;
+.create-task-modal .modal-header h2 {
+  font-size: var(--font-size-xl);
+  color: var(--black);
+  margin: 0;
 }
 
-.modal-header h2 {
-  /* Uses .heading-primary from base */
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-textarea.input {
-  resize: vertical;
-  font-family: inherit;
-}
-
-.modal-actions {
-  justify-content: flex-end;
-  margin-top: 24px;
-  padding-top: 24px;
-}
-
-/* AI categorization alert styles */
 .ai-categorization-alert {
-  /* Uses .alert and .alert-yellow from base */
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  background: var(--yellow);
+  border: 2px solid var(--black);
+  border-radius: 0;
+  color: var(--black);
 }
 
 .ai-categorization-reasoning {
-  opacity: 0.8;
+  opacity: 0.9;
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-sm);
 }
 
 .ai-categorization-confidence {
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   opacity: 0.7;
+  margin-top: var(--space-xs);
 }
 
 .ai-categorizing {
   text-align: center;
+  padding: var(--space-md);
+  color: var(--black);
 }
 
 .ai-categorizing-icon {
-  margin-right: 8px;
+  margin-right: var(--space-sm);
+  display: inline-block;
   vertical-align: middle;
 }
-
-/* Error message styles */
-.error-message {
-  /* Uses .alert and .alert-error from base */
-}
-

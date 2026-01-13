@@ -1,9 +1,9 @@
-/* App Header component styles */
+/* App Header - Navigation and branding */
 
 .app-header {
   background: var(--white);
   border-bottom: 3px solid var(--black);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -12,16 +12,15 @@
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 20px;
+  padding: var(--space-md) var(--space-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
+  gap: var(--space-lg);
 }
 
 .app-title {
-  font-size: 24px;
+  font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--black);
   margin: 0;
@@ -29,65 +28,57 @@
 
 .header-nav {
   display: flex;
-  gap: 12px;
+  gap: var(--space-md);
   align-items: center;
-  flex-wrap: wrap;
 }
 
 .nav-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
   background: var(--white);
   border: 2px solid var(--black);
   color: var(--black);
-  font-size: 14px;
+  font-size: var(--font-size-base);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   border-radius: 0;
-}
-
-.nav-btn svg {
-  color: var(--black);
+  text-decoration: none;
 }
 
 .nav-btn:hover {
-  background: var(--primary);
-  color: var(--black);
-  border-color: var(--primary);
-}
-
-.nav-btn:hover svg {
-  color: var(--black);
+  background: var(--yellow);
+  border-color: var(--black);
 }
 
 .nav-btn-logout {
-  background: var(--accent-orange);
-  color: var(--black);
-  border-color: var(--accent-orange);
+  background: var(--orange);
+  border-color: var(--black);
 }
 
 .nav-btn-logout:hover {
-  background: var(--danger);
-  border-color: var(--danger);
+  background: var(--black);
+  color: var(--orange);
+  border-color: var(--orange);
 }
 
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
-    align-items: stretch;
+    gap: var(--space-md);
   }
-
+  
   .header-nav {
+    width: 100%;
     justify-content: center;
+    flex-wrap: wrap;
   }
-
+  
   .nav-btn {
     flex: 1;
     justify-content: center;
+    min-width: 120px;
   }
 }
-
-

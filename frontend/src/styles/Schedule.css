@@ -1,2 +1,7 @@
-/* Schedule page styles - extends base classes from index.css */
+/* Schedule Page - Daily schedule view */
 
+.schedule-page {
+  padding: var(--space-xl) 0;
+  min-height: 100vh;
+  background: var(--white);
+}

@@ -1,76 +1,151 @@
-/* Analytics page styles - extends base classes from index.css */
+/* Analytics Page - Data visualization and statistics */
+
+.analytics-page {
+  padding: var(--space-xl) 0;
+  min-height: 100vh;
+  background: var(--white);
+}
+
+.analytics-header {
+  margin-bottom: var(--space-xl);
+}
 
 .analytics-header h1 {
-  margin: 16px 0 0 0;
+  margin: var(--space-md) 0 0 0;
 }
 
 .analytics-title {
-  font-size: 28px;
-  margin-bottom: 24px;
+  font-size: var(--font-size-2xl);
   color: var(--black);
+  margin-bottom: var(--space-lg);
 }
 
+/* Chart Section */
 .chart-header {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
 }
 
 .chart-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .chart-toggle-btn {
-  padding: 8px 16px;
-  font-size: 13px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  background: var(--white);
+  border: 2px solid var(--black);
+  color: var(--black);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0;
+}
+
+.chart-toggle-btn:hover,
+.chart-toggle-btn.active {
+  background: var(--yellow);
 }
 
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-  gap: 24px;
-  margin-top: 24px;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.chart-card {
+  background: var(--white);
+  border: 2px solid var(--black);
+  padding: var(--space-lg);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
 }
 
 .chart-card h2 {
-  margin-bottom: 8px;
+  font-size: var(--font-size-lg);
+  color: var(--black);
+  margin-bottom: var(--space-sm);
 }
 
 .chart-description {
-  font-size: 14px;
-  margin: 0 0 24px 0;
+  font-size: var(--font-size-base);
+  color: var(--black);
+  opacity: 0.8;
+  margin: 0 0 var(--space-lg) 0;
 }
 
 .empty-chart {
   height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--black);
+  opacity: 0.6;
+  border: 2px dashed var(--black);
+  border-radius: 0;
 }
 
+/* Summary Section */
 .summary-section {
-  margin-top: 32px;
+  margin-top: var(--space-xl);
 }
 
 .summary-section h2 {
-  margin-bottom: 20px;
-  padding-bottom: 12px;
+  font-size: var(--font-size-xl);
+  color: var(--black);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 2px solid var(--black);
 }
 
 .summary-grid {
+  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
 }
 
 .summary-card {
+  background: var(--white);
+  border: 2px solid var(--black);
   text-align: center;
-  padding: 20px;
+  padding: var(--space-lg);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .summary-value {
-  font-size: 36px;
+  font-size: var(--font-size-3xl);
   font-weight: 700;
-  color: #000000 !important; /* Text must always be black */
-  border-bottom: 3px solid var(--accent-yellow); /* Use border for accent instead */
+  color: var(--black);
+  margin-bottom: var(--space-sm);
+  border-bottom: 3px solid var(--yellow);
+  padding-bottom: var(--space-sm);
 }
 
 .summary-label {
-  font-size: 14px;
-  margin-top: 8px;
+  font-size: var(--font-size-base);
+  color: var(--black);
+  opacity: 0.8;
 }
 
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

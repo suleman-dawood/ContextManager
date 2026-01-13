@@ -1,29 +1,17 @@
-/* Edit Task Modal component styles - extends base classes from index.css */
+/* Edit Task Modal - Task editing form */
 
-.modal-header {
-  margin-bottom: 24px;
+.edit-task-modal .modal-header h2 {
+  font-size: var(--font-size-xl);
+  color: var(--black);
+  margin: 0;
 }
 
-/* .modal-header h2 uses .heading-primary from base */
-
-.form-group {
-  margin-bottom: 20px;
+.edit-task-modal .form-group {
+  margin-bottom: var(--space-lg);
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-textarea.input {
-  resize: vertical;
-  font-family: inherit;
-}
-
-.modal-actions {
+.edit-task-modal .modal-actions {
+  display: flex;
   justify-content: flex-end;
-  margin-top: 24px;
-  padding-top: 24px;
+  gap: var(--space-md);
 }
-

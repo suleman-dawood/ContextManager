@@ -1,63 +1,51 @@
-/* Tailwind CSS v4 import */
-@import "tailwindcss";
+/* Context Manager - Minimalist Design System */
+/* Clean, simple aesthetic with black text, white background, yellow and orange accents */
 
-@theme {
-  /* Custom theme colors */
-  --color-accent-yellow: #FFD700;
-  --color-accent-orange: #FF8C00;
-  --color-primary: #FFD700;
-  --color-primary-dark: #FFC107;
-  --color-gray-light: #F5F5F5;
-  --color-gray-medium: #CCCCCC;
-  --color-gray-dark: #333333;
-  
-  /* Custom shadows */
-  --shadow-minor: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+/* ========================================
+   RESET & BASE STYLES
+   ======================================== */
 
-/* Universal black text enforcement - MUST be first to override everything */
-/* This ensures ALL text is black regardless of dark mode, browser settings, or other CSS */
-*,
-*::before,
-*::after {
-  color: #000000 !important;
-}
-
-/* Reset margins and padding */
-@layer base {
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  }
 }
 
-@layer base {
 :root {
-    /* Black, white, yellow theme - CSS variables for backward compatibility */
-    --primary: #FFD700;
-    --primary-dark: #FFC107;
-    --accent-yellow: #FFD700;
-    --accent-orange: #FF8C00;
-    --black: #000000;
-    --white: #FFFFFF;
-    --gray-light: #F5F5F5;
-    --gray-medium: #CCCCCC;
-    --gray-dark: #333333;
-    --border-color: #000000;
-    /* Semantic colors using theme */
-    --success: #FFD700;
-    --warning: #FF8C00;
-    --danger: #FF8C00;
-}
-
-/* Force black text on body and all descendants */
-body,
-body *,
-body *::before,
-body *::after {
-  color: #000000 !important;
+  /* Color Palette - Minimalist black, white, yellow, orange */
+  --white: #FFFFFF;
+  --black: #000000;
+  --yellow: #FFD700;
+  --orange: #FF8C00;
+  --gray-light: #F5F5F5;
+  
+  /* Semantic Colors */
+  --bg-primary: #FFFFFF;
+  --text-primary: #000000;
+  --accent-primary: #FFD700;
+  --accent-secondary: #FF8C00;
+  --border-primary: #000000;
+  
+  /* Spacing Scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Typography */
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 36px;
+  
+  /* Shadows - Subtle and minimal */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 body {
@@ -65,329 +53,318 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: white !important;
-  color: #000000 !important;
+  background-color: var(--white);
+  color: var(--black);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
 }
 
-/* Override any dark mode styles - force light mode */
-@media (prefers-color-scheme: dark) {
-  *,
-  *::before,
-  *::after {
-    color: #000000 !important;
-  }
-  
-  body {
-    background-color: white !important;
-    color: #000000 !important;
-  }
+/* ========================================
+   TYPOGRAPHY
+   ======================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--black);
+  font-weight: 700;
+  line-height: 1.2;
 }
 
-/* Ensure all text elements default to black with high specificity */
-h1, h2, h3, h4, h5, h6, p, span, div, label, button, input, textarea, select,
-h1 *, h2 *, h3 *, h4 *, h5 *, h6 *, p *, span *, div *, label *, button *, input *, textarea *, select * {
-  color: #000000 !important;
+h1 {
+  font-size: var(--font-size-2xl);
 }
 
-/* SVG icons always black - force override */
-svg,
-svg *,
-svg path,
-svg circle,
-svg rect,
-svg line,
-svg polyline,
-svg polygon {
-  color: #000000 !important;
-  fill: #000000 !important;
-  stroke: #000000 !important;
+h2 {
+  font-size: var(--font-size-xl);
 }
 
-/* Custom utility classes - can be replaced with Tailwind equivalents */
-@layer components {
+h3 {
+  font-size: var(--font-size-lg);
+}
+
+h4 {
+  font-size: var(--font-size-md);
+}
+
+p {
+  color: var(--black);
+  margin-bottom: var(--space-md);
+}
+
+/* ========================================
+   LAYOUT
+   ======================================== */
+
 .container {
-    @apply max-w-[1200px] mx-auto p-5;
-  }
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
 }
 
-@layer components {
-  .container {
-    @apply max-w-[1200px] mx-auto;
-    padding: 20px;
-}
-
-.btn {
-    @apply px-5 py-2.5 border-2 border-black rounded-none text-sm font-semibold cursor-pointer transition-all inline-flex items-center gap-2;
-    box-shadow: var(--shadow-minor);
-}
-
-.btn-primary {
-    background-color: var(--color-accent-yellow);
-    @apply text-black border-black;
-}
-
-.btn-primary:hover {
-    @apply bg-black;
-    color: #000000 !important; /* Keep text black even on hover - use border/background for emphasis */
-    border-color: var(--color-accent-yellow); /* Use border instead for hover effect */
-}
-
-.btn-secondary {
-    @apply bg-white text-black border-black;
-}
-
-.btn-secondary:hover {
-    background-color: var(--color-gray-light);
-}
-
-.btn-success {
-    background-color: var(--color-accent-yellow);
-    @apply text-black border-black;
-}
-
-.btn-danger {
-    background-color: var(--color-accent-orange);
-    @apply text-black border-black;
-}
-
-.btn:disabled {
-    @apply opacity-50 cursor-not-allowed;
-}
-
-.card {
-    @apply bg-white rounded-none border-2 border-black p-6;
-    box-shadow: var(--shadow-minor);
-}
-
-.input {
-    @apply w-full p-3 border-2 border-black rounded-none text-sm bg-white text-black transition-colors;
-}
-
-.input:focus {
-    @apply outline-none;
-    border-color: var(--color-accent-yellow);
-    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
-  }
-
-  select.input {
-    @apply cursor-pointer appearance-none pr-9;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23000000' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-  }
-
-  textarea.input {
-    @apply resize-y;
-    font-family: inherit;
-  }
-
-  input[type="checkbox"] {
-    @apply w-[18px] h-[18px] cursor-pointer border-2 border-black rounded-none;
-    accent-color: var(--color-accent-yellow);
-  }
-
-  input[type="date"] {
-    @apply cursor-pointer;
-}
-
-.label {
-    @apply block mb-2 font-semibold text-black text-sm;
-}
-
-.modal-overlay {
-    @apply fixed inset-0 bg-black/70 flex items-center justify-center z-[1000];
-}
-
-.modal {
-    @apply bg-white rounded-none border-[3px] border-black p-8 max-w-[500px] w-[90%] max-h-[90vh] overflow-y-auto;
-    box-shadow: var(--shadow-medium);
-}
-
-  .priority-high {
-    color: #000000 !important; /* Changed from orange to black - text must always be black */
-    /* Use border or background to show priority instead */
-    border-left: 3px solid var(--color-accent-orange);
-  }
-
-  .priority-medium {
-    color: #000000 !important; /* Changed from yellow to black - text must always be black */
-    /* Use border or background to show priority instead */
-    border-left: 3px solid var(--color-accent-yellow);
-  }
-
-  .priority-low {
-    @apply text-black;
-    color: #000000 !important;
-  }
-}
-
-/* CRITICAL: Override ALL Tailwind text color utilities to force black */
-/* This must come after @layer components to override Tailwind classes */
-.text-white,
-.text-gray-50,
-.text-gray-100,
-.text-gray-200,
-.text-gray-300,
-.text-gray-400,
-.text-gray-500,
-.text-gray-600,
-.text-gray-700,
-.text-gray-800,
-.text-gray-900,
-.text-zinc-*,
-.text-slate-*,
-.text-neutral-*,
-.text-stone-*,
-[class*="text-"] {
-  color: #000000 !important;
-}
-
-/* Override any Tailwind classes applied via @apply */
-.btn-danger,
-.btn-danger *,
-.btn-danger::before,
-.btn-danger::after {
-  color: #000000 !important;
-}
-
-/* Common base classes for reuse across components */
-
-/* Page wrapper - base for all pages */
 .page-wrapper {
   min-height: 100vh;
   background: var(--white);
 }
 
-/* Card/Section base - common container style */
-.card-base {
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 10px 20px;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--black);
   background: var(--white);
-  border-radius: 0;
   border: 2px solid var(--black);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Header base - common header style */
-.header-base {
-  background: var(--white);
-  padding: 24px 0;
-  border-bottom: 3px solid var(--black);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Ensure header content aligns with container */
-.header-base > div {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-/* Content section base */
-.content-section {
-  background: var(--white);
   border-radius: 0;
-  border: 2px solid var(--black);
-  padding: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
 }
 
-/* Typography base */
-.text-black {
-  color: var(--black);
+.btn:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
-.text-secondary {
-  color: var(--black);
-  opacity: 0.7;
+.btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
-.text-muted {
-  color: var(--black);
-  opacity: 0.5;
+.btn-primary {
+  background: var(--yellow);
+  border-color: var(--black);
 }
 
-/* Heading styles */
-.heading-primary {
-  font-size: 24px;
-  color: var(--black);
-  margin: 0;
+.btn-primary:hover {
+  background: var(--black);
+  color: var(--yellow);
+  border-color: var(--yellow);
 }
 
-.heading-secondary {
-  font-size: 20px;
-  color: var(--black);
-  margin: 0;
+.btn-secondary {
+  background: var(--white);
+  border-color: var(--black);
 }
 
-.heading-tertiary {
-  font-size: 18px;
-  color: var(--black);
-  margin: 0;
+.btn-secondary:hover {
+  background: var(--gray-light);
 }
 
-/* Divider/separator */
-.divider-bottom {
-  border-bottom: 2px solid var(--black);
-  padding-bottom: 16px;
+.btn-danger {
+  background: var(--orange);
+  border-color: var(--black);
 }
 
-.divider-top {
-  border-top: 2px solid var(--black);
-  padding-top: 16px;
+.btn-danger:hover {
+  background: var(--black);
+  color: var(--orange);
+  border-color: var(--orange);
 }
 
-/* Loading state */
-.loading {
+.btn-small {
+  padding: 6px 12px;
+  font-size: var(--font-size-sm);
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  font-size: 18px;
-  color: var(--black);
 }
 
-/* Empty state */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--black);
-  opacity: 0.6;
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
-/* Badge base */
-.badge-base {
-  padding: 2px 8px;
-  border-radius: 0;
-  border: 1px solid var(--black);
-  font-size: 12px;
+/* ========================================
+   FORMS
+   ======================================== */
+
+.form-group {
+  margin-bottom: var(--space-lg);
+}
+
+.label {
+  display: block;
+  margin-bottom: var(--space-sm);
   font-weight: 600;
-  background: var(--white);
+  font-size: var(--font-size-base);
+  color: var(--black);
 }
 
-/* Alert/Message styles */
-.alert {
+.input,
+.textarea,
+.select {
+  width: 100%;
   padding: 12px;
-  margin-bottom: 12px;
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  color: var(--black);
+  background: var(--white);
   border: 2px solid var(--black);
   border-radius: 0;
-  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23000000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  border: 2px solid var(--black);
+  border-radius: 0;
+}
+
+input[type="date"] {
+  cursor: pointer;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+/* ========================================
+   CARDS
+   ======================================== */
+
+.card {
+  background: var(--white);
+  border: 2px solid var(--black);
+  border-radius: 0;
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   MODALS
+   ======================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--white);
+  border: 3px solid var(--black);
+  border-radius: 0;
+  padding: var(--space-xl);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  margin-bottom: var(--space-lg);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 2px solid var(--black);
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--black);
+  background: var(--white);
+  border: 1px solid var(--black);
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-yellow {
+  background: var(--yellow);
+}
+
+.badge-orange {
+  background: var(--orange);
+}
+
+/* ========================================
+   ALERTS
+   ======================================== */
+
+.alert {
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  border: 2px solid var(--black);
+  border-radius: 0;
+  font-size: var(--font-size-base);
   color: var(--black);
 }
 
 .alert-yellow {
-  background-color: #FFD700;
+  background: var(--yellow);
 }
 
 .alert-error {
-  background-color: #FF6B6B;
+  background: var(--orange);
 }
 
-/* Grid utilities */
-.grid-auto-fit {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.flex {
+  display: flex;
 }
 
 .flex-between {
@@ -399,57 +376,119 @@ svg polygon {
 .flex-center {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
-/* FINAL OVERRIDE: Force black text on ALL elements with maximum specificity */
-/* This comes last to ensure it overrides everything */
-html,
-html *,
-html *::before,
-html *::after,
-body,
-body *,
-body *::before,
-body *::after,
-[id],
-[id] *,
-[class],
-[class] *,
-[class] *::before,
-[class] *::after,
-input,
-input *,
-button,
-button *,
-span,
-span *,
-div,
-div *,
-p,
-p *,
-h1, h2, h3, h4, h5, h6,
-h1 *, h2 *, h3 *, h4 *, h5 *, h6 *,
-label,
-label *,
-textarea,
-textarea *,
-select,
-select *,
-a,
-a * {
-  color: #000000 !important;
+.grid {
+  display: grid;
 }
 
-/* Override inline style colors (though inline styles have higher specificity, this helps with CSS-in-JS) */
-[style*="color: white"],
-[style*="color: #fff"],
-[style*="color: #ffffff"],
-[style*="color: #FFF"],
-[style*="color: #FFFFFF"],
-[style*="color:rgb(255"],
-[style*="color:rgba(255"] {
-  color: #000000 !important;
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-lg);
 }
 
+.text-center {
+  text-align: center;
+}
+
+.text-bold {
+  font-weight: 700;
+}
+
+.mb-sm {
+  margin-bottom: var(--space-sm);
+}
+
+.mb-md {
+  margin-bottom: var(--space-md);
+}
+
+.mb-lg {
+  margin-bottom: var(--space-lg);
+}
+
+.mt-sm {
+  margin-top: var(--space-sm);
+}
+
+.mt-md {
+  margin-top: var(--space-md);
+}
+
+.mt-lg {
+  margin-top: var(--space-lg);
+}
+
+/* ========================================
+   STATES
+   ======================================== */
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: var(--font-size-lg);
+  color: var(--black);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px var(--space-lg);
+  color: var(--black);
+}
+
+.empty-state h3 {
+  margin-bottom: var(--space-md);
+}
+
+.empty-state p {
+  opacity: 0.7;
+  margin-bottom: var(--space-lg);
+}
+
+.error-message {
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  background: var(--orange);
+  border: 2px solid var(--black);
+  color: var(--black);
+  border-radius: 0;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--space-md);
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-auto-fit {
+    grid-template-columns: 1fr;
+  }
 }

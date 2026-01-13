@@ -1,30 +1,39 @@
-/* Task Card component styles - extends base classes from index.css */
+/* Task Card - Individual task display component */
 
 .task-card {
-  padding: 10px;
-  margin-bottom: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  background: var(--white);
+  border: 2px solid var(--black);
+  border-radius: 0;
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.task-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .task-header {
   display: flex;
   justify-content: space-between;
-  align-items: start;
-  margin-bottom: 6px;
+  align-items: flex-start;
+  margin-bottom: var(--space-sm);
 }
 
 .task-title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   flex: 1;
 }
 
 .task-title-row h3 {
-  font-size: 14px;
+  font-size: var(--font-size-base);
   font-weight: 600;
-  margin: 0;
   color: var(--black);
+  margin: 0;
 }
 
 .task-title-row h3.completed {
@@ -32,88 +41,66 @@
   opacity: 0.5;
 }
 
-.task-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.task-actions {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
 .task-description {
-  font-size: 14px;
-  margin-bottom: 12px;
+  font-size: var(--font-size-base);
   color: var(--black);
+  opacity: 0.8;
+  margin-bottom: var(--space-md);
+  line-height: 1.5;
 }
 
 .task-meta {
   display: flex;
-  gap: 16px;
+  gap: var(--space-md);
   align-items: center;
-  font-size: 13px;
-  margin-bottom: 12px;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
 }
 
 .task-meta span {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-xs);
   color: var(--black);
 }
 
-.task-meta svg,
-.task-card svg {
-  color: var(--black);
+.task-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--black);
+}
+
+.task-actions {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
 }
 
 .context-badge {
-  padding: 4px 12px;
-  border-width: 2px;
-  font-size: 12px;
-  color: var(--black);
-}
-
-.badge {
-  /* Uses .badge-base from base */
-}
-
-.btn-icon {
-  background: none;
+  padding: var(--space-xs) var(--space-md);
   border: 2px solid var(--black);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--black);
+  background: var(--white);
   border-radius: 0;
-  color: var(--black);
-  cursor: pointer;
-  padding: 4px 8px;
-  transition: all 0.2s;
-}
-
-.btn-icon:hover {
-  background: var(--accent-orange);
-  color: var(--black);
-}
-
-.btn-small {
-  padding: 5px 10px;
-  font-size: 13px;
-}
-
-.text-danger {
-  color: #000000 !important; /* Text must always be black */
-  border-left: 2px solid var(--accent-orange); /* Use border to indicate danger instead */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .status-badge {
-  padding: 2px 8px;
-  font-size: 11px;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-sm);
   font-weight: 700;
   text-transform: uppercase;
   border: 1px solid var(--black);
+  border-radius: 0;
+  letter-spacing: 0.5px;
 }
 
 .status-todo {
@@ -122,34 +109,42 @@
 }
 
 .status-inprogress {
-  background: var(--primary);
+  background: var(--yellow);
   color: var(--black);
 }
 
 .status-completed {
-  background: var(--success);
+  background: var(--gray-light);
   color: var(--black);
 }
 
-/* Dynamic styles - kept inline for context color */
-.task-card-border-left {
-  border-left: 4px solid;
+.priority-high {
+  border-left: 4px solid var(--orange);
 }
 
-.due-date-text {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.priority-medium {
+  border-left: 4px solid var(--yellow);
+}
+
+.priority-low {
+  border-left: 4px solid var(--black);
 }
 
 .due-date-overdue {
-  color: #000000 !important; /* Text must always be black */
-  font-weight: 700; /* Make it bold to indicate urgency instead of color */
-  border-left: 2px solid var(--accent-orange); /* Use border for visual indicator */
-  padding-left: 4px;
-}
-
-.due-date-normal {
   color: var(--black);
+  font-weight: 700;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--orange);
+  border: 1px solid var(--black);
 }
 
+@media (max-width: 768px) {
+  .task-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .task-actions {
+    justify-content: space-between;
+  }
+}
