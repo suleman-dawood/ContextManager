@@ -85,6 +85,7 @@ export interface CreateTaskRequest {
 }
 
 export interface UpdateTaskRequest {
+  contextId: string;
   title: string;
   description: string;
   estimatedMinutes: number;

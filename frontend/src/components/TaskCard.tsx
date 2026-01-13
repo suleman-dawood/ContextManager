@@ -71,6 +71,9 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           <Clock size={14} /> {task.estimatedMinutes}min
         </span>
         {formatDueDate(task.dueDate)}
+        <span className={`status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
+          {TaskStatus[task.status]}
+        </span>
       </div>
 
       <button className="btn btn-secondary btn-small" onClick={() => onEdit(task)}>
@@ -82,17 +85,17 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           background: var(--white);
           border-radius: 0;
           border: 2px solid var(--black);
-          padding: 16px;
-          margin-bottom: 12px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          padding: 12px;
+          margin-bottom: 8px;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .task-header {
           display: flex;
           justify-content: space-between;
           align-items: start;
-          margin-bottom: 12px;
-          padding-bottom: 12px;
+          margin-bottom: 8px;
+          padding-bottom: 8px;
           border-bottom: 1px solid var(--gray-medium);
         }
 
@@ -173,12 +176,35 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
         }
 
         .btn-small {
-          padding: 6px 12px;
-          font-size: 12px;
+          padding: 5px 10px;
+          font-size: 13px;
         }
 
         .text-danger {
           color: var(--accent-orange);
+        }
+
+        .status-badge {
+          padding: 2px 8px;
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          border: 1px solid var(--black);
+        }
+
+        .status-todo {
+          background: var(--white);
+          color: var(--black);
+        }
+
+        .status-inprogress {
+          background: var(--primary);
+          color: var(--white);
+        }
+
+        .status-completed {
+          background: var(--success);
+          color: var(--white);
         }
       `}</style>
     </div>

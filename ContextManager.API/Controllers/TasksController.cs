@@ -192,6 +192,7 @@ namespace ContextManager.API.Controllers
                 return NotFound(new { message = "Task not found" });
             }
             
+            task.ContextId = request.ContextId;
             task.Title = request.Title;
             task.Description = request.Description;
             task.EstimatedMinutes = request.EstimatedMinutes;

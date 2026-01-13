@@ -119,7 +119,8 @@ export default function ScheduleView() {
   const loadPendingTasksCount = async () => {
     setLoadingCount(true);
     try {
-      const response = await fetch('/api/tasks/count', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${apiUrl}/tasks/count`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -298,10 +299,6 @@ export default function ScheduleView() {
           <Calendar size={48} />
           <h3>No session plan for this date</h3>
           <p>Generate an AI-powered session plan to organize your tasks</p>
-          <button className="btn btn-primary" onClick={handleGeneratePlan}>
-            <Zap size={18} />
-            Generate Session Plan
-          </button>
         </div>
       ) : (
         <div className="session-plan-content">

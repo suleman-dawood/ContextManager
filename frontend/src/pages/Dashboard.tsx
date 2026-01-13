@@ -68,6 +68,7 @@ export const Dashboard = () => {
   const handleUpdateTask = async (taskId: string, updates: UpdateTaskRequest) => {
     const updatedTask = await tasksApi.updateTask(taskId, updates);
     setTasks(tasks.map(t => t.id === taskId ? updatedTask : t));
+    setEditingTask(null);
   };
 
   const handleDeleteTask = async (taskId: string) => {
@@ -82,6 +83,7 @@ export const Dashboard = () => {
     if (!task) return;
 
     const updates: UpdateTaskRequest = {
+      contextId: task.contextId,
       title: task.title,
       description: task.description,
       estimatedMinutes: task.estimatedMinutes,
@@ -164,6 +166,7 @@ export const Dashboard = () => {
       {editingTask && (
         <EditTaskModal
           task={editingTask}
+          contexts={contexts}
           onClose={() => setEditingTask(null)}
           onSubmit={handleUpdateTask}
         />

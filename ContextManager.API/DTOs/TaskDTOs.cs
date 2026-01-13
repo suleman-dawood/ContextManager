@@ -20,6 +20,7 @@ namespace ContextManager.API.DTOs
     /// </summary>
     public class UpdateTaskRequest
     {
+        public Guid ContextId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public int EstimatedMinutes { get; set; }

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import type { Task, UpdateTaskRequest } from '../types';
+import type { Task, UpdateTaskRequest, Context } from '../types';
 import { Priority, TaskStatus } from '../types';
 
 interface EditTaskModalProps {
   task: Task;
+  contexts: Context[];
   onClose: () => void;
   onSubmit: (taskId: string, updates: UpdateTaskRequest) => Promise<void>;
 }
@@ -12,7 +13,7 @@ interface EditTaskModalProps {
 /**
  * Modal for editing an existing task
  */
-export const EditTaskModal = ({ task, onClose, onSubmit }: EditTaskModalProps) => {
+export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskModalProps) => {
   const [loading, setLoading] = useState(false);
   
   // Convert ISO datetime to YYYY-MM-DD format for date input
@@ -22,6 +23,7 @@ export const EditTaskModal = ({ task, onClose, onSubmit }: EditTaskModalProps) =
   };
   
   const [formData, setFormData] = useState<UpdateTaskRequest>({
+    contextId: task.contextId,
     title: task.title,
     description: task.description,
     estimatedMinutes: task.estimatedMinutes,
@@ -75,6 +77,22 @@ export const EditTaskModal = ({ task, onClose, onSubmit }: EditTaskModalProps) =
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
+          </div>
+
+          <div className="form-group">
+            <label className="label">Context *</label>
+            <select
+              className="input"
+              value={formData.contextId}
+              onChange={(e) => setFormData({ ...formData, contextId: e.target.value })}
+              required
+            >
+              {contexts.map((context) => (
+                <option key={context.id} value={context.id}>
+                  {context.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="form-row">
