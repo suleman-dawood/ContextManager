@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { analyticsApi } from '../services/api';
 import type { ContextDistribution, CompletionRate } from '../types';
+import { AppHeader } from '../components/AppHeader';
 
 /**
  * Analytics page showing productivity insights
  */
 export const Analytics = () => {
-  const navigate = useNavigate();
   const [contextDistribution, setContextDistribution] = useState<ContextDistribution[]>([]);
   const [completionRate, setCompletionRate] = useState<CompletionRate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showPieChart, setShowPieChart] = useState(true);
 
   useEffect(() => {
     loadAnalytics();
@@ -39,39 +38,69 @@ export const Analytics = () => {
 
   return (
     <div className="analytics-page">
-      <header className="analytics-header">
-        <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
-          <ArrowLeft size={18} /> Back to Dashboard
-        </button>
-        <h1>Productivity Analytics</h1>
-      </header>
+      <AppHeader />
 
       <div className="container">
+        <h1 style={{ fontSize: '28px', marginBottom: '24px', color: 'var(--black)' }}>Productivity Analytics</h1>
         <div className="charts-grid">
           {/* Chart 1: Task Distribution by Context */}
           <div className="chart-card">
-            <h2>Tasks by Context</h2>
-            <p className="chart-description">Distribution of your tasks across different mental contexts</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div>
+                <h2>Tasks by Context</h2>
+                <p className="chart-description">Distribution of your tasks across different mental contexts</p>
+              </div>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowPieChart(!showPieChart)}
+                style={{ padding: '8px 16px', fontSize: '13px' }}
+              >
+                {showPieChart ? 'Show List' : 'Show Chart'}
+              </button>
+            </div>
             {contextDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={contextDistribution}
-                    dataKey="count"
-                    nameKey="context"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    label={({ context, count }) => `${context}: ${count}`}
-                  >
-                    {contextDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              showPieChart ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={contextDistribution}
+                      dataKey="count"
+                      nameKey="context"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      label={({ context, count }) => `${context}: ${count}`}
+                    >
+                      {contextDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div style={{ padding: '16px' }}>
+                  {contextDistribution.map((item) => (
+                    <div 
+                      key={item.context} 
+                      style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        padding: '12px', 
+                        borderBottom: '1px solid var(--border-color)',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '16px', height: '16px', background: item.color, border: '2px solid var(--black)' }}></div>
+                        <span style={{ fontWeight: 600, color: 'var(--black)' }}>{item.context}</span>
+                      </div>
+                      <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--black)' }}>{item.count}</span>
+                    </div>
+                  ))}
+                </div>
+              )
             ) : (
               <div className="empty-chart">No task data available</div>
             )}

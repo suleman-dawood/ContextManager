@@ -21,7 +21,6 @@ namespace ContextManager.API.Services
 
         /// <summary>
         /// Hashes a plain text password using SHA256
-        /// In production, consider using BCrypt or Argon2 for better security
         /// </summary>
         public string HashPassword(string password)
         {

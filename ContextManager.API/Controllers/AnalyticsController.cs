@@ -51,6 +51,7 @@ namespace ContextManager.API.Controllers
 
         /// <summary>
         /// Get completion rate over the last 7 days
+        /// Shows percentage of tasks completed on each day
         /// GET /api/analytics/completion-rate
         /// </summary>
         [HttpGet("completion-rate")]
@@ -59,17 +60,26 @@ namespace ContextManager.API.Controllers
             var userId = _authService.GetUserIdFromClaims(User);
             var sevenDaysAgo = DateTime.UtcNow.AddDays(-7).Date;
 
-            // Get all tasks from the last 7 days
+            // Get all tasks that were completed or were due in the last 7 days
             var tasks = await _db.Tasks
-                .Where(t => t.UserId == userId && t.CreatedAt >= sevenDaysAgo)
+                .Where(t => t.UserId == userId && 
+                    (t.CompletedAt >= sevenDaysAgo || 
+                     (t.DueDate.HasValue && t.DueDate.Value >= sevenDaysAgo)))
                 .ToListAsync();
 
-            // Group by date and calculate completion rate
+            // Calculate average completion rate for each day
             var completionData = Enumerable.Range(0, 7)
                 .Select(offset =>
                 {
                     var date = DateTime.UtcNow.AddDays(-6 + offset).Date;
-                    var dayTasks = tasks.Where(t => t.CreatedAt.Date == date).ToList();
+                    var nextDay = date.AddDays(1);
+                    
+                    // Tasks that were due on this day or completed on this day
+                    var dayTasks = tasks.Where(t => 
+                        (t.DueDate.HasValue && t.DueDate.Value.Date == date) ||
+                        (t.CompletedAt.HasValue && t.CompletedAt.Value.Date == date)
+                    ).Distinct().ToList();
+                    
                     var completedCount = dayTasks.Count(t => t.Status == Models.TaskStatus.Completed);
                     var totalCount = dayTasks.Count;
                     var rate = totalCount > 0 ? (double)completedCount / totalCount * 100 : 0;

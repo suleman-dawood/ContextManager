@@ -227,11 +227,12 @@
 .context-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  color: var(--white);
+  color: var(--black);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  border: 1px solid var(--black);
 }
 
 .task-header-row {
@@ -247,6 +248,32 @@
   color: var(--black);
   margin: 0;
   flex: 1;
+}
+
+.task-description {
+  color: var(--black);
+  opacity: 0.8;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.task-meta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  color: var(--black);
+  font-size: 0.875rem;
+}
+
+.time-estimate, .ai-reasoning {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--black);
+}
+
+.time-estimate svg, .ai-reasoning svg {
+  color: var(--black);
 }
 
 .btn-remove-task {

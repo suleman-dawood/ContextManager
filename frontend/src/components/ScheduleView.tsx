@@ -67,10 +67,20 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
         
         <div className="task-details">
           <div className="task-header-row">
-            <h4>{item.task.title}</h4>
+            <div>
+              <h4>{item.task.title}</h4>
+              {item.startTime && (
+                <span className="task-time-range" style={{ color: 'var(--black)', fontSize: '0.875rem', opacity: 0.8 }}>
+                  {item.startTime} - {item.endTime}
+                </span>
+              )}
+            </div>
             <button 
               className="btn-remove-task" 
-              onClick={() => onRemove(item.task.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove(item.task.id);
+              }}
               title="Remove from plan"
             >
               ×

@@ -123,7 +123,28 @@ namespace ContextManager.API.Services
                 return null;
             }
             
-            // Map to response DTO
+            // Map to response DTO with calculated start/end times
+            var orderedItems = sessionPlan.Items.OrderBy(spi => spi.Order).ToList();
+            var currentTime = new TimeSpan(9, 0, 0); // Start at 9 AM
+            
+            var itemsWithTimes = orderedItems.Select(spi =>
+            {
+                var startTime = currentTime;
+                var endTime = currentTime.Add(TimeSpan.FromMinutes(spi.Task.EstimatedMinutes));
+                currentTime = endTime;
+                
+                return new SessionPlanItemResponse
+                {
+                    Id = spi.Id,
+                    Task = MapTaskToDTO(spi.Task),
+                    Order = spi.Order,
+                    GroupNumber = spi.GroupNumber,
+                    Reasoning = spi.Reasoning,
+                    StartTime = FormatTime(startTime),
+                    EndTime = FormatTime(endTime)
+                };
+            }).ToList();
+            
             var response = new SessionPlanResponse
             {
                 Id = sessionPlan.Id,
@@ -131,21 +152,26 @@ namespace ContextManager.API.Services
                 CreatedAt = sessionPlan.CreatedAt,
                 LastModifiedAt = sessionPlan.LastModifiedAt,
                 IsCustomized = sessionPlan.IsCustomized,
-                Items = sessionPlan.Items
-                    .OrderBy(spi => spi.Order)
-                    .Select(spi => new SessionPlanItemResponse
-                    {
-                        Id = spi.Id,
-                        Task = MapTaskToDTO(spi.Task),
-                        Order = spi.Order,
-                        GroupNumber = spi.GroupNumber,
-                        Reasoning = spi.Reasoning
-                    })
-                    .ToList(),
+                Items = itemsWithTimes,
                 TotalEstimatedMinutes = sessionPlan.Items.Sum(spi => spi.Task.EstimatedMinutes)
             };
             
             return response;
+        }
+        
+        /// <summary>
+        /// Formats a TimeSpan to a readable time string (e.g., "9:00 AM")
+        /// </summary>
+        private string FormatTime(TimeSpan time)
+        {
+            var hours = time.Hours;
+            var minutes = time.Minutes;
+            var period = hours >= 12 ? "PM" : "AM";
+            
+            if (hours > 12) hours -= 12;
+            if (hours == 0) hours = 12;
+            
+            return $"{hours}:{minutes:D2} {period}";
         }
 
         /// <summary>

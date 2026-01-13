@@ -251,20 +251,20 @@ Important:
             return $@"You are an intelligent productivity assistant. Plan an optimal work session by ordering tasks across different mental contexts.
 
 Current Time: {dayOfWeek} {timeOfDay} ({DateTime.Now:HH:mm})
-Work Hours: 9:00 AM - 5:00 PM (7.5 hours available with 30-min break at 1:30 PM)
+Work Hours: 9:00 AM - 5:00 PM (8 hours available, no breaks)
 
 Available Tasks ({tasks.Count} total):
 {taskList}
 
 Instructions:
-1. Select tasks that fit within the 7.5-hour workday (450 minutes total)
+1. Select tasks that fit within the 8-hour workday (480 minutes total)
 2. Order them intelligently considering:
    - Context switching (group similar mental modes together to minimize cognitive load)
    - Time of day (meetings in afternoon, deep work in morning, admin tasks when appropriate)
    - Task priorities and deadlines (high priority and urgent tasks first)
-   - Estimated time (don't exceed work hours)
+   - Estimated time (MUST NOT exceed 480 minutes total)
 3. Group consecutive tasks by context where possible to minimize mental switching
-4. Aim for 5-10 tasks that fill ~6-7 hours (leave buffer time)
+4. Aim for tasks that fill ~7-8 hours maximum
 5. Provide brief reasoning for each task's position
 
 Respond ONLY with valid JSON in this exact format:
@@ -279,10 +279,11 @@ Respond ONLY with valid JSON in this exact format:
 
 Important:
 - taskNumber is the number from the task list above (1-{tasks.Count})
-- Total selected tasks should be ~360-420 minutes (6-7 hours)
+- Total selected tasks MUST NOT exceed 480 minutes (8 hours)
 - Order them from first to last (morning to afternoon)
 - Group by context to reduce context switching
-- Keep individual reasoning under 100 characters";
+- Keep individual reasoning under 100 characters
+- If you cannot fit all tasks, prioritize high priority and urgent tasks";
         }
 
         /// <summary>

@@ -114,6 +114,8 @@ export interface SessionPlanItem {
   order: number;
   groupNumber: number;
   reasoning: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 export interface SessionPlan {

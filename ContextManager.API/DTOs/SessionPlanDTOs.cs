@@ -95,6 +95,16 @@ namespace ContextManager.API.DTOs
         /// AI reasoning for including this task
         /// </summary>
         public string Reasoning { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// Start time for this task (e.g., "9:00 AM")
+        /// </summary>
+        public string StartTime { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// End time for this task (e.g., "10:30 AM")
+        /// </summary>
+        public string EndTime { get; set; } = string.Empty;
     }
 }
 
