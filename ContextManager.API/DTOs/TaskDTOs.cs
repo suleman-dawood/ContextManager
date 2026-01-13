@@ -2,9 +2,6 @@ using ContextManager.API.Models;
 
 namespace ContextManager.API.DTOs
 {
-    /// <summary>
-    /// Request data for creating a new task
-    /// </summary>
     public class CreateTaskRequest
     {
         public Guid ContextId { get; set; }
@@ -15,9 +12,6 @@ namespace ContextManager.API.DTOs
         public DateTime? DueDate { get; set; }
     }
 
-    /// <summary>
-    /// Request data for updating an existing task
-    /// </summary>
     public class UpdateTaskRequest
     {
         public Guid ContextId { get; set; }
@@ -29,9 +23,6 @@ namespace ContextManager.API.DTOs
         public DateTime? DueDate { get; set; }
     }
 
-    /// <summary>
-    /// Response data for a task (includes context details)
-    /// </summary>
     public class TaskResponse
     {
         public Guid Id { get; set; }
