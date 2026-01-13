@@ -3,10 +3,7 @@ using ContextManager.API.Models;
 
 namespace ContextManager.API.Data
 {
-    /// <summary>
-    /// Database context for the Context Manager application
-    /// Manages all entity relationships and database operations
-    /// </summary>
+    /// manages entity relationships and database operations
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -14,34 +11,25 @@ namespace ContextManager.API.Data
         {
         }
 
-        // Database tables (DbSets)
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Context> Contexts { get; set; } = null!;
         public DbSet<Models.Task> Tasks { get; set; } = null!;
         public DbSet<SessionPlan> SessionPlans { get; set; } = null!;
         public DbSet<SessionPlanItem> SessionPlanItems { get; set; } = null!;
 
-        /// <summary>
-        /// Override SaveChanges to ensure all DateTime values are UTC before saving to PostgreSQL
-        /// </summary>
+        /// overrriding SaveChanges to ensure all DateTime values are UTC
         public override int SaveChanges()
         {
             EnsureUtcDates();
             return base.SaveChanges();
         }
 
-        /// <summary>
-        /// Override SaveChangesAsync to ensure all DateTime values are UTC before saving to PostgreSQL
-        /// </summary>
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             EnsureUtcDates();
             return await base.SaveChangesAsync(cancellationToken);
         }
 
-        /// <summary>
-        /// Ensures all DateTime properties are set to UTC before saving
-        /// </summary>
         private void EnsureUtcDates()
         {
             var entries = ChangeTracker.Entries()
@@ -68,98 +56,84 @@ namespace ContextManager.API.Data
             }
         }
 
-        /// <summary>
-        /// Configures entity relationships and seeds initial data
-        /// </summary>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Explicitly set table names (PostgreSQL case sensitivity)
+            // explicitly setting table names due to PostgreSQL case sensitivity
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<Context>().ToTable("Contexts");
             modelBuilder.Entity<Models.Task>().ToTable("Tasks");
             modelBuilder.Entity<SessionPlan>().ToTable("SessionPlans");
             modelBuilder.Entity<SessionPlanItem>().ToTable("SessionPlanItems");
 
-            // Configure User entity
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                entity.HasIndex(e => e.Email).IsUnique(); // Email must be unique for login
+                entity.HasIndex(e => e.Email).IsUnique(); 
                 entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.PasswordHash).IsRequired();
             });
 
-            // Configure Context entity
             modelBuilder.Entity<Context>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Description).IsRequired().HasMaxLength(200);
-                entity.Property(e => e.Color).IsRequired().HasMaxLength(7); // Hex color
-                entity.Property(e => e.Icon).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Color).IsRequired().HasMaxLength(7); // hex color
+                entity.Property(e => e.Icon).IsRequired().HasMaxLength(100);
             });
 
-            // Configure Task entity
             modelBuilder.Entity<Models.Task>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
-                entity.Property(e => e.Description).HasMaxLength(1000);
+                entity.Property(e => e.Description).HasMaxLength(2000);
                 
-                // Relationship: Task belongs to User
                 entity.HasOne(t => t.User)
                     .WithMany()
                     .HasForeignKey(t => t.UserId)
-                    .OnDelete(DeleteBehavior.Cascade); // Delete tasks when user is deleted
+                    .OnDelete(DeleteBehavior.Cascade); // delete tasks when user is deleted
                 
-                // Relationship: Task belongs to Context
                 entity.HasOne(t => t.Context)
                     .WithMany()
                     .HasForeignKey(t => t.ContextId)
-                    .OnDelete(DeleteBehavior.Restrict); // Don't allow context deletion if tasks exist
+                    .OnDelete(DeleteBehavior.Restrict); // don't allow context deletion if tasks exist
             });
 
-            // Configure SessionPlan entity
             modelBuilder.Entity<SessionPlan>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                
-                // Relationship: SessionPlan belongs to User
+
                 entity.HasOne(sp => sp.User)
                     .WithMany()
                     .HasForeignKey(sp => sp.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
                 
-                // Create index for querying by user and date
+                // index for querying by user and date
                 entity.HasIndex(sp => new { sp.UserId, sp.PlanDate }).IsUnique();
             });
 
-            // Configure SessionPlanItem entity
             modelBuilder.Entity<SessionPlanItem>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Reasoning).HasMaxLength(500);
+                entity.Property(e => e.Reasoning).HasMaxLength(2000);
                 
-                // Relationship: SessionPlanItem belongs to SessionPlan
                 entity.HasOne(spi => spi.SessionPlan)
                     .WithMany(sp => sp.Items)
                     .HasForeignKey(spi => spi.SessionPlanId)
                     .OnDelete(DeleteBehavior.Cascade);
                 
-                // Relationship: SessionPlanItem references Task
-                entity.HasOne(spi => spi.Task)
+                entity.HasOne(spi => spi.Task) // many to many relationship
                     .WithMany()
                     .HasForeignKey(spi => spi.TaskId)
                     .OnDelete(DeleteBehavior.Cascade);
                 
-                // Create index for ordering
                 entity.HasIndex(spi => new { spi.SessionPlanId, spi.Order });
             });
 
-            // Seed default contexts (5 pre-defined mental modes)
+            // 5 pre-defined contexts
             modelBuilder.Entity<Context>().HasData(
                 new Context
                 {
