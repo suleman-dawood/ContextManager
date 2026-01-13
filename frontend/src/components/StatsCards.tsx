@@ -42,7 +42,7 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
 
       <div className="stat-card card-base">
         <div className="stat-icon stat-icon-orange">
-          <TrendingUp size={24} color="#FFFFFF" />
+          <TrendingUp size={24} color="#000000" />
         </div>
         <div className="stat-content">
           <div className="stat-value text-black">{completionRate}%</div>

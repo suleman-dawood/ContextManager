@@ -4,7 +4,7 @@ AI-powered task management application that organizes work by mental context. Us
 
 ## Tech Stack
 
-- **Backend:** .NET 8, PostgreSQL, Claude AI API
+- **Backend:** .NET 8, PostgreSQL, Claude Anthropic API
 - **Frontend:** React 18 + TypeScript
 
 ## Setup

@@ -1,7 +1,4 @@
--- Migration 002: Add SessionPlans and SessionPlanItems tables
--- Adds support for AI-powered session planning with user customization
 
--- Create SessionPlans table
 CREATE TABLE IF NOT EXISTS "SessionPlans" (
     "Id" uuid NOT NULL,
     "UserId" uuid NOT NULL,
@@ -13,10 +10,8 @@ CREATE TABLE IF NOT EXISTS "SessionPlans" (
     CONSTRAINT "FK_SessionPlans_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
 );
 
--- Create unique index on UserId and PlanDate (one plan per user per day)
 CREATE UNIQUE INDEX IF NOT EXISTS "IX_SessionPlans_UserId_PlanDate" ON "SessionPlans" ("UserId", "PlanDate");
 
--- Create SessionPlanItems table
 CREATE TABLE IF NOT EXISTS "SessionPlanItems" (
     "Id" uuid NOT NULL,
     "SessionPlanId" uuid NOT NULL,
@@ -29,9 +24,7 @@ CREATE TABLE IF NOT EXISTS "SessionPlanItems" (
     CONSTRAINT "FK_SessionPlanItems_Tasks_TaskId" FOREIGN KEY ("TaskId") REFERENCES "Tasks" ("Id") ON DELETE CASCADE
 );
 
--- Create index for ordering items within a session plan
 CREATE INDEX IF NOT EXISTS "IX_SessionPlanItems_SessionPlanId_Order" ON "SessionPlanItems" ("SessionPlanId", "Order");
 
--- Create index for task lookups
 CREATE INDEX IF NOT EXISTS "IX_SessionPlanItems_TaskId" ON "SessionPlanItems" ("TaskId");
 

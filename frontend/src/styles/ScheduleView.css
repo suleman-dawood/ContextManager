@@ -2,6 +2,8 @@
 
 .schedule-view {
   padding: 2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
   max-width: 1200px;
   margin: 0 auto;
   background: var(--white);
@@ -302,7 +304,7 @@
 
 .btn-remove-task:hover {
   background: var(--accent-orange);
-  color: var(--white);
+  color: var(--black);
   border-color: var(--accent-orange);
 }
 
@@ -349,6 +351,8 @@
 @media (max-width: 768px) {
   .schedule-view {
     padding: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   .schedule-header {

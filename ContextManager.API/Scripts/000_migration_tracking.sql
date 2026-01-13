@@ -1,6 +1,4 @@
--- Migration 000: Create migration tracking table
--- This table tracks which migrations have been applied
--- Must run before any other migrations
+--this table tracks which migrations have been applied
 
 CREATE TABLE IF NOT EXISTS "__Migrations" (
     "MigrationId" character varying(255) NOT NULL,

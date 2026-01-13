@@ -64,7 +64,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
 
       <div className="task-footer">
         <div className="task-meta">
-          <span className="context-badge badge-base" style={{ backgroundColor: task.contextColor }}>
+          <span className="context-badge badge-base" style={{ backgroundColor: task.contextColor, color: '#000000' }}>
             {task.contextName}
           </span>
           <span className="text-black">

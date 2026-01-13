@@ -72,7 +72,8 @@ svg {
 
 @layer components {
   .container {
-    @apply max-w-[1200px] mx-auto p-5;
+    @apply max-w-[1200px] mx-auto;
+    padding: 20px;
 }
 
 .btn {
@@ -193,9 +194,18 @@ svg {
 /* Header base - common header style */
 .header-base {
   background: var(--white);
-  padding: 24px;
+  padding: 24px 0;
   border-bottom: 3px solid var(--black);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure header content aligns with container */
+.header-base > div {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 /* Content section base */

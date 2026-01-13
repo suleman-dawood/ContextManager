@@ -10,9 +10,9 @@
 }
 
 .header-content {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -65,7 +65,7 @@
 
 .nav-btn-logout {
   background: var(--accent-orange);
-  color: var(--white);
+  color: var(--black);
   border-color: var(--accent-orange);
 }
 

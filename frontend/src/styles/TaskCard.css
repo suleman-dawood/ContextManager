@@ -95,7 +95,7 @@
 
 .btn-icon:hover {
   background: var(--accent-orange);
-  color: var(--white);
+  color: var(--black);
 }
 
 .btn-small {

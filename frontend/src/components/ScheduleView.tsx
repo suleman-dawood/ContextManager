@@ -60,7 +60,7 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
       <div className="task-content">
         {isFirstInGroup && (
           <div className="context-header" style={{ borderLeftColor: contextColor }}>
-            <span className="context-badge context-badge-dynamic" style={{ backgroundColor: contextColor }}>
+            <span className="context-badge context-badge-dynamic" style={{ backgroundColor: contextColor, color: '#000000' }}>
               {contextName}
             </span>
           </div>
