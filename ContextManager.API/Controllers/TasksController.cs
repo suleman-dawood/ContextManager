@@ -194,20 +194,20 @@ namespace ContextManager.API.Controllers
                 context = await _db.Contexts.FindAsync(request.ContextId);
                 
                 var response = new TaskResponse
-                {
-                    Id = task.Id,
-                    UserId = task.UserId,
-                    ContextId = task.ContextId,
+                    {
+                        Id = task.Id,
+                        UserId = task.UserId,
+                        ContextId = task.ContextId,
                     ContextName = context?.Name ?? "",
                     ContextColor = context?.Color ?? "",
-                    Title = task.Title,
-                    Description = task.Description,
-                    EstimatedMinutes = task.EstimatedMinutes,
-                    Priority = task.Priority,
-                    Status = task.Status,
-                    DueDate = task.DueDate,
-                    CreatedAt = task.CreatedAt,
-                    CompletedAt = task.CompletedAt
+                        Title = task.Title,
+                        Description = task.Description,
+                        EstimatedMinutes = task.EstimatedMinutes,
+                        Priority = task.Priority,
+                        Status = task.Status,
+                        DueDate = task.DueDate,
+                        CreatedAt = task.CreatedAt,
+                        CompletedAt = task.CompletedAt
                 };
                 
                 return CreatedAtAction(nameof(GetTask), new { id = task.Id }, response);

@@ -4,6 +4,8 @@
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  background: var(--white);
+  min-height: 100vh;
 }
 
 .schedule-header {
@@ -294,9 +296,9 @@
 }
 
 .btn-remove-task:hover {
-  background: var(--danger);
+  background: var(--accent-orange);
   color: var(--white);
-  border-color: var(--danger);
+  border-color: var(--accent-orange);
 }
 
 .task-description {
@@ -327,6 +329,15 @@
 
 .ai-reasoning {
   font-style: italic;
+  color: var(--black);
+}
+
+.task-time-range {
+  color: var(--black);
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+  display: block;
 }
 
 /* Responsive */

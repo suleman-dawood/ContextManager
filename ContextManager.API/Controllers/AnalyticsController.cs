@@ -27,16 +27,23 @@ namespace ContextManager.API.Controllers
 
         /// <summary>
         /// Get task distribution across contexts
-        /// GET /api/analytics/context-distribution
+        /// GET /api/analytics/context-distribution?activeOnly=false
         /// </summary>
         [HttpGet("context-distribution")]
-        public async Task<ActionResult<List<ContextDistributionResponse>>> GetContextDistribution()
+        public async Task<ActionResult<List<ContextDistributionResponse>>> GetContextDistribution([FromQuery] bool activeOnly = false)
         {
             var userId = _authService.GetUserIdFromClaims(User);
 
             // Get task counts by context
-            var distribution = await _db.Tasks
-                .Where(t => t.UserId == userId)
+            var query = _db.Tasks.Where(t => t.UserId == userId);
+            
+            // Filter out completed tasks if activeOnly is true
+            if (activeOnly)
+            {
+                query = query.Where(t => t.Status != Models.TaskStatus.Completed);
+            }
+            
+            var distribution = await query
                 .GroupBy(t => t.Context)
                 .Select(g => new ContextDistributionResponse
                 {

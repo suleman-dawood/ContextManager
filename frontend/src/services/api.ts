@@ -204,8 +204,8 @@ export const analyticsApi = {
   /**
    * Get task distribution across contexts
    */
-  getContextDistribution: async (): Promise<ContextDistribution[]> => {
-    const response = await api.get<ContextDistribution[]>('/analytics/context-distribution');
+  getContextDistribution: async (activeOnly: boolean = false): Promise<ContextDistribution[]> => {
+    const response = await api.get<ContextDistribution[]>(`/analytics/context-distribution?activeOnly=${activeOnly}`);
     return response.data;
   },
 

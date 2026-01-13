@@ -55,39 +55,42 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           </h3>
           {getPriorityBadge()}
         </div>
-        <button className="btn-icon" onClick={() => onDelete(task.id)} title="Delete task">
-          <Trash2 size={18} />
-        </button>
       </div>
 
       {task.description && (
         <p className="task-description">{task.description}</p>
       )}
 
-      <div className="task-meta">
-        <span className="context-badge" style={{ background: task.contextColor }}>
-          {task.contextName}
-        </span>
-        <span style={{ color: 'var(--black)' }}>
-          <Clock size={14} style={{ color: 'var(--black)' }} /> {task.estimatedMinutes}min
-        </span>
-        {formatDueDate(task.dueDate)}
-        <span className={`status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
-          {TaskStatus[task.status]}
-        </span>
+      <div className="task-footer">
+        <div className="task-meta">
+          <span className="context-badge" style={{ background: task.contextColor }}>
+            {task.contextName}
+          </span>
+          <span style={{ color: 'var(--black)', fontSize: '12px' }}>
+            <Clock size={12} style={{ color: 'var(--black)' }} /> {task.estimatedMinutes}min
+          </span>
+          {formatDueDate(task.dueDate)}
+          <span className={`status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
+            {TaskStatus[task.status]}
+          </span>
+        </div>
+        <div className="task-actions">
+          <button className="btn btn-secondary btn-small" onClick={() => onEdit(task)}>
+            Edit
+          </button>
+          <button className="btn-icon" onClick={() => onDelete(task.id)} title="Delete task">
+            <Trash2 size={16} />
+          </button>
+        </div>
       </div>
-
-      <button className="btn btn-secondary btn-small" onClick={() => onEdit(task)}>
-        Edit
-      </button>
 
       <style>{`
         .task-card {
           background: var(--white);
           border-radius: 0;
           border: 2px solid var(--black);
-          padding: 12px;
-          margin-bottom: 8px;
+          padding: 10px;
+          margin-bottom: 6px;
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
@@ -95,20 +98,18 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           display: flex;
           justify-content: space-between;
           align-items: start;
-          margin-bottom: 8px;
-          padding-bottom: 8px;
-          border-bottom: 1px solid var(--gray-medium);
+          margin-bottom: 6px;
         }
 
         .task-title-row {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 8px;
           flex: 1;
         }
 
         .task-title-row h3 {
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 600;
           margin: 0;
           color: var(--black);
@@ -117,6 +118,20 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
         .task-title-row h3.completed {
           text-decoration: line-through;
           opacity: 0.5;
+        }
+
+        .task-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          margin-top: 8px;
+        }
+
+        .task-actions {
+          display: flex;
+          gap: 6px;
+          align-items: center;
         }
 
         .task-description {
