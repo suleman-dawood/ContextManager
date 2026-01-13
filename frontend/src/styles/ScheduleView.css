@@ -94,8 +94,9 @@
 }
 
 .empty-state svg {
-  color: var(--gray-light);
+  color: var(--black);
   margin-bottom: 1rem;
+  opacity: 0.6;
 }
 
 .empty-state h3 {
@@ -274,7 +275,11 @@
   color: var(--black);
 }
 
-.time-estimate svg, .ai-reasoning svg {
+.time-estimate svg, .ai-reasoning svg,
+.task-meta svg,
+.empty-state-icon svg,
+.drag-instructions-icon svg,
+.drag-handle-icon svg {
   color: var(--black);
 }
 

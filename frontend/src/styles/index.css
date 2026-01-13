@@ -49,9 +49,18 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-    background-color: white;
-    color: black;
-  }
+  background-color: white;
+  color: var(--black);
+}
+
+/* Ensure all text elements default to black unless explicitly overridden */
+h1, h2, h3, h4, h5, h6, p, span, div, label, button, input, textarea, select {
+  color: var(--black);
+}
+
+/* SVG icons default to black */
+svg {
+  color: var(--black);
 }
 
 /* Custom utility classes - can be replaced with Tailwind equivalents */

@@ -24,6 +24,7 @@
   font-size: 14px;
   font-weight: 600;
   margin: 0;
+  color: var(--black);
 }
 
 .task-title-row h3.completed {
@@ -48,6 +49,7 @@
 .task-description {
   font-size: 14px;
   margin-bottom: 12px;
+  color: var(--black);
 }
 
 .task-meta {
@@ -62,9 +64,11 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  color: var(--black);
 }
 
-.task-meta svg {
+.task-meta svg,
+.task-card svg {
   color: var(--black);
 }
 
@@ -72,6 +76,7 @@
   padding: 4px 12px;
   border-width: 2px;
   font-size: 12px;
+  color: var(--black);
 }
 
 .badge {
@@ -117,12 +122,12 @@
 
 .status-inprogress {
   background: var(--primary);
-  color: var(--white);
+  color: var(--black);
 }
 
 .status-completed {
   background: var(--success);
-  color: var(--white);
+  color: var(--black);
 }
 
 /* Dynamic styles - kept inline for context color */

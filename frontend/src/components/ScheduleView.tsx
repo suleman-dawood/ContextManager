@@ -247,7 +247,6 @@ export default function ScheduleView() {
       await loadPendingTasksCount();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to remove task from plan');
-      console.error(err);
     }
   };
 
@@ -275,7 +274,6 @@ export default function ScheduleView() {
         const taskIds = newItems.map((item) => item.task.id);
         await sessionPlanApi.updateSessionPlanOrder(sessionPlan.id, { taskIds });
       } catch (err) {
-        console.error('Failed to update order:', err);
         // Revert on error
         loadSessionPlan();
       }
