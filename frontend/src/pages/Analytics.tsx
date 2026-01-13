@@ -95,7 +95,7 @@ export const Analytics = () => {
                   <Line 
                     type="monotone" 
                     dataKey="rate" 
-                    stroke="#3B82F6" 
+                    stroke="#FFD700" 
                     strokeWidth={2}
                     name="Completion Rate (%)"
                   />
@@ -136,18 +136,20 @@ export const Analytics = () => {
       <style>{`
         .analytics-page {
           min-height: 100vh;
-          background: var(--gray-50);
+          background: var(--white);
         }
 
         .analytics-header {
-          background: white;
+          background: var(--white);
           padding: 24px;
-          border-bottom: 1px solid var(--gray-200);
+          border-bottom: 3px solid var(--black);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .analytics-header h1 {
           font-size: 24px;
           margin: 16px 0 0 0;
+          color: var(--black);
         }
 
         .charts-grid {
@@ -158,21 +160,24 @@ export const Analytics = () => {
         }
 
         .chart-card {
-          background: white;
-          border-radius: 12px;
+          background: var(--white);
+          border-radius: 0;
+          border: 2px solid var(--black);
           padding: 24px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .chart-card h2 {
           font-size: 18px;
           margin: 0 0 8px 0;
+          color: var(--black);
         }
 
         .chart-description {
-          color: var(--gray-600);
+          color: var(--black);
           font-size: 14px;
           margin: 0 0 24px 0;
+          opacity: 0.7;
         }
 
         .empty-chart {
@@ -180,20 +185,25 @@ export const Analytics = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: var(--gray-600);
+          color: var(--black);
+          opacity: 0.5;
         }
 
         .summary-section {
           margin-top: 32px;
-          background: white;
-          border-radius: 12px;
+          background: var(--white);
+          border-radius: 0;
+          border: 2px solid var(--black);
           padding: 24px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .summary-section h2 {
           font-size: 18px;
           margin: 0 0 20px 0;
+          color: var(--black);
+          border-bottom: 2px solid var(--black);
+          padding-bottom: 12px;
         }
 
         .summary-grid {
@@ -205,20 +215,23 @@ export const Analytics = () => {
         .summary-card {
           text-align: center;
           padding: 20px;
-          background: var(--gray-50);
-          border-radius: 8px;
+          background: var(--white);
+          border-radius: 0;
+          border: 2px solid var(--black);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .summary-value {
           font-size: 36px;
           font-weight: 700;
-          color: var(--primary);
+          color: var(--accent-yellow);
         }
 
         .summary-label {
           font-size: 14px;
-          color: var(--gray-600);
+          color: var(--black);
           margin-top: 8px;
+          opacity: 0.7;
         }
 
         .loading {
@@ -227,7 +240,7 @@ export const Analytics = () => {
           justify-content: center;
           min-height: 100vh;
           font-size: 18px;
-          color: var(--gray-600);
+          color: var(--black);
         }
       `}</style>
     </div>

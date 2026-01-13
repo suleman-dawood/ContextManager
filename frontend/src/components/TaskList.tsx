@@ -86,13 +86,16 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
           font-size: 18px;
           font-weight: 600;
           margin-bottom: 16px;
-          color: var(--gray-700);
+          color: var(--black);
+          padding-bottom: 8px;
+          border-bottom: 2px solid var(--black);
         }
 
         .empty-state {
           text-align: center;
           padding: 60px 20px;
-          color: var(--gray-600);
+          color: var(--black);
+          opacity: 0.6;
         }
       `}</style>
     </div>

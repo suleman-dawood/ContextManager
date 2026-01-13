@@ -139,11 +139,14 @@ export const CreateTaskModal = ({ contexts, onClose, onSubmit }: CreateTaskModal
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--black);
           }
 
           .modal-header h2 {
             margin: 0;
             font-size: 24px;
+            color: var(--black);
           }
 
           .form-group {
@@ -166,6 +169,8 @@ export const CreateTaskModal = ({ contexts, onClose, onSubmit }: CreateTaskModal
             gap: 12px;
             justify-content: flex-end;
             margin-top: 24px;
+            padding-top: 24px;
+            border-top: 2px solid var(--black);
           }
         `}</style>
       </div>

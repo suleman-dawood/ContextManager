@@ -174,27 +174,30 @@ export const Dashboard = () => {
       <style>{`
         .dashboard {
           min-height: 100vh;
-          background: var(--gray-50);
+          background: var(--white);
         }
 
         .dashboard-header {
-          background: white;
+          background: var(--white);
           padding: 24px;
-          border-bottom: 1px solid var(--gray-200);
+          border-bottom: 3px solid var(--black);
           display: flex;
           justify-content: space-between;
           align-items: center;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .dashboard-header h1 {
           font-size: 24px;
           margin: 0 0 4px 0;
+          color: var(--black);
         }
 
         .dashboard-header p {
-          color: var(--gray-600);
+          color: var(--black);
           font-size: 14px;
           margin: 0;
+          opacity: 0.7;
         }
 
         .header-actions {
@@ -203,10 +206,11 @@ export const Dashboard = () => {
         }
 
         .main-content {
-          background: white;
-          border-radius: 12px;
+          background: var(--white);
+          border-radius: 0;
+          border: 2px solid var(--black);
           padding: 24px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .content-header {
@@ -214,11 +218,14 @@ export const Dashboard = () => {
           justify-content: space-between;
           align-items: center;
           margin-bottom: 24px;
+          border-bottom: 2px solid var(--black);
+          padding-bottom: 16px;
         }
 
         .content-header h2 {
           font-size: 20px;
           margin: 0;
+          color: var(--black);
         }
 
         .loading {
@@ -227,7 +234,7 @@ export const Dashboard = () => {
           justify-content: center;
           min-height: 100vh;
           font-size: 18px;
-          color: var(--gray-600);
+          color: var(--black);
         }
       `}</style>
     </div>

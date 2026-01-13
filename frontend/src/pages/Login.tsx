@@ -64,7 +64,7 @@ export const Login = () => {
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
-          <Brain size={48} color="#3B82F6" />
+          <Brain size={48} color="#FFD700" />
           <h1>Context Manager</h1>
           <p>AI-powered task management for focused work</p>
         </div>
@@ -165,17 +165,18 @@ export const Login = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--black);
           padding: 20px;
         }
 
         .login-container {
-          background: white;
-          border-radius: 16px;
+          background: var(--white);
+          border-radius: 0;
+          border: 3px solid var(--accent-yellow);
           padding: 40px;
           width: 100%;
           max-width: 400px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .login-header {
@@ -186,48 +187,59 @@ export const Login = () => {
         .login-header h1 {
           font-size: 28px;
           margin: 16px 0 8px;
-          color: var(--gray-900);
+          color: var(--black);
         }
 
         .login-header p {
-          color: var(--gray-600);
+          color: var(--black);
           font-size: 14px;
+          opacity: 0.7;
         }
 
         .auth-tabs {
           display: flex;
-          gap: 8px;
+          gap: 0;
           margin-bottom: 24px;
-          background: var(--gray-100);
-          padding: 4px;
-          border-radius: 8px;
+          background: var(--white);
+          border: 2px solid var(--black);
+          border-radius: 0;
         }
 
         .auth-tabs button {
           flex: 1;
           padding: 10px;
-          background: none;
+          background: var(--white);
           border: none;
+          border-right: 2px solid var(--black);
           font-weight: 600;
-          color: var(--gray-600);
+          color: var(--black);
           cursor: pointer;
-          border-radius: 6px;
+          border-radius: 0;
           transition: all 0.2s;
         }
 
+        .auth-tabs button:last-child {
+          border-right: none;
+        }
+
         .auth-tabs button.active {
-          background: white;
-          color: var(--gray-900);
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          background: var(--accent-yellow);
+          color: var(--black);
+        }
+
+        .auth-tabs button:hover:not(.active) {
+          background: var(--gray-light);
         }
 
         .error-message {
-          background: #FEE2E2;
-          color: #DC2626;
+          background: var(--white);
+          color: var(--accent-orange);
           padding: 12px;
-          border-radius: 8px;
+          border-radius: 0;
+          border: 2px solid var(--accent-orange);
           margin-bottom: 20px;
           font-size: 14px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         form .btn {

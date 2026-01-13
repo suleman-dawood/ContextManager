@@ -79,11 +79,12 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
 
       <style>{`
         .task-card {
-          background: white;
-          border-radius: 8px;
+          background: var(--white);
+          border-radius: 0;
+          border: 2px solid var(--black);
           padding: 16px;
           margin-bottom: 12px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .task-header {
@@ -91,6 +92,8 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           justify-content: space-between;
           align-items: start;
           margin-bottom: 12px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid var(--gray-medium);
         }
 
         .task-title-row {
@@ -104,17 +107,19 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           font-size: 16px;
           font-weight: 600;
           margin: 0;
+          color: var(--black);
         }
 
         .task-title-row h3.completed {
           text-decoration: line-through;
-          opacity: 0.6;
+          opacity: 0.5;
         }
 
         .task-description {
-          color: var(--gray-600);
+          color: var(--black);
           font-size: 14px;
           margin-bottom: 12px;
+          opacity: 0.7;
         }
 
         .task-meta {
@@ -122,8 +127,9 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           gap: 16px;
           align-items: center;
           font-size: 13px;
-          color: var(--gray-600);
+          color: var(--black);
           margin-bottom: 12px;
+          opacity: 0.8;
         }
 
         .task-meta span {
@@ -133,30 +139,37 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
         }
 
         .context-badge {
-          color: white;
+          color: var(--black);
           padding: 4px 12px;
-          border-radius: 12px;
+          border-radius: 0;
+          border: 2px solid var(--black);
           font-size: 12px;
           font-weight: 600;
+          background: var(--white);
         }
 
         .badge {
           padding: 2px 8px;
-          border-radius: 4px;
+          border-radius: 0;
+          border: 1px solid var(--black);
           font-size: 12px;
           font-weight: 600;
+          background: var(--white);
         }
 
         .btn-icon {
           background: none;
-          border: none;
-          color: var(--gray-600);
+          border: 2px solid var(--black);
+          border-radius: 0;
+          color: var(--black);
           cursor: pointer;
-          padding: 4px;
+          padding: 4px 8px;
+          transition: all 0.2s;
         }
 
         .btn-icon:hover {
-          color: var(--danger);
+          background: var(--accent-orange);
+          color: var(--white);
         }
 
         .btn-small {
@@ -165,7 +178,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
         }
 
         .text-danger {
-          color: var(--danger);
+          color: var(--accent-orange);
         }
       `}</style>
     </div>

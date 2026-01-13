@@ -38,31 +38,39 @@ export const ContextFilter = ({
       <style>{`
         .context-filter {
           display: flex;
-          gap: 8px;
-          border-bottom: 1px solid var(--gray-200);
+          gap: 0;
+          border-bottom: 2px solid var(--black);
           margin-bottom: 24px;
           overflow-x: auto;
         }
 
         .filter-btn {
-          background: none;
+          background: var(--white);
           border: none;
+          border-right: 2px solid var(--black);
           padding: 12px 20px;
           font-size: 14px;
           font-weight: 600;
-          color: var(--gray-600);
+          color: var(--black);
           cursor: pointer;
           border-bottom: 3px solid transparent;
           transition: all 0.2s;
           white-space: nowrap;
+          border-radius: 0;
+        }
+
+        .filter-btn:last-child {
+          border-right: none;
         }
 
         .filter-btn:hover {
-          color: var(--gray-900);
+          background: var(--gray-light);
         }
 
         .filter-btn.active {
-          color: var(--gray-900);
+          background: var(--accent-yellow);
+          color: var(--black);
+          border-bottom-color: var(--black);
         }
       `}</style>
     </div>

@@ -20,8 +20,8 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
   return (
     <div className="stats-cards">
       <div className="stat-card">
-        <div className="stat-icon" style={{ background: '#DBEAFE' }}>
-          <Clock size={24} color="#3B82F6" />
+        <div className="stat-icon" style={{ background: '#FFD700' }}>
+          <Clock size={24} color="#000000" />
         </div>
         <div className="stat-content">
           <div className="stat-value">{totalTasks}</div>
@@ -30,8 +30,8 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
       </div>
 
       <div className="stat-card">
-        <div className="stat-icon" style={{ background: '#D1FAE5' }}>
-          <CheckCircle2 size={24} color="#10B981" />
+        <div className="stat-icon" style={{ background: '#FFD700' }}>
+          <CheckCircle2 size={24} color="#000000" />
         </div>
         <div className="stat-content">
           <div className="stat-value">{completedTasks}</div>
@@ -40,8 +40,8 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
       </div>
 
       <div className="stat-card">
-        <div className="stat-icon" style={{ background: '#FEF3C7' }}>
-          <TrendingUp size={24} color="#F59E0B" />
+        <div className="stat-icon" style={{ background: '#FF8C00' }}>
+          <TrendingUp size={24} color="#FFFFFF" />
         </div>
         <div className="stat-content">
           <div className="stat-value">{completionRate}%</div>
@@ -50,8 +50,8 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
       </div>
 
       <div className="stat-card">
-        <div className="stat-icon" style={{ background: '#E0E7FF' }}>
-          <Clock size={24} color="#8B5CF6" />
+        <div className="stat-icon" style={{ background: '#FFD700' }}>
+          <Clock size={24} color="#000000" />
         </div>
         <div className="stat-content">
           <div className="stat-value">{Math.round(totalMinutes / 60)}h</div>
@@ -68,19 +68,21 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
         }
 
         .stat-card {
-          background: white;
-          border-radius: 12px;
+          background: var(--white);
+          border-radius: 0;
+          border: 2px solid var(--black);
           padding: 20px;
           display: flex;
           align-items: center;
           gap: 16px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .stat-icon {
           width: 48px;
           height: 48px;
-          border-radius: 12px;
+          border-radius: 0;
+          border: 2px solid var(--black);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -93,14 +95,15 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
         .stat-value {
           font-size: 28px;
           font-weight: 700;
-          color: var(--gray-900);
+          color: var(--black);
           line-height: 1;
           margin-bottom: 4px;
         }
 
         .stat-label {
           font-size: 14px;
-          color: var(--gray-600);
+          color: var(--black);
+          opacity: 0.7;
         }
       `}</style>
     </div>

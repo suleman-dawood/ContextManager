@@ -55,18 +55,20 @@ export const Settings = () => {
       <style>{`
         .settings-page {
           min-height: 100vh;
-          background: var(--gray-50);
+          background: var(--white);
         }
 
         .settings-header {
-          background: white;
+          background: var(--white);
           padding: 24px;
-          border-bottom: 1px solid var(--gray-200);
+          border-bottom: 3px solid var(--black);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .settings-header h1 {
           font-size: 24px;
           margin: 16px 0 0 0;
+          color: var(--black);
         }
 
         .settings-content {
@@ -75,22 +77,27 @@ export const Settings = () => {
         }
 
         .settings-section {
-          background: white;
-          border-radius: 12px;
+          background: var(--white);
+          border-radius: 0;
+          border: 2px solid var(--black);
           padding: 32px;
           margin-bottom: 24px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .settings-section h2 {
           font-size: 20px;
           margin: 0 0 24px 0;
+          color: var(--black);
+          border-bottom: 2px solid var(--black);
+          padding-bottom: 12px;
         }
 
         .settings-section p {
-          color: var(--gray-600);
+          color: var(--black);
           line-height: 1.6;
           margin-bottom: 16px;
+          opacity: 0.8;
         }
 
         .profile-info {
@@ -104,30 +111,34 @@ export const Settings = () => {
           align-items: center;
           gap: 16px;
           padding: 16px;
-          background: var(--gray-50);
-          border-radius: 8px;
+          background: var(--white);
+          border-radius: 0;
+          border: 2px solid var(--black);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .info-item > svg {
-          color: var(--primary);
+          color: var(--accent-yellow);
         }
 
         .info-label {
           font-size: 13px;
-          color: var(--gray-600);
+          color: var(--black);
           margin-bottom: 4px;
+          opacity: 0.7;
         }
 
         .info-value {
           font-size: 16px;
           font-weight: 600;
-          color: var(--gray-900);
+          color: var(--black);
         }
 
         .version {
           font-size: 12px;
-          color: var(--gray-500);
+          color: var(--black);
           margin: 0;
+          opacity: 0.5;
         }
       `}</style>
     </div>

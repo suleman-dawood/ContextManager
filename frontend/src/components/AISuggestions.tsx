@@ -108,11 +108,13 @@ export const AISuggestions = ({ contextId }: AISuggestionsProps) => {
         }
 
         .error-message {
-          background: #FEE2E2;
-          color: #DC2626;
+          background: var(--white);
+          color: var(--accent-orange);
           padding: 12px;
-          border-radius: 8px;
+          border-radius: 0;
+          border: 2px solid var(--accent-orange);
           margin-top: 12px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .suggestions-list {
@@ -125,11 +127,13 @@ export const AISuggestions = ({ contextId }: AISuggestionsProps) => {
         }
 
         .suggestion-card {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+          background: var(--accent-yellow);
+          color: var(--black);
           padding: 20px;
-          border-radius: 12px;
+          border-radius: 0;
+          border: 3px solid var(--black);
           margin-bottom: 16px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .suggestion-header {
@@ -143,9 +147,10 @@ export const AISuggestions = ({ contextId }: AISuggestionsProps) => {
 
         .confidence-bar {
           position: relative;
-          background: rgba(255, 255, 255, 0.2);
+          background: var(--white);
+          border: 2px solid var(--black);
           height: 8px;
-          border-radius: 4px;
+          border-radius: 0;
           overflow: hidden;
         }
 
@@ -154,7 +159,7 @@ export const AISuggestions = ({ contextId }: AISuggestionsProps) => {
           top: 0;
           left: 0;
           height: 100%;
-          background: rgba(255, 255, 255, 0.8);
+          background: var(--black);
           transition: width 0.3s;
         }
 
