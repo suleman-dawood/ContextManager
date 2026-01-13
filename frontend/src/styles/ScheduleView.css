@@ -2,8 +2,6 @@
 
 .schedule-view {
   padding: 2rem;
-  padding-left: 2rem;
-  padding-right: 2rem;
   max-width: 1200px;
   margin: 0 auto;
   background: var(--white);
@@ -150,11 +148,11 @@
 }
 
 .summary-item .value.customized {
-  color: var(--accent-yellow);
+  color: #000000 !important; /* Text must always be black */
 }
 
 .summary-item .value.ai-generated {
-  color: var(--primary);
+  color: #000000 !important; /* Text must always be black */
 }
 
 /* Drag Instructions */
@@ -351,8 +349,6 @@
 @media (max-width: 768px) {
   .schedule-view {
     padding: 1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
   }
 
   .schedule-header {

@@ -104,7 +104,8 @@
 }
 
 .text-danger {
-  color: var(--accent-orange);
+  color: #000000 !important; /* Text must always be black */
+  border-left: 2px solid var(--accent-orange); /* Use border to indicate danger instead */
 }
 
 .status-badge {
@@ -142,7 +143,10 @@
 }
 
 .due-date-overdue {
-  color: var(--accent-orange);
+  color: #000000 !important; /* Text must always be black */
+  font-weight: 700; /* Make it bold to indicate urgency instead of color */
+  border-left: 2px solid var(--accent-orange); /* Use border for visual indicator */
+  padding-left: 4px;
 }
 
 .due-date-normal {

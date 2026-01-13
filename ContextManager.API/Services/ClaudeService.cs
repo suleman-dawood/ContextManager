@@ -7,10 +7,7 @@ using ContextManager.API.Models;
 
 namespace ContextManager.API.Services
 {
-    /// <summary>
-    /// Service for interacting with Claude API for AI-powered task intelligence
-    /// Handles task categorization and session planning
-    /// </summary>
+    /// service for interacting with Claude API
     public class ClaudeService
     {
         private readonly HttpClient _httpClient;
@@ -20,25 +17,19 @@ namespace ContextManager.API.Services
         public ClaudeService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ApplicationDbContext db)
         {
             _httpClient = httpClientFactory.CreateClient();
-            // Try environment variable first (Railway), then configuration
             _apiKey = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
                 ?? configuration["Anthropic:ApiKey"] 
                 ?? throw new InvalidOperationException("Anthropic API key not configured. Set ANTHROPIC_API_KEY environment variable or configure in appsettings.json");
             _db = db;
             
-            // Set up HTTP client for Claude API
             _httpClient.BaseAddress = new Uri("https://api.anthropic.com/");
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _apiKey);
             _httpClient.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
         }
 
-        /// <summary>
-        /// AI-powered context categorization - Categorizes a task into the appropriate mental context
-        /// This is a core feature: intelligent task classification using Claude AI
-        /// </summary>
+        /// categorizes a task into the appropriate context
         public async Task<ContextCategorizationResponse> CategorizeTaskAsync(string title, string description)
         {
-            // Get all available contexts
             var contexts = await _db.Contexts.ToListAsync();
             
             if (!contexts.Any())
@@ -46,37 +37,26 @@ namespace ContextManager.API.Services
                 throw new InvalidOperationException("No contexts available in database");
             }
 
-            // Build prompt for Claude to categorize the task
             var prompt = BuildCategorizationPrompt(title, description, contexts);
-
-            // Call Claude API
             var claudeResponse = await CallClaudeApiAsync(prompt);
 
-            // Parse and return the categorization
             return ParseCategorizationResponse(claudeResponse, contexts);
         }
 
-        /// <summary>
-        /// AI-powered session planning - Plans an entire work session across all contexts
-        /// This is the star feature: intelligently orders tasks for the day with context grouping
-        /// Returns a structured plan with tasks and reasoning
-        /// Excludes completed, overdue, and already assigned tasks
-        /// </summary>
+        /// intelligently orders tasks for the day with context grouping
+        /// returns a structured plan with tasks and reasoning
         public async Task<SessionPlanResponse> GetSessionPlanAsync(Guid userId)
         {
             var now = DateTime.UtcNow;
             
-            // Get tasks that are already assigned to any session plan
+            // tasks that are already assigned to any session plan
             var assignedTaskIds = await _db.SessionPlanItems
                 .Where(spi => spi.SessionPlan.UserId == userId)
                 .Select(spi => spi.TaskId)
                 .Distinct()
                 .ToListAsync();
             
-            // Get available tasks:
-            // - Not completed
-            // - Not overdue
-            // - Not already in a session plan
+            // available tasks
             var tasks = await _db.Tasks
                 .Include(t => t.Context)
                 .Where(t => t.UserId == userId 
@@ -92,21 +72,14 @@ namespace ContextManager.API.Services
                 return new SessionPlanResponse { Items = new List<SessionPlanItemResponse>() };
             }
 
-            // Build session planning prompt
             var prompt = BuildSessionPlanningPrompt(tasks);
-
-            // Call Claude API
             var claudeResponse = await CallClaudeApiAsync(prompt);
-
-            // Parse session plan
             var sessionPlan = ParseSessionPlanResponse(claudeResponse, tasks);
             
-            // Validate total time doesn't exceed 8 hours (480 minutes)
             var totalMinutes = sessionPlan.Items.Sum(item => item.Task.EstimatedMinutes);
             if (totalMinutes > 480)
             {
-                // If Claude returned too many tasks, trim to fit within 480 minutes
-                // Prioritize keeping high priority tasks and those with due dates
+                // trim to fit within 480 minutes
                 var originalItems = sessionPlan.Items.ToList();
                 var sortedItems = originalItems
                     .OrderByDescending(item => item.Task.Priority)
@@ -125,22 +98,18 @@ namespace ContextManager.API.Services
                     }
                 }
                 
-                // Preserve original order from Claude's response for remaining items
+                // preserving original order from Claude's response for remaining items
                 var trimmedTaskIds = trimmedItems.Select(item => item.Task.Id).ToHashSet();
                 sessionPlan.Items = originalItems
                     .Where(item => trimmedTaskIds.Contains(item.Task.Id))
                     .ToList();
                 
-                // Recalculate total
                 sessionPlan.TotalEstimatedMinutes = sessionPlan.Items.Sum(item => item.Task.EstimatedMinutes);
             }
 
             return sessionPlan;
         }
 
-        /// <summary>
-        /// Makes the HTTP request to Claude API
-        /// </summary>
         private async Task<string> CallClaudeApiAsync(string prompt)
         {
             var requestBody = new
@@ -173,7 +142,7 @@ namespace ContextManager.API.Services
 
             var responseJson = await response.Content.ReadAsStringAsync();
             
-            // Parse Claude's response format
+            // parse Claude's response 
             using var doc = JsonDocument.Parse(responseJson);
             var contentArray = doc.RootElement.GetProperty("content");
             var textContent = contentArray[0].GetProperty("text").GetString();
@@ -181,9 +150,6 @@ namespace ContextManager.API.Services
             return textContent ?? throw new InvalidOperationException("No text content in Claude response");
         }
 
-        /// <summary>
-        /// Builds a prompt for Claude to categorize a task into the appropriate context
-        /// </summary>
         private string BuildCategorizationPrompt(string title, string description, List<Context> contexts)
         {
             var contextList = string.Join("\n", contexts.Select((c, i) => 
@@ -204,7 +170,7 @@ Available Contexts:
 Instructions:
 1. Analyze the task title and description
 2. Determine which context best matches the mental mode required for this task
-3. Consider the type of work: deep focus, collaboration, administrative, creative, or learning
+3. Consider the type of work: deep focus, meetings, administrative, creative, or learning
 4. Provide a confidence score (0.0 to 1.0) and brief reasoning
 
 Respond ONLY with valid JSON in this exact format:
@@ -220,9 +186,6 @@ Important:
 - Keep reasoning under 150 characters";
         }
 
-        /// <summary>
-        /// Parses Claude's context categorization response
-        /// </summary>
         private ContextCategorizationResponse ParseCategorizationResponse(string claudeResponse, List<Context> contexts)
         {
             try
@@ -257,9 +220,6 @@ Important:
             }
         }
 
-        /// <summary>
-        /// Builds a prompt for Claude to plan an entire work session
-        /// </summary>
         private string BuildSessionPlanningPrompt(List<Models.Task> tasks)
         {
             var currentHour = DateTime.Now.Hour;
@@ -319,9 +279,6 @@ Important:
 - If you cannot fit all tasks, prioritize high priority and urgent tasks";
         }
 
-        /// <summary>
-        /// Parses Claude's session planning response
-        /// </summary>
         private SessionPlanResponse ParseSessionPlanResponse(string claudeResponse, List<Models.Task> tasks)
         {
             try
@@ -359,7 +316,7 @@ Important:
                             ContextColor = task.Context?.Color ?? "",
                             Title = task.Title,
                             Description = task.Description,
-                        EstimatedMinutes = task.EstimatedMinutes,
+                            EstimatedMinutes = task.EstimatedMinutes,
                             Priority = task.Priority,
                             Status = task.Status,
                             DueDate = task.DueDate,
@@ -367,7 +324,7 @@ Important:
                             CompletedAt = task.CompletedAt
                         },
                         Order = items.Count,
-                        GroupNumber = 0, // Will be calculated later based on context grouping
+                        GroupNumber = 0,
                         Reasoning = reasoning
                     });
                 }

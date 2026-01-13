@@ -16,7 +16,15 @@
   --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Modern, clean styling for Context Manager */
+/* Universal black text enforcement - MUST be first to override everything */
+/* This ensures ALL text is black regardless of dark mode, browser settings, or other CSS */
+*,
+*::before,
+*::after {
+  color: #000000 !important;
+}
+
+/* Reset margins and padding */
 @layer base {
 * {
   margin: 0;
@@ -44,23 +52,55 @@
     --danger: #FF8C00;
 }
 
+/* Force black text on body and all descendants */
+body,
+body *,
+body *::before,
+body *::after {
+  color: #000000 !important;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: white;
-  color: var(--black);
+  background-color: white !important;
+  color: #000000 !important;
 }
 
-/* Ensure all text elements default to black unless explicitly overridden */
-h1, h2, h3, h4, h5, h6, p, span, div, label, button, input, textarea, select {
-  color: var(--black);
+/* Override any dark mode styles - force light mode */
+@media (prefers-color-scheme: dark) {
+  *,
+  *::before,
+  *::after {
+    color: #000000 !important;
+  }
+  
+  body {
+    background-color: white !important;
+    color: #000000 !important;
+  }
 }
 
-/* SVG icons default to black */
-svg {
-  color: var(--black);
+/* Ensure all text elements default to black with high specificity */
+h1, h2, h3, h4, h5, h6, p, span, div, label, button, input, textarea, select,
+h1 *, h2 *, h3 *, h4 *, h5 *, h6 *, p *, span *, div *, label *, button *, input *, textarea *, select * {
+  color: #000000 !important;
+}
+
+/* SVG icons always black - force override */
+svg,
+svg *,
+svg path,
+svg circle,
+svg rect,
+svg line,
+svg polyline,
+svg polygon {
+  color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
 }
 
 /* Custom utility classes - can be replaced with Tailwind equivalents */
@@ -88,7 +128,8 @@ svg {
 
 .btn-primary:hover {
     @apply bg-black;
-    color: var(--color-accent-yellow);
+    color: #000000 !important; /* Keep text black even on hover - use border/background for emphasis */
+    border-color: var(--color-accent-yellow); /* Use border instead for hover effect */
 }
 
 .btn-secondary {
@@ -106,7 +147,7 @@ svg {
 
 .btn-danger {
     background-color: var(--color-accent-orange);
-    @apply text-white border-black;
+    @apply text-black border-black;
 }
 
 .btn:disabled {
@@ -163,16 +204,50 @@ svg {
 }
 
   .priority-high {
-    color: var(--color-accent-orange);
+    color: #000000 !important; /* Changed from orange to black - text must always be black */
+    /* Use border or background to show priority instead */
+    border-left: 3px solid var(--color-accent-orange);
   }
 
   .priority-medium {
-    color: var(--color-accent-yellow);
+    color: #000000 !important; /* Changed from yellow to black - text must always be black */
+    /* Use border or background to show priority instead */
+    border-left: 3px solid var(--color-accent-yellow);
   }
 
   .priority-low {
     @apply text-black;
+    color: #000000 !important;
   }
+}
+
+/* CRITICAL: Override ALL Tailwind text color utilities to force black */
+/* This must come after @layer components to override Tailwind classes */
+.text-white,
+.text-gray-50,
+.text-gray-100,
+.text-gray-200,
+.text-gray-300,
+.text-gray-400,
+.text-gray-500,
+.text-gray-600,
+.text-gray-700,
+.text-gray-800,
+.text-gray-900,
+.text-zinc-*,
+.text-slate-*,
+.text-neutral-*,
+.text-stone-*,
+[class*="text-"] {
+  color: #000000 !important;
+}
+
+/* Override any Tailwind classes applied via @apply */
+.btn-danger,
+.btn-danger *,
+.btn-danger::before,
+.btn-danger::after {
+  color: #000000 !important;
 }
 
 /* Common base classes for reuse across components */
@@ -325,6 +400,56 @@ svg {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+/* FINAL OVERRIDE: Force black text on ALL elements with maximum specificity */
+/* This comes last to ensure it overrides everything */
+html,
+html *,
+html *::before,
+html *::after,
+body,
+body *,
+body *::before,
+body *::after,
+[id],
+[id] *,
+[class],
+[class] *,
+[class] *::before,
+[class] *::after,
+input,
+input *,
+button,
+button *,
+span,
+span *,
+div,
+div *,
+p,
+p *,
+h1, h2, h3, h4, h5, h6,
+h1 *, h2 *, h3 *, h4 *, h5 *, h6 *,
+label,
+label *,
+textarea,
+textarea *,
+select,
+select *,
+a,
+a * {
+  color: #000000 !important;
+}
+
+/* Override inline style colors (though inline styles have higher specificity, this helps with CSS-in-JS) */
+[style*="color: white"],
+[style*="color: #fff"],
+[style*="color: #ffffff"],
+[style*="color: #FFF"],
+[style*="color: #FFFFFF"],
+[style*="color:rgb(255"],
+[style*="color:rgba(255"] {
+  color: #000000 !important;
 }
 
 }

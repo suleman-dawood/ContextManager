@@ -3,10 +3,7 @@ using ContextManager.API.Data;
 
 namespace ContextManager.API.Services
 {
-    /// <summary>
-    /// Service responsible for running database migrations in order
-    /// Tracks applied migrations to avoid re-running them
-    /// </summary>
+    /// responsible for running database migrations in order
     public class DatabaseMigrationService
     {
         private readonly ApplicationDbContext _db;
@@ -20,15 +17,11 @@ namespace ContextManager.API.Services
             _logger = logger;
         }
 
-        /// <summary>
-        /// Ensures database is initialized and all migrations are applied
-        /// Migrations are run in numerical order and only once
-        /// </summary>
         public async Task MigrateAsync()
         {
             try
             {
-                // Ensure database exists
+                // ensure database exists
                 var canConnect = await _db.Database.CanConnectAsync();
                 
                 if (!canConnect)
@@ -37,15 +30,11 @@ namespace ContextManager.API.Services
                     await _db.Database.EnsureCreatedAsync();
                 }
 
-                // Create migration tracking table first
                 await EnsureMigrationTrackingTableAsync();
-
-                // Get all migration scripts in order (numbered: 000_, 001_, 002_, etc.)
                 var migrationScripts = GetMigrationScripts();
 
                 foreach (var script in migrationScripts)
                 {
-                    // Skip migration tracking script (000_) - it's handled separately
                     if (script.Name.StartsWith("000_"))
                     {
                         continue;
@@ -53,18 +42,15 @@ namespace ContextManager.API.Services
 
                     var migrationId = ExtractMigrationId(script.Name);
 
-                    // Check if migration has already been applied
                     if (await IsMigrationAppliedAsync(migrationId))
                     {
                         _logger.LogDebug("Migration already applied: {MigrationId}", migrationId);
                         continue;
                     }
 
-                    // Run the migration
                     _logger.LogInformation("Applying migration: {MigrationId}", migrationId);
                     await RunMigrationScriptAsync(script.FullName);
 
-                    // Record migration as applied
                     await RecordMigrationAppliedAsync(migrationId);
                     _logger.LogInformation("Migration completed: {MigrationId}", migrationId);
                 }
@@ -78,9 +64,6 @@ namespace ContextManager.API.Services
             }
         }
 
-        /// <summary>
-        /// Ensures the migration tracking table exists
-        /// </summary>
         private async Task EnsureMigrationTrackingTableAsync()
         {
             var trackingScriptPath = GetScriptPath("000_migration_tracking.sql");
@@ -94,14 +77,11 @@ namespace ContextManager.API.Services
                 }
                 catch
                 {
-                    // Table might already exist, ignore
+                    // table might already exist, ignore
                 }
             }
         }
 
-        /// <summary>
-        /// Checks if a migration has already been applied
-        /// </summary>
         private async Task<bool> IsMigrationAppliedAsync(string migrationId)
         {
             try
@@ -126,14 +106,11 @@ namespace ContextManager.API.Services
             }
             catch
             {
-                // If query fails, migration table might not exist yet - return false to run migrations
+                // return false to run migrations
                 return false;
             }
         }
 
-        /// <summary>
-        /// Records that a migration has been applied
-        /// </summary>
         private async Task RecordMigrationAppliedAsync(string migrationId)
         {
             try
@@ -165,9 +142,6 @@ namespace ContextManager.API.Services
             }
         }
 
-        /// <summary>
-        /// Runs a migration script
-        /// </summary>
         private async Task RunMigrationScriptAsync(string scriptPath)
         {
             if (!File.Exists(scriptPath))
@@ -179,10 +153,6 @@ namespace ContextManager.API.Services
             await _db.Database.ExecuteSqlRawAsync(sql);
         }
 
-        /// <summary>
-        /// Gets all migration scripts from the Scripts directory
-        /// Returns them sorted by filename (numerical order)
-        /// </summary>
         private List<FileInfo> GetMigrationScripts()
         {
             var scriptsDirectory = GetScriptsDirectory();
@@ -201,28 +171,17 @@ namespace ContextManager.API.Services
             return scripts;
         }
 
-        /// <summary>
-        /// Extracts migration ID from script filename
-        /// Example: "001_init.sql" -> "001_init"
-        /// </summary>
         private string ExtractMigrationId(string filename)
         {
             return Path.GetFileNameWithoutExtension(filename);
         }
 
-        /// <summary>
-        /// Gets the path to a specific script file
-        /// </summary>
         private string GetScriptPath(string scriptName)
         {
             var scriptsDir = GetScriptsDirectory();
             return Path.Combine(scriptsDir, scriptName);
         }
 
-        /// <summary>
-        /// Gets the Scripts directory path
-        /// Tries multiple locations for flexibility
-        /// </summary>
         private string GetScriptsDirectory()
         {
             var baseDirectory = AppContext.BaseDirectory;
@@ -233,7 +192,7 @@ namespace ContextManager.API.Services
                 Path.Combine(baseDirectory, "Scripts"),
                 Path.Combine(currentDirectory, "Scripts"),
                 Path.Combine(currentDirectory, "..", "Scripts"),
-                Path.Combine(baseDirectory, "..", "..", "..", "Scripts"), // For bin/Debug/net8.0
+                Path.Combine(baseDirectory, "..", "..", "..", "Scripts"),
             };
 
             foreach (var path in possiblePaths)
@@ -244,7 +203,6 @@ namespace ContextManager.API.Services
                 }
             }
 
-            // Return first path as default (will show error if doesn't exist)
             return possiblePaths[0];
         }
     }
