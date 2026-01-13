@@ -1,6 +1,6 @@
--- Context Manager Database Initialization Script
--- This script creates all necessary tables and seeds initial data
--- Safe to run multiple times (uses IF NOT EXISTS checks)
+-- Migration 001: Initial database schema
+-- Creates Users, Contexts, and Tasks tables
+-- Seeds default contexts
 
 -- Create Users table
 CREATE TABLE IF NOT EXISTS "Users" (
@@ -43,30 +43,9 @@ CREATE TABLE IF NOT EXISTS "Tasks" (
     CONSTRAINT "FK_Tasks_Contexts_ContextId" FOREIGN KEY ("ContextId") REFERENCES "Contexts" ("Id") ON DELETE RESTRICT
 );
 
--- Create TaskSuggestions table
-CREATE TABLE IF NOT EXISTS "TaskSuggestions" (
-    "Id" uuid NOT NULL,
-    "UserId" uuid NOT NULL,
-    "TaskId" uuid NOT NULL,
-    "ContextId" uuid NOT NULL,
-    "ConfidenceScore" real NOT NULL,
-    "Reasoning" character varying(500) NOT NULL,
-    "CreatedAt" timestamp with time zone NOT NULL,
-    "UserAccepted" boolean,
-    CONSTRAINT "PK_TaskSuggestions" PRIMARY KEY ("Id"),
-    CONSTRAINT "FK_TaskSuggestions_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_TaskSuggestions_Tasks_TaskId" FOREIGN KEY ("TaskId") REFERENCES "Tasks" ("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_TaskSuggestions_Contexts_ContextId" FOREIGN KEY ("ContextId") REFERENCES "Contexts" ("Id") ON DELETE RESTRICT
-);
-
 -- Create indexes for Tasks table
 CREATE INDEX IF NOT EXISTS "IX_Tasks_UserId" ON "Tasks" ("UserId");
 CREATE INDEX IF NOT EXISTS "IX_Tasks_ContextId" ON "Tasks" ("ContextId");
-
--- Create indexes for TaskSuggestions table
-CREATE INDEX IF NOT EXISTS "IX_TaskSuggestions_UserId" ON "TaskSuggestions" ("UserId");
-CREATE INDEX IF NOT EXISTS "IX_TaskSuggestions_TaskId" ON "TaskSuggestions" ("TaskId");
-CREATE INDEX IF NOT EXISTS "IX_TaskSuggestions_ContextId" ON "TaskSuggestions" ("ContextId");
 
 -- Seed default contexts (only if they don't exist)
 INSERT INTO "Contexts" ("Id", "Name", "Description", "Color", "Icon")

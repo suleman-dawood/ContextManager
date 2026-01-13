@@ -1,0 +1,276 @@
+/* Schedule View Styles */
+
+.schedule-view {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.date-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.date-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  color: var(--black);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  margin-top: 2rem;
+}
+
+.empty-state svg {
+  color: var(--gray-light);
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: var(--black);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--gray-light);
+  margin-bottom: 1.5rem;
+}
+
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--gray-light);
+  font-size: 1.1rem;
+}
+
+/* Session Summary */
+.session-summary {
+  display: flex;
+  gap: 2rem;
+  padding: 1.5rem;
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.summary-item .label {
+  font-size: 0.875rem;
+  color: var(--gray-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-item .value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.summary-item .value.customized {
+  color: var(--accent-yellow);
+}
+
+.summary-item .value.ai-generated {
+  color: var(--primary);
+}
+
+/* Drag Instructions */
+.drag-instructions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--accent-yellow);
+  color: var(--black);
+  border: 2px solid var(--black);
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Session Tasks */
+.schedule-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.schedule-task-item {
+  display: flex;
+  gap: 1rem;
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  border-top: none;
+  padding: 1rem;
+  transition: all 0.2s;
+}
+
+.schedule-task-item:first-child {
+  border-top: 2px solid var(--border-color);
+}
+
+.schedule-task-item.first-in-group {
+  margin-top: 1rem;
+  border-top: 2px solid var(--border-color);
+}
+
+.schedule-task-item:hover {
+  background: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  color: var(--gray-light);
+  padding: 0.5rem 0;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle:hover {
+  color: var(--black);
+}
+
+.task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.context-header {
+  border-left: 4px solid;
+  padding-left: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.context-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.task-details h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 0.5rem;
+}
+
+.task-description {
+  font-size: 0.875rem;
+  color: var(--gray-light);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.task-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.task-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--gray-light);
+}
+
+.time-estimate {
+  font-weight: 600;
+  color: var(--black);
+}
+
+.ai-reasoning {
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .schedule-view {
+    padding: 1rem;
+  }
+
+  .schedule-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .date-navigation {
+    justify-content: center;
+  }
+
+  .session-summary {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .drag-handle {
+    padding: 0.25rem 0;
+  }
+
+  .schedule-task-item {
+    padding: 0.75rem;
+  }
+}
+

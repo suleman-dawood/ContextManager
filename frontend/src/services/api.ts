@@ -7,9 +7,13 @@ import type {
   CreateTaskRequest,
   UpdateTaskRequest,
   Context,
-  TaskSuggestion,
   ContextDistribution,
-  CompletionRate
+  CompletionRate,
+  ContextCategorizationResponse,
+  CategorizeTaskRequest,
+  SessionPlan,
+  GenerateSessionPlanRequest,
+  UpdateSessionPlanOrderRequest
 } from '../types';
 
 // Create axios instance with base configuration
@@ -139,23 +143,56 @@ export const contextsApi = {
 };
 
 // ========================================
-// AI Suggestions API (Star Feature!)
+// AI Suggestions API
 // ========================================
 
 export const suggestionsApi = {
   /**
-   * Get AI-powered task suggestions for a context
+   * AI-powered context categorization - Categorizes a task into the appropriate context
+   * This is the core feature: intelligent task classification using Claude AI
    */
-  getSuggestions: async (contextId: string): Promise<TaskSuggestion[]> => {
-    const response = await api.get<TaskSuggestion[]>(`/suggestions?contextId=${contextId}`);
+  categorizeTask: async (data: CategorizeTaskRequest): Promise<ContextCategorizationResponse> => {
+    const response = await api.post<ContextCategorizationResponse>('/suggestions/categorize', data);
+    return response.data;
+  }
+};
+
+// ========================================
+// Session Planning API (Star Feature!)
+// ========================================
+
+export const sessionPlanApi = {
+  /**
+   * Generate a new AI-powered session plan for a specific date
+   * This is the star feature: intelligently orders tasks for the day with context grouping
+   */
+  generateSessionPlan: async (data: GenerateSessionPlanRequest): Promise<SessionPlan> => {
+    const response = await api.post<SessionPlan>('/sessionplan/generate', data);
     return response.data;
   },
 
   /**
-   * Provide feedback on a suggestion
+   * Get an existing session plan for a specific date
    */
-  provideFeedback: async (suggestionId: string, accepted: boolean): Promise<void> => {
-    await api.post(`/suggestions/${suggestionId}/feedback`, { accepted });
+  getSessionPlan: async (date: string): Promise<SessionPlan> => {
+    const response = await api.get<SessionPlan>(`/sessionplan?date=${date}`);
+    return response.data;
+  },
+
+  /**
+   * Get all session plans within a date range (for calendar view)
+   */
+  getSessionPlansInRange: async (startDate: string, endDate: string): Promise<SessionPlan[]> => {
+    const response = await api.get<SessionPlan[]>(`/sessionplan/range?startDate=${startDate}&endDate=${endDate}`);
+    return response.data;
+  },
+
+  /**
+   * Update the order of tasks in a session plan (after user drag-and-drop)
+   */
+  updateSessionPlanOrder: async (sessionPlanId: string, data: UpdateSessionPlanOrderRequest): Promise<SessionPlan> => {
+    const response = await api.put<SessionPlan>(`/sessionplan/${sessionPlanId}/order`, data);
+    return response.data;
   }
 };
 

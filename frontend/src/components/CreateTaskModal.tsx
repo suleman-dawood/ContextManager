@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
-import type { Context, CreateTaskRequest } from '../types';
+import { X, Sparkles } from 'lucide-react';
+import { suggestionsApi } from '../services/api';
+import type { Context, CreateTaskRequest, ContextCategorizationResponse } from '../types';
 import { Priority } from '../types';
 
 interface CreateTaskModalProps {
@@ -14,6 +15,8 @@ interface CreateTaskModalProps {
  */
 export const CreateTaskModal = ({ contexts, onClose, onSubmit }: CreateTaskModalProps) => {
   const [loading, setLoading] = useState(false);
+  const [categorizing, setCategorizing] = useState(false);
+  const [categorization, setCategorization] = useState<ContextCategorizationResponse | null>(null);
   const [formData, setFormData] = useState<CreateTaskRequest>({
     contextId: contexts[0]?.id || '',
     title: '',
@@ -22,6 +25,31 @@ export const CreateTaskModal = ({ contexts, onClose, onSubmit }: CreateTaskModal
     priority: Priority.Medium,
     dueDate: undefined
   });
+
+  // Handle AI categorization
+  const handleCategorize = async () => {
+    if (!formData.title.trim()) {
+      alert('Please enter a task title first');
+      return;
+    }
+
+    setCategorizing(true);
+    setCategorization(null);
+    try {
+      const result = await suggestionsApi.categorizeTask({
+        title: formData.title,
+        description: formData.description
+      });
+      setCategorization(result);
+      // Auto-select the suggested context
+      setFormData({ ...formData, contextId: result.contextId });
+    } catch (error: any) {
+      console.error('Failed to categorize task:', error);
+      alert(error.response?.data?.message || 'Failed to categorize task. Please try again.');
+    } finally {
+      setCategorizing(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +89,37 @@ export const CreateTaskModal = ({ contexts, onClose, onSubmit }: CreateTaskModal
           </div>
 
           <div className="form-group">
-            <label className="label">Context *</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <label className="label" style={{ margin: 0 }}>Context *</label>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleCategorize}
+                disabled={categorizing || !formData.title.trim()}
+                style={{ padding: '6px 12px', fontSize: '12px' }}
+              >
+                <Sparkles size={14} />
+                {categorizing ? 'AI Analyzing...' : 'Auto-Categorize with AI'}
+              </button>
+            </div>
+            {categorization && (
+              <div style={{
+                padding: '12px',
+                marginBottom: '12px',
+                backgroundColor: '#FFD700',
+                border: '2px solid #000000',
+                borderRadius: 0,
+                fontSize: '13px'
+              }}>
+                <strong>AI Suggestion: {categorization.contextName}</strong>
+                <br />
+                <span style={{ opacity: 0.8 }}>{categorization.reasoning}</span>
+                <br />
+                <span style={{ fontSize: '11px', opacity: 0.7 }}>
+                  Confidence: {Math.round(categorization.confidence * 100)}%
+                </span>
+              </div>
+            )}
             <select
               className="input"
               value={formData.contextId}

@@ -8,8 +8,8 @@ using ContextManager.API.Models;
 namespace ContextManager.API.Services
 {
     /// <summary>
-    /// Service for interacting with Claude API to generate AI-powered task suggestions
-    /// This is the star feature of the application!
+    /// Service for interacting with Claude API for AI-powered task intelligence
+    /// Handles task categorization and session planning
     /// </summary>
     public class ClaudeService
     {
@@ -33,103 +33,60 @@ namespace ContextManager.API.Services
         }
 
         /// <summary>
-        /// Gets AI-powered task suggestions for a specific user and context
-        /// Claude analyzes pending tasks and recommends the top 3 based on context, time, and priority
+        /// AI-powered context categorization - Categorizes a task into the appropriate mental context
+        /// This is a core feature: intelligent task classification using Claude AI
         /// </summary>
-        public async Task<List<TaskSuggestionResponse>> GetSuggestionsAsync(Guid userId, Guid contextId)
+        public async Task<ContextCategorizationResponse> CategorizeTaskAsync(string title, string description)
         {
-            // 1. Get user's pending tasks for this context
+            // Get all available contexts
+            var contexts = await _db.Contexts.ToListAsync();
+            
+            if (!contexts.Any())
+            {
+                throw new InvalidOperationException("No contexts available in database");
+            }
+
+            // Build prompt for Claude to categorize the task
+            var prompt = BuildCategorizationPrompt(title, description, contexts);
+
+            // Call Claude API
+            var claudeResponse = await CallClaudeApiAsync(prompt);
+
+            // Parse and return the categorization
+            return ParseCategorizationResponse(claudeResponse, contexts);
+        }
+
+        /// <summary>
+        /// AI-powered session planning - Plans an entire work session across all contexts
+        /// This is the star feature: intelligently orders tasks for the day with context grouping
+        /// Returns a structured plan with tasks and reasoning
+        /// </summary>
+        public async Task<SessionPlanResponse> GetSessionPlanAsync(Guid userId)
+        {
+            // Get all pending tasks across ALL contexts
             var tasks = await _db.Tasks
-                .Where(t => t.UserId == userId 
-                         && t.ContextId == contextId 
-                         && t.Status != Models.TaskStatus.Completed)
+                .Include(t => t.Context)
+                .Include(t => t.User)
+                .Where(t => t.UserId == userId && t.Status != Models.TaskStatus.Completed)
                 .OrderBy(t => t.DueDate)
                 .ThenByDescending(t => t.Priority)
                 .ToListAsync();
 
-            // No tasks to suggest
             if (!tasks.Any())
             {
-                return new List<TaskSuggestionResponse>();
+                return new SessionPlanResponse { Items = new List<SessionPlanItemResponse>() };
             }
 
-            // 2. Get context details
-            var context = await _db.Contexts.FindAsync(contextId);
-            if (context == null)
-            {
-                throw new ArgumentException("Invalid context ID");
-            }
+            // Build session planning prompt
+            var prompt = BuildSessionPlanningPrompt(tasks);
 
-            // 3. Build the prompt for Claude
-            var prompt = BuildPrompt(context, tasks);
-
-            // 4. Call Claude API
+            // Call Claude API
             var claudeResponse = await CallClaudeApiAsync(prompt);
 
-            // 5. Parse Claude's response and save suggestions to database
-            var suggestions = await ParseAndSaveSuggestionsAsync(claudeResponse, tasks, userId, contextId);
+            // Parse session plan
+            var sessionPlan = ParseSessionPlanResponse(claudeResponse, tasks);
 
-            return suggestions;
-        }
-
-        /// <summary>
-        /// Builds a detailed prompt for Claude to analyze tasks and provide suggestions
-        /// </summary>
-        private string BuildPrompt(Context context, List<Models.Task> tasks)
-        {
-            var currentHour = DateTime.Now.Hour;
-            var timeOfDay = currentHour < 12 ? "morning" : currentHour < 17 ? "afternoon" : "evening";
-            var dayOfWeek = DateTime.Now.DayOfWeek.ToString();
-
-            // Create a numbered list of tasks with relevant details
-            var taskList = string.Join("\n", tasks.Select((t, i) => 
-            {
-                var priorityEmoji = t.Priority switch
-                {
-                    Priority.High => "🔴",
-                    Priority.Medium => "🟡",
-                    Priority.Low => "🟢",
-                    _ => ""
-                };
-                var dueInfo = t.DueDate.HasValue 
-                    ? $", Due: {t.DueDate.Value:MMM dd}" 
-                    : "";
-                return $"{i + 1}. {priorityEmoji} [{t.Title}] - Priority: {t.Priority}, Estimated: {t.EstimatedMinutes}min{dueInfo}";
-            }));
-
-            return $@"You are a productivity assistant helping prioritize tasks for a specific mental context.
-
-Context: {context.Name} - {context.Description}
-Current Time: {dayOfWeek} {timeOfDay} ({DateTime.Now:HH:mm})
-
-Available Tasks:
-{taskList}
-
-Instructions:
-1. Suggest the TOP 3 tasks that best fit this ""{context.Name}"" context right now
-2. Consider:
-   - Time of day (energy levels, meeting times)
-   - Task priority and deadlines
-   - Estimated time (can it fit in a typical work session?)
-   - Context fit (does it match the mental mode?)
-3. Provide a brief, practical reasoning for each suggestion
-
-Respond ONLY with valid JSON in this exact format:
-{{
-  ""suggestions"": [
-    {{
-      ""taskNumber"": 1,
-      ""confidence"": 0.95,
-      ""reasoning"": ""Brief explanation why this task is ideal right now""
-    }}
-  ]
-}}
-
-Important: 
-- taskNumber is the number from the list above (1-{tasks.Count})
-- confidence is a score from 0.0 to 1.0
-- Suggest 1-3 tasks (fewer is better if others don't fit well)
-- Keep reasoning under 100 characters";
+            return sessionPlan;
         }
 
         /// <summary>
@@ -172,82 +129,213 @@ Important:
             var contentArray = doc.RootElement.GetProperty("content");
             var textContent = contentArray[0].GetProperty("text").GetString();
 
-            return textContent ?? string.Empty;
+            return textContent ?? throw new InvalidOperationException("No text content in Claude response");
         }
 
         /// <summary>
-        /// Parses Claude's JSON response and saves suggestions to database
+        /// Builds a prompt for Claude to categorize a task into the appropriate context
         /// </summary>
-        private async Task<List<TaskSuggestionResponse>> ParseAndSaveSuggestionsAsync(
-            string claudeResponse, 
-            List<Models.Task> tasks, 
-            Guid userId, 
-            Guid contextId)
+        private string BuildCategorizationPrompt(string title, string description, List<Context> contexts)
         {
-            var suggestions = new List<TaskSuggestionResponse>();
+            var contextList = string.Join("\n", contexts.Select((c, i) => 
+                $"{i + 1}. {c.Name} - {c.Description}"));
 
+            var taskInfo = string.IsNullOrWhiteSpace(description) 
+                ? $"Title: {title}"
+                : $"Title: {title}\nDescription: {description}";
+
+            return $@"You are an intelligent task classification assistant. Analyze the following task and categorize it into the most appropriate mental context.
+
+Task Information:
+{taskInfo}
+
+Available Contexts:
+{contextList}
+
+Instructions:
+1. Analyze the task title and description
+2. Determine which context best matches the mental mode required for this task
+3. Consider the type of work: deep focus, collaboration, administrative, creative, or learning
+4. Provide a confidence score (0.0 to 1.0) and brief reasoning
+
+Respond ONLY with valid JSON in this exact format:
+{{
+  ""contextNumber"": 1,
+  ""confidence"": 0.95,
+  ""reasoning"": ""Brief explanation of why this context is appropriate""
+}}
+
+Important:
+- contextNumber is the number from the list above (1-{contexts.Count})
+- confidence is a score from 0.0 to 1.0
+- Keep reasoning under 150 characters";
+        }
+
+        /// <summary>
+        /// Parses Claude's context categorization response
+        /// </summary>
+        private ContextCategorizationResponse ParseCategorizationResponse(string claudeResponse, List<Context> contexts)
+        {
             try
             {
-                // Extract JSON from Claude's response (it might include extra text)
                 var jsonStart = claudeResponse.IndexOf('{');
                 var jsonEnd = claudeResponse.LastIndexOf('}') + 1;
                 var jsonString = claudeResponse.Substring(jsonStart, jsonEnd - jsonStart);
 
                 using var doc = JsonDocument.Parse(jsonString);
-                var suggestionsArray = doc.RootElement.GetProperty("suggestions");
+                var contextNumber = doc.RootElement.GetProperty("contextNumber").GetInt32();
+                var confidence = (float)doc.RootElement.GetProperty("confidence").GetDouble();
+                var reasoning = doc.RootElement.GetProperty("reasoning").GetString() ?? "";
 
-                foreach (var item in suggestionsArray.EnumerateArray())
+                if (contextNumber < 1 || contextNumber > contexts.Count)
+                {
+                    throw new InvalidOperationException($"Invalid context number: {contextNumber}");
+                }
+
+                var context = contexts[contextNumber - 1];
+
+                return new ContextCategorizationResponse
+                {
+                    ContextId = context.Id,
+                    ContextName = context.Name,
+                    Confidence = confidence,
+                    Reasoning = reasoning
+                };
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException($"Failed to parse Claude categorization response: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Builds a prompt for Claude to plan an entire work session
+        /// </summary>
+        private string BuildSessionPlanningPrompt(List<Models.Task> tasks)
+        {
+            var currentHour = DateTime.Now.Hour;
+            var timeOfDay = currentHour < 12 ? "morning" : currentHour < 17 ? "afternoon" : "evening";
+            var dayOfWeek = DateTime.Now.DayOfWeek.ToString();
+
+            var taskList = string.Join("\n", tasks.Select((t, i) => 
+            {
+                var priorityEmoji = t.Priority switch
+                {
+                    Priority.High => "🔴",
+                    Priority.Medium => "🟡",
+                    Priority.Low => "🟢",
+                    _ => ""
+                };
+                var dueInfo = t.DueDate.HasValue 
+                    ? $", Due: {t.DueDate.Value:MMM dd}" 
+                    : "";
+                return $"{i + 1}. {priorityEmoji} [{t.Title}] - Context: {t.Context.Name}, Priority: {t.Priority}, Time: {t.EstimatedMinutes}min{dueInfo}";
+            }));
+
+            return $@"You are an intelligent productivity assistant. Plan an optimal work session by ordering tasks across different mental contexts.
+
+Current Time: {dayOfWeek} {timeOfDay} ({DateTime.Now:HH:mm})
+Work Hours: 9:00 AM - 5:00 PM (7.5 hours available with 30-min break at 1:30 PM)
+
+Available Tasks ({tasks.Count} total):
+{taskList}
+
+Instructions:
+1. Select tasks that fit within the 7.5-hour workday (450 minutes total)
+2. Order them intelligently considering:
+   - Context switching (group similar mental modes together to minimize cognitive load)
+   - Time of day (meetings in afternoon, deep work in morning, admin tasks when appropriate)
+   - Task priorities and deadlines (high priority and urgent tasks first)
+   - Estimated time (don't exceed work hours)
+3. Group consecutive tasks by context where possible to minimize mental switching
+4. Aim for 5-10 tasks that fill ~6-7 hours (leave buffer time)
+5. Provide brief reasoning for each task's position
+
+Respond ONLY with valid JSON in this exact format:
+{{
+  ""tasks"": [
+    {{
+      ""taskNumber"": 1,
+      ""reasoning"": ""Why this task at this position""
+    }}
+  ]
+}}
+
+Important:
+- taskNumber is the number from the task list above (1-{tasks.Count})
+- Total selected tasks should be ~360-420 minutes (6-7 hours)
+- Order them from first to last (morning to afternoon)
+- Group by context to reduce context switching
+- Keep individual reasoning under 100 characters";
+        }
+
+        /// <summary>
+        /// Parses Claude's session planning response
+        /// </summary>
+        private SessionPlanResponse ParseSessionPlanResponse(string claudeResponse, List<Models.Task> tasks)
+        {
+            try
+            {
+                var jsonStart = claudeResponse.IndexOf('{');
+                var jsonEnd = claudeResponse.LastIndexOf('}') + 1;
+                var jsonString = claudeResponse.Substring(jsonStart, jsonEnd - jsonStart);
+
+                using var doc = JsonDocument.Parse(jsonString);
+                var tasksArray = doc.RootElement.GetProperty("tasks");
+
+                var items = new List<SessionPlanItemResponse>();
+
+                foreach (var item in tasksArray.EnumerateArray())
                 {
                     var taskNumber = item.GetProperty("taskNumber").GetInt32();
-                    var confidence = (float)item.GetProperty("confidence").GetDouble();
                     var reasoning = item.GetProperty("reasoning").GetString() ?? "";
 
-                    // Get the task (taskNumber is 1-indexed)
                     if (taskNumber < 1 || taskNumber > tasks.Count)
                     {
-                        continue; // Skip invalid task numbers
+                        continue;
                     }
 
                     var task = tasks[taskNumber - 1];
 
-                    // Save suggestion to database
-                    var suggestion = new TaskSuggestion
+                    items.Add(new SessionPlanItemResponse
                     {
                         Id = Guid.NewGuid(),
-                        UserId = userId,
-                        TaskId = task.Id,
-                        ContextId = contextId,
-                        ConfidenceScore = confidence,
-                        Reasoning = reasoning,
-                        CreatedAt = DateTime.UtcNow,
-                        UserAccepted = null // No feedback yet
-                    };
-
-                    _db.TaskSuggestions.Add(suggestion);
-
-                    // Add to response list
-                    suggestions.Add(new TaskSuggestionResponse
-                    {
-                        Id = suggestion.Id,
-                        TaskId = task.Id,
-                        TaskTitle = task.Title,
-                        TaskDescription = task.Description,
-                        EstimatedMinutes = task.EstimatedMinutes,
-                        Confidence = confidence,
-                        Reasoning = reasoning,
-                        CreatedAt = suggestion.CreatedAt
+                        Task = new TaskResponse
+                        {
+                            Id = task.Id,
+                            UserId = task.UserId,
+                            ContextId = task.ContextId,
+                            ContextName = task.Context?.Name ?? "",
+                            ContextColor = task.Context?.Color ?? "",
+                            Title = task.Title,
+                            Description = task.Description,
+                            EstimatedMinutes = task.EstimatedMinutes,
+                            Priority = task.Priority,
+                            Status = task.Status,
+                            DueDate = task.DueDate,
+                            CreatedAt = task.CreatedAt,
+                            CompletedAt = task.CompletedAt
+                        },
+                        Order = items.Count,
+                        GroupNumber = 0, // Will be calculated later based on context grouping
+                        Reasoning = reasoning
                     });
                 }
 
-                await _db.SaveChangesAsync();
+                return new SessionPlanResponse
+                {
+                    Id = Guid.NewGuid(),
+                    PlanDate = DateTime.UtcNow.Date,
+                    CreatedAt = DateTime.UtcNow,
+                    IsCustomized = false,
+                    Items = items,
+                    TotalEstimatedMinutes = items.Sum(i => i.Task.EstimatedMinutes)
+                };
             }
             catch (JsonException ex)
             {
-                throw new InvalidOperationException($"Failed to parse Claude response: {ex.Message}");
+                throw new InvalidOperationException($"Failed to parse session plan: {ex.Message}");
             }
-
-            return suggestions;
         }
     }
 }
-

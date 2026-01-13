@@ -1,61 +1,42 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ContextManager.API.Data;
 using ContextManager.API.DTOs;
 using ContextManager.API.Services;
 
 namespace ContextManager.API.Controllers
 {
     /// <summary>
-    /// Handles AI-powered task suggestions (the star feature!)
+    /// Handles AI-powered task categorization
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
     public class SuggestionsController : ControllerBase
     {
-        private readonly ApplicationDbContext _db;
         private readonly ClaudeService _claudeService;
-        private readonly AuthService _authService;
 
-        public SuggestionsController(
-            ApplicationDbContext db, 
-            ClaudeService claudeService, 
-            AuthService authService)
+        public SuggestionsController(ClaudeService claudeService)
         {
-            _db = db;
             _claudeService = claudeService;
-            _authService = authService;
         }
 
         /// <summary>
-        /// Get AI-generated task suggestions for a specific context
-        /// GET /api/suggestions?contextId={guid}
+        /// AI-powered task categorization - Categorizes a task into the appropriate context
+        /// This is the core feature: intelligent task classification using Claude AI
+        /// POST /api/suggestions/categorize
         /// </summary>
-        [HttpGet]
-        public async Task<ActionResult<List<TaskSuggestionResponse>>> GetSuggestions([FromQuery] Guid contextId)
+        [HttpPost("categorize")]
+        public async Task<ActionResult<ContextCategorizationResponse>> CategorizeTask([FromBody] CategorizeTaskRequest request)
         {
-            var userId = _authService.GetUserIdFromClaims(User);
-
-            // Validate context exists
-            var contextExists = await _db.Contexts.AnyAsync(c => c.Id == contextId);
-            if (!contextExists)
+            if (string.IsNullOrWhiteSpace(request.Title))
             {
-                return BadRequest(new { message = "Invalid context ID" });
+                return BadRequest(new { message = "Task title is required" });
             }
 
             try
             {
-                // Call Claude AI to get suggestions
-                var suggestions = await _claudeService.GetSuggestionsAsync(userId, contextId);
-
-                if (!suggestions.Any())
-                {
-                    return Ok(new List<TaskSuggestionResponse>());
-                }
-
-                return Ok(suggestions);
+                var categorization = await _claudeService.CategorizeTaskAsync(request.Title, request.Description ?? "");
+                return Ok(categorization);
             }
             catch (ArgumentException ex)
             {
@@ -67,33 +48,8 @@ namespace ContextManager.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Failed to generate suggestions", error = ex.Message });
+                return StatusCode(500, new { message = "Failed to categorize task", error = ex.Message });
             }
-        }
-
-        /// <summary>
-        /// Provide feedback on a suggestion (helps AI learn)
-        /// POST /api/suggestions/{id}/feedback
-        /// </summary>
-        [HttpPost("{id}/feedback")]
-        public async Task<IActionResult> ProvideFeedback(Guid id, [FromBody] SuggestionFeedbackRequest request)
-        {
-            var userId = _authService.GetUserIdFromClaims(User);
-
-            var suggestion = await _db.TaskSuggestions
-                .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
-
-            if (suggestion == null)
-            {
-                return NotFound(new { message = "Suggestion not found" });
-            }
-
-            // Update feedback
-            suggestion.UserAccepted = request.Accepted;
-            await _db.SaveChangesAsync();
-
-            return Ok(new { message = "Feedback recorded successfully" });
         }
     }
 }
-

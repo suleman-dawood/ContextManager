@@ -18,7 +18,8 @@ namespace ContextManager.API.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Context> Contexts { get; set; } = null!;
         public DbSet<Models.Task> Tasks { get; set; } = null!;
-        public DbSet<TaskSuggestion> TaskSuggestions { get; set; } = null!;
+        public DbSet<SessionPlan> SessionPlans { get; set; } = null!;
+        public DbSet<SessionPlanItem> SessionPlanItems { get; set; } = null!;
 
         /// <summary>
         /// Configures entity relationships and seeds initial data
@@ -31,7 +32,8 @@ namespace ContextManager.API.Data
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<Context>().ToTable("Contexts");
             modelBuilder.Entity<Models.Task>().ToTable("Tasks");
-            modelBuilder.Entity<TaskSuggestion>().ToTable("TaskSuggestions");
+            modelBuilder.Entity<SessionPlan>().ToTable("SessionPlans");
+            modelBuilder.Entity<SessionPlanItem>().ToTable("SessionPlanItems");
 
             // Configure User entity
             modelBuilder.Entity<User>(entity =>
@@ -73,29 +75,41 @@ namespace ContextManager.API.Data
                     .OnDelete(DeleteBehavior.Restrict); // Don't allow context deletion if tasks exist
             });
 
-            // Configure TaskSuggestion entity
-            modelBuilder.Entity<TaskSuggestion>(entity =>
+            // Configure SessionPlan entity
+            modelBuilder.Entity<SessionPlan>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Reasoning).IsRequired().HasMaxLength(500);
                 
-                // Relationship: Suggestion belongs to User
-                entity.HasOne(ts => ts.User)
+                // Relationship: SessionPlan belongs to User
+                entity.HasOne(sp => sp.User)
                     .WithMany()
-                    .HasForeignKey(ts => ts.UserId)
+                    .HasForeignKey(sp => sp.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
                 
-                // Relationship: Suggestion belongs to Task
-                entity.HasOne(ts => ts.Task)
-                    .WithMany()
-                    .HasForeignKey(ts => ts.TaskId)
+                // Create index for querying by user and date
+                entity.HasIndex(sp => new { sp.UserId, sp.PlanDate }).IsUnique();
+            });
+
+            // Configure SessionPlanItem entity
+            modelBuilder.Entity<SessionPlanItem>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Reasoning).HasMaxLength(500);
+                
+                // Relationship: SessionPlanItem belongs to SessionPlan
+                entity.HasOne(spi => spi.SessionPlan)
+                    .WithMany(sp => sp.Items)
+                    .HasForeignKey(spi => spi.SessionPlanId)
                     .OnDelete(DeleteBehavior.Cascade);
                 
-                // Relationship: Suggestion belongs to Context
-                entity.HasOne(ts => ts.Context)
+                // Relationship: SessionPlanItem references Task
+                entity.HasOne(spi => spi.Task)
                     .WithMany()
-                    .HasForeignKey(ts => ts.ContextId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .HasForeignKey(spi => spi.TaskId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                
+                // Create index for ordering
+                entity.HasIndex(spi => new { spi.SessionPlanId, spi.Order });
             });
 
             // Seed default contexts (5 pre-defined mental modes)

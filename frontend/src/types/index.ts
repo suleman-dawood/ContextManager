@@ -42,17 +42,6 @@ export interface Task {
   completedAt?: string;
 }
 
-export interface TaskSuggestion {
-  id: string;
-  taskId: string;
-  taskTitle: string;
-  taskDescription: string;
-  estimatedMinutes: number;
-  confidence: number;
-  reasoning: string;
-  createdAt: string;
-}
-
 // Analytics
 export interface ContextDistribution {
   context: string;
@@ -102,5 +91,45 @@ export interface UpdateTaskRequest {
   priority: Priority;
   status: TaskStatus;
   dueDate?: string;
+}
+
+// AI Categorization
+export interface ContextCategorizationResponse {
+  contextId: string;
+  contextName: string;
+  confidence: number;
+  reasoning: string;
+}
+
+export interface CategorizeTaskRequest {
+  title: string;
+  description: string;
+}
+
+// Session Planning
+export interface SessionPlanItem {
+  id: string;
+  task: Task;
+  order: number;
+  groupNumber: number;
+  reasoning: string;
+}
+
+export interface SessionPlan {
+  id: string;
+  planDate: string;
+  createdAt: string;
+  lastModifiedAt?: string;
+  isCustomized: boolean;
+  items: SessionPlanItem[];
+  totalEstimatedMinutes: number;
+}
+
+export interface GenerateSessionPlanRequest {
+  planDate: string;
+}
+
+export interface UpdateSessionPlanOrderRequest {
+  taskIds: string[];
 }
 

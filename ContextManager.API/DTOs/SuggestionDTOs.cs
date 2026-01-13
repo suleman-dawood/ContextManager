@@ -1,26 +1,22 @@
 namespace ContextManager.API.DTOs
 {
     /// <summary>
-    /// Response data for an AI-generated task suggestion
+    /// Request data for AI-powered context categorization
     /// </summary>
-    public class TaskSuggestionResponse
+    public class CategorizeTaskRequest
     {
-        public Guid Id { get; set; }
-        public Guid TaskId { get; set; }
-        public string TaskTitle { get; set; } = string.Empty;
-        public string TaskDescription { get; set; } = string.Empty;
-        public int EstimatedMinutes { get; set; }
-        public float Confidence { get; set; }
-        public string Reasoning { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
     }
 
     /// <summary>
-    /// Request data for providing feedback on a suggestion
+    /// Response data for context categorization
     /// </summary>
-    public class SuggestionFeedbackRequest
+    public class ContextCategorizationResponse
     {
-        public bool Accepted { get; set; }
+        public Guid ContextId { get; set; }
+        public string ContextName { get; set; } = string.Empty;
+        public float Confidence { get; set; }
+        public string Reasoning { get; set; } = string.Empty;
     }
 }
-

@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Plus, LogOut } from 'lucide-react';
+import { Plus, LogOut, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TaskList } from '../components/TaskList';
 import { ContextFilter } from '../components/ContextFilter';
 import { CreateTaskModal } from '../components/CreateTaskModal';
 import { EditTaskModal } from '../components/EditTaskModal';
-import { AISuggestions } from '../components/AISuggestions';
 import { StatsCards } from '../components/StatsCards';
 import { tasksApi, contextsApi } from '../services/api';
 import { getCurrentUser, logout } from '../services/auth';
@@ -116,6 +115,9 @@ export const Dashboard = () => {
           <p>Manage your tasks by mental context</p>
         </div>
         <div className="header-actions">
+          <button className="btn btn-primary" onClick={() => navigate('/schedule')}>
+            <Calendar size={18} /> Session Planner
+          </button>
           <button className="btn btn-secondary" onClick={() => navigate('/analytics')}>
             Analytics
           </button>
@@ -141,10 +143,6 @@ export const Dashboard = () => {
             selectedContext={selectedContext}
             onSelectContext={setSelectedContext}
           />
-
-          {selectedContext && (
-            <AISuggestions contextId={selectedContext} />
-          )}
 
           <TaskList
             tasks={filteredTasks}

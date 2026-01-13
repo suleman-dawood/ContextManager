@@ -52,6 +52,8 @@ builder.Services.AddAuthentication(options =>
 // Services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ClaudeService>();
+builder.Services.AddScoped<SessionPlanService>();
+builder.Services.AddScoped<DatabaseMigrationService>();
 builder.Services.AddHttpClient();
 
 // CORS Configuration
@@ -122,34 +124,11 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Initialize database
+// Run database migrations on startup
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    
-    try
-    {
-        await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
-    }
-    catch
-    {
-        // Database not initialized - run SQL script
-        var sqlPath = Path.Combine(AppContext.BaseDirectory, "Scripts", "init.sql");
-        if (!File.Exists(sqlPath))
-        {
-            sqlPath = Path.Combine(Directory.GetCurrentDirectory(), "Scripts", "init.sql");
-        }
-        
-        if (File.Exists(sqlPath))
-        {
-            var sql = await File.ReadAllTextAsync(sqlPath);
-            await db.Database.ExecuteSqlRawAsync(sql);
-        }
-        else
-        {
-            await db.Database.EnsureCreatedAsync();
-        }
-    }
+    var migrationService = scope.ServiceProvider.GetRequiredService<DatabaseMigrationService>();
+    await migrationService.MigrateAsync();
 }
 
 app.UseCors("AllowFrontend");
