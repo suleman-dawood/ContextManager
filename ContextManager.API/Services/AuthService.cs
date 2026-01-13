@@ -53,7 +53,6 @@ namespace ContextManager.API.Services
             
             var jwtIssuer = _configuration["JwtSettings:Issuer"] ?? "ContextManager";
             var jwtAudience = _configuration["JwtSettings:Audience"] ?? "ContextManager";
-            var jwtExpiryDays = int.Parse(_configuration["JwtSettings:ExpiryDays"] ?? "30");
 
             // Create security key from secret
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
@@ -73,7 +72,7 @@ namespace ContextManager.API.Services
                 issuer: jwtIssuer,
                 audience: jwtAudience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(jwtExpiryDays),
+                expires: DateTime.UtcNow.AddDays(30),
                 signingCredentials: credentials
             );
 

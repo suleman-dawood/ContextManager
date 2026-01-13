@@ -122,58 +122,64 @@ namespace ContextManager.API.Controllers
         [HttpPost]
         public async Task<ActionResult<TaskResponse>> CreateTask([FromBody] CreateTaskRequest request)
         {
-            var userId = _authService.GetUserIdFromClaims(User);
-
-            // Validate context exists
-            var contextExists = await _db.Contexts.AnyAsync(c => c.Id == request.ContextId);
-            if (!contextExists)
+            try
             {
-                return BadRequest(new { message = "Invalid context ID" });
-            }
+                var userId = _authService.GetUserIdFromClaims(User);
 
-            var task = new Models.Task
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                ContextId = request.ContextId,
-                Title = request.Title,
-                Description = request.Description,
-                EstimatedMinutes = request.EstimatedMinutes,
-                Priority = request.Priority,
-                Status = Models.TaskStatus.Todo,
-                DueDate = request.DueDate,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _db.Tasks.Add(task);
-            await _db.SaveChangesAsync();
-
-            // Load context for response
-            var context = await _db.Contexts.FindAsync(task.ContextId);
-            if (context == null)
-            {
-                return BadRequest(new { message = "Context not found" });
-            }
-
-            return CreatedAtAction(
-                nameof(GetTask),
-                new { id = task.Id },
-                new TaskResponse
+                // Validate required fields
+                if (string.IsNullOrWhiteSpace(request.Title))
                 {
-                    Id = task.Id,
-                    UserId = task.UserId,
-                    ContextId = task.ContextId,
-                    ContextName = context.Name,
-                    ContextColor = context.Color,
-                    Title = task.Title,
-                    Description = task.Description,
-                    EstimatedMinutes = task.EstimatedMinutes,
-                    Priority = task.Priority,
-                    Status = task.Status,
-                    DueDate = task.DueDate,
-                    CreatedAt = task.CreatedAt,
-                    CompletedAt = task.CompletedAt
-                });
+                    return BadRequest(new { message = "Title is required" });
+                }
+
+                // Validate context exists
+                var context = await _db.Contexts.FindAsync(request.ContextId);
+                if (context == null)
+                {
+                    return BadRequest(new { message = "Invalid context ID" });
+                }
+
+                var task = new Models.Task
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    ContextId = request.ContextId,
+                    Title = request.Title.Trim(),
+                    Description = request.Description?.Trim() ?? string.Empty,
+                    EstimatedMinutes = request.EstimatedMinutes,
+                    Priority = request.Priority,
+                    Status = Models.TaskStatus.Todo,
+                    DueDate = request.DueDate,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _db.Tasks.Add(task);
+                await _db.SaveChangesAsync();
+
+                return CreatedAtAction(
+                    nameof(GetTask),
+                    new { id = task.Id },
+                    new TaskResponse
+                    {
+                        Id = task.Id,
+                        UserId = task.UserId,
+                        ContextId = task.ContextId,
+                        ContextName = context.Name,
+                        ContextColor = context.Color,
+                        Title = task.Title,
+                        Description = task.Description,
+                        EstimatedMinutes = task.EstimatedMinutes,
+                        Priority = task.Priority,
+                        Status = task.Status,
+                        DueDate = task.DueDate,
+                        CreatedAt = task.CreatedAt,
+                        CompletedAt = task.CompletedAt
+                    });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to create task", error = ex.Message });
+            }
         }
 
         /// <summary>
