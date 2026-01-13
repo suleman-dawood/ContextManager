@@ -1,0 +1,29 @@
+/* Edit Task Modal component styles - extends base classes from index.css */
+
+.modal-header {
+  margin-bottom: 24px;
+}
+
+/* .modal-header h2 uses .heading-primary from base */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+textarea.input {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.modal-actions {
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 24px;
+}
+

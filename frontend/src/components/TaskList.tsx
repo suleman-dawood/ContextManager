@@ -1,6 +1,7 @@
 import { TaskCard } from './TaskCard';
 import type { Task } from '../types';
 import { TaskStatus } from '../types';
+import '../styles/TaskList.css';
 
 interface TaskListProps {
   tasks: Task[];
@@ -16,7 +17,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
   if (tasks.length === 0) {
     return (
       <div className="empty-state">
-        <p>No tasks yet. Create your first task to get started!</p>
+        <p className="text-secondary">No tasks yet. Create your first task to get started!</p>
       </div>
     );
   }
@@ -30,7 +31,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
     <div className="task-list">
       {inProgressTasks.length > 0 && (
         <div className="task-section">
-          <h3>In Progress ({inProgressTasks.length})</h3>
+          <h3 className="heading-tertiary divider-bottom">In Progress ({inProgressTasks.length})</h3>
           {inProgressTasks.map(task => (
             <TaskCard
               key={task.id}
@@ -45,7 +46,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
 
       {todoTasks.length > 0 && (
         <div className="task-section">
-          <h3>To Do ({todoTasks.length})</h3>
+          <h3 className="heading-tertiary divider-bottom">To Do ({todoTasks.length})</h3>
           {todoTasks.map(task => (
             <TaskCard
               key={task.id}
@@ -60,7 +61,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
 
       {completedTasks.length > 0 && (
         <div className="task-section">
-          <h3>Completed ({completedTasks.length})</h3>
+          <h3 className="heading-tertiary divider-bottom">Completed ({completedTasks.length})</h3>
           {completedTasks.map(task => (
             <TaskCard
               key={task.id}
@@ -72,32 +73,6 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
           ))}
         </div>
       )}
-
-      <style>{`
-        .task-list {
-          margin-top: 24px;
-        }
-
-        .task-section {
-          margin-bottom: 32px;
-        }
-
-        .task-section h3 {
-          font-size: 18px;
-          font-weight: 600;
-          margin-bottom: 16px;
-          color: var(--black);
-          padding-bottom: 8px;
-          border-bottom: 2px solid var(--black);
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 60px 20px;
-          color: var(--black);
-          opacity: 0.6;
-        }
-      `}</style>
     </div>
   );
 };

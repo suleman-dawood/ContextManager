@@ -1,0 +1,59 @@
+/* Create Task Modal component styles - extends base classes from index.css */
+
+.modal-header {
+  margin-bottom: 24px;
+}
+
+.modal-header h2 {
+  /* Uses .heading-primary from base */
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+textarea.input {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.modal-actions {
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 24px;
+}
+
+/* AI categorization alert styles */
+.ai-categorization-alert {
+  /* Uses .alert and .alert-yellow from base */
+}
+
+.ai-categorization-reasoning {
+  opacity: 0.8;
+}
+
+.ai-categorization-confidence {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.ai-categorizing {
+  text-align: center;
+}
+
+.ai-categorizing-icon {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Error message styles */
+.error-message {
+  /* Uses .alert and .alert-error from base */
+}
+

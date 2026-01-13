@@ -369,3 +369,71 @@
   }
 }
 
+/* Additional styles for removing inline styles */
+.drag-handle-icon {
+  color: var(--black);
+}
+
+.context-header-border {
+  border-left-color: var(--border-color);
+}
+
+.context-badge-dynamic {
+  color: var(--black);
+}
+
+.task-title-completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.task-title-normal {
+  opacity: 1;
+}
+
+.completed-badge {
+  margin-left: 8px;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  background: var(--success);
+  color: var(--black);
+  border: 1px solid var(--black);
+  font-weight: 600;
+}
+
+.error-message {
+  color: var(--black);
+  background: #fee;
+  border: 2px solid var(--accent-orange);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state-icon {
+  color: var(--black);
+}
+
+.empty-state-title {
+  color: var(--black);
+}
+
+.empty-state-text {
+  color: var(--black);
+}
+
+.summary-label {
+  color: var(--black);
+}
+
+.summary-value {
+  color: var(--black);
+}
+
+.drag-instructions-icon {
+  color: var(--black);
+}
+
+.drag-instructions-text {
+  color: var(--black);
+}
+

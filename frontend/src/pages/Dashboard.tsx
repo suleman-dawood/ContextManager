@@ -10,6 +10,7 @@ import { tasksApi, contextsApi } from '../services/api';
 import { getCurrentUser, logout } from '../services/auth';
 import type { Task, Context, CreateTaskRequest, UpdateTaskRequest } from '../types';
 import { TaskStatus } from '../types';
+import '../styles/Dashboard.css';
 
 /**
  * Main dashboard page - the heart of the application
@@ -35,12 +36,6 @@ export const Dashboard = () => {
   }, [navigate, user]);
 
   const loadData = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    
     try {
       const [contextsData, tasksData] = await Promise.all([
         contextsApi.getContexts(),
@@ -110,11 +105,11 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="dashboard">
-      <header className="dashboard-header">
+    <div className="dashboard page-wrapper">
+      <header className="dashboard-header header-base">
         <div>
-          <h1>Welcome back, {user?.name}!</h1>
-          <p>Manage your tasks by mental context</p>
+          <h1 className="heading-primary">Welcome back, {user?.name}!</h1>
+          <p className="text-secondary">Manage your tasks by mental context</p>
         </div>
         <div className="header-actions">
           <button className="btn btn-primary" onClick={() => navigate('/schedule')}>
@@ -132,9 +127,9 @@ export const Dashboard = () => {
       <div className="container">
         <StatsCards tasks={tasks} />
 
-        <div className="main-content">
-          <div className="content-header">
-            <h2>Your Tasks</h2>
+        <div className="main-content content-section">
+          <div className="content-header flex-between divider-bottom">
+            <h2 className="heading-secondary">Your Tasks</h2>
             <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
               <Plus size={18} /> New Task
             </button>
@@ -157,7 +152,6 @@ export const Dashboard = () => {
 
       {showCreateModal && (
         <CreateTaskModal
-          contexts={contexts}
           onClose={() => setShowCreateModal(false)}
           onSubmit={handleCreateTask}
         />
@@ -171,73 +165,6 @@ export const Dashboard = () => {
           onSubmit={handleUpdateTask}
         />
       )}
-
-      <style>{`
-        .dashboard {
-          min-height: 100vh;
-          background: var(--white);
-        }
-
-        .dashboard-header {
-          background: var(--white);
-          padding: 24px;
-          border-bottom: 3px solid var(--black);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .dashboard-header h1 {
-          font-size: 24px;
-          margin: 0 0 4px 0;
-          color: var(--black);
-        }
-
-        .dashboard-header p {
-          color: var(--black);
-          font-size: 14px;
-          margin: 0;
-          opacity: 0.7;
-        }
-
-        .header-actions {
-          display: flex;
-          gap: 12px;
-        }
-
-        .main-content {
-          background: var(--white);
-          border-radius: 0;
-          border: 2px solid var(--black);
-          padding: 24px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .content-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 24px;
-          border-bottom: 2px solid var(--black);
-          padding-bottom: 16px;
-        }
-
-        .content-header h2 {
-          font-size: 20px;
-          margin: 0;
-          color: var(--black);
-        }
-
-        .loading {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-          font-size: 18px;
-          color: var(--black);
-        }
-      `}</style>
     </div>
   );
 };

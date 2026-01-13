@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import { suggestionsApi } from '../services/api';
-import type { Context, CreateTaskRequest, ContextCategorizationResponse } from '../types';
+import type { CreateTaskRequest, ContextCategorizationResponse } from '../types';
 import { Priority } from '../types';
+import '../styles/CreateTaskModal.css';
 
 interface CreateTaskModalProps {
-  contexts?: Context[]; // Optional, no longer used but kept for backward compatibility
   onClose: () => void;
   onSubmit: (task: CreateTaskRequest) => Promise<void>;
 }
@@ -68,8 +68,8 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Create New Task</h2>
+        <div className="modal-header flex-between divider-bottom">
+          <h2 className="heading-primary">Create New Task</h2>
           <button className="btn-icon" onClick={onClose}>
             <X size={24} />
           </button>
@@ -89,51 +89,26 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
           </div>
 
           {categorization && (
-            <div style={{
-              padding: '12px',
-              marginBottom: '12px',
-              backgroundColor: '#FFD700',
-              border: '2px solid #000000',
-              borderRadius: 0,
-              fontSize: '13px',
-              color: 'var(--black)'
-            }}>
+            <div className="ai-categorization-alert alert alert-yellow">
               <strong>AI Selected Context: {categorization.contextName}</strong>
               <br />
-              <span style={{ opacity: 0.8 }}>{categorization.reasoning}</span>
+              <span className="ai-categorization-reasoning">{categorization.reasoning}</span>
               <br />
-              <span style={{ fontSize: '11px', opacity: 0.7 }}>
+              <span className="ai-categorization-confidence">
                 Confidence: {Math.round(categorization.confidence * 100)}%
               </span>
             </div>
           )}
           
           {categorizing && (
-            <div style={{
-              padding: '12px',
-              marginBottom: '12px',
-              backgroundColor: '#FFD700',
-              border: '2px solid #000000',
-              borderRadius: 0,
-              fontSize: '13px',
-              color: 'var(--black)',
-              textAlign: 'center'
-            }}>
-              <Sparkles size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+            <div className="ai-categorizing alert alert-yellow">
+              <Sparkles size={16} className="ai-categorizing-icon" />
               AI is analyzing your task...
-          </div>
+            </div>
           )}
           
           {error && (
-            <div style={{
-              padding: '12px',
-              marginBottom: '12px',
-              backgroundColor: '#FF6B6B',
-              border: '2px solid #000000',
-              borderRadius: 0,
-              fontSize: '13px',
-              color: 'var(--black)'
-            }}>
+            <div className="error-message alert alert-error">
               {error}
             </div>
           )}
@@ -185,7 +160,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
             />
           </div>
 
-          <div className="modal-actions">
+          <div className="modal-actions flex-center divider-top">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
               Cancel
             </button>
@@ -194,47 +169,6 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
             </button>
           </div>
         </form>
-
-        <style>{`
-          .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--black);
-          }
-
-          .modal-header h2 {
-            margin: 0;
-            font-size: 24px;
-            color: var(--black);
-          }
-
-          .form-group {
-            margin-bottom: 20px;
-          }
-
-          .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-          }
-
-          textarea.input {
-            resize: vertical;
-            font-family: inherit;
-          }
-
-          .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 2px solid var(--black);
-          }
-        `}</style>
       </div>
     </div>
   );

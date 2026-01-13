@@ -1,0 +1,75 @@
+/* Analytics page styles - extends base classes from index.css */
+
+.analytics-header h1 {
+  margin: 16px 0 0 0;
+}
+
+.analytics-title {
+  font-size: 28px;
+  margin-bottom: 24px;
+  color: var(--black);
+}
+
+.chart-header {
+  margin-bottom: 16px;
+}
+
+.chart-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chart-toggle-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.chart-card h2 {
+  margin-bottom: 8px;
+}
+
+.chart-description {
+  font-size: 14px;
+  margin: 0 0 24px 0;
+}
+
+.empty-chart {
+  height: 300px;
+}
+
+.summary-section {
+  margin-top: 32px;
+}
+
+.summary-section h2 {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+}
+
+.summary-grid {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.summary-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.summary-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--accent-yellow);
+}
+
+.summary-label {
+  font-size: 14px;
+  margin-top: 8px;
+}
+

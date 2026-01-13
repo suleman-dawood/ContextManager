@@ -165,3 +165,146 @@ body {
   }
 }
 
+/* Common base classes for reuse across components */
+
+/* Page wrapper - base for all pages */
+.page-wrapper {
+  min-height: 100vh;
+  background: var(--white);
+}
+
+/* Card/Section base - common container style */
+.card-base {
+  background: var(--white);
+  border-radius: 0;
+  border: 2px solid var(--black);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header base - common header style */
+.header-base {
+  background: var(--white);
+  padding: 24px;
+  border-bottom: 3px solid var(--black);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Content section base */
+.content-section {
+  background: var(--white);
+  border-radius: 0;
+  border: 2px solid var(--black);
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Typography base */
+.text-black {
+  color: var(--black);
+}
+
+.text-secondary {
+  color: var(--black);
+  opacity: 0.7;
+}
+
+.text-muted {
+  color: var(--black);
+  opacity: 0.5;
+}
+
+/* Heading styles */
+.heading-primary {
+  font-size: 24px;
+  color: var(--black);
+  margin: 0;
+}
+
+.heading-secondary {
+  font-size: 20px;
+  color: var(--black);
+  margin: 0;
+}
+
+.heading-tertiary {
+  font-size: 18px;
+  color: var(--black);
+  margin: 0;
+}
+
+/* Divider/separator */
+.divider-bottom {
+  border-bottom: 2px solid var(--black);
+  padding-bottom: 16px;
+}
+
+.divider-top {
+  border-top: 2px solid var(--black);
+  padding-top: 16px;
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 18px;
+  color: var(--black);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--black);
+  opacity: 0.6;
+}
+
+/* Badge base */
+.badge-base {
+  padding: 2px 8px;
+  border-radius: 0;
+  border: 1px solid var(--black);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--white);
+}
+
+/* Alert/Message styles */
+.alert {
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 2px solid var(--black);
+  border-radius: 0;
+  font-size: 13px;
+  color: var(--black);
+}
+
+.alert-yellow {
+  background-color: #FFD700;
+}
+
+.alert-error {
+  background-color: #FF6B6B;
+}
+
+/* Grid utilities */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+

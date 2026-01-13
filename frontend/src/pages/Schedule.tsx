@@ -3,6 +3,7 @@ import { getCurrentUser } from '../services/auth';
 import ScheduleView from '../components/ScheduleView';
 import { AppHeader } from '../components/AppHeader';
 import { useEffect } from 'react';
+import '../styles/Schedule.css';
 
 /**
  * Schedule page - AI-powered session planning with drag-and-drop
@@ -19,17 +20,10 @@ export const Schedule = () => {
   }, [navigate, user]);
 
   return (
-    <div className="schedule-page">
+    <div className="schedule-page page-wrapper">
       <AppHeader />
 
       <ScheduleView />
-
-      <style>{`
-        .schedule-page {
-          min-height: 100vh;
-          background: var(--white);
-        }
-      `}</style>
     </div>
   );
 };

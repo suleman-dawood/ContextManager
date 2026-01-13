@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Analytics } from './pages/Analytics';
-import { Settings } from './pages/Settings';
 import { Schedule } from './pages/Schedule';
 import { isAuthenticated } from './services/auth';
 import type { ReactNode } from 'react';
@@ -38,14 +37,6 @@ function App() {
           element={
             <ProtectedRoute>
               <Analytics />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Settings />
             </ProtectedRoute>
           }
         />

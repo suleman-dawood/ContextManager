@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import type { Task, UpdateTaskRequest, Context } from '../types';
 import { Priority, TaskStatus } from '../types';
+import '../styles/EditTaskModal.css';
 
 interface EditTaskModalProps {
   task: Task;
@@ -49,8 +50,8 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Edit Task</h2>
+        <div className="modal-header flex-between divider-bottom">
+          <h2 className="heading-primary">Edit Task</h2>
           <button className="btn-icon" onClick={onClose}>
             <X size={24} />
           </button>
@@ -147,7 +148,7 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
             </div>
           </div>
 
-          <div className="modal-actions">
+          <div className="modal-actions flex-center divider-top">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
               Cancel
             </button>
@@ -156,47 +157,6 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
             </button>
           </div>
         </form>
-
-        <style>{`
-          .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--black);
-          }
-
-          .modal-header h2 {
-            margin: 0;
-            font-size: 24px;
-            color: var(--black);
-          }
-
-          .form-group {
-            margin-bottom: 20px;
-          }
-
-          .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-          }
-
-          textarea.input {
-            resize: vertical;
-            font-family: inherit;
-          }
-
-          .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 2px solid var(--black);
-          }
-        `}</style>
       </div>
     </div>
   );

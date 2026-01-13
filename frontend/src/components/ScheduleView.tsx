@@ -54,13 +54,13 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
       className={`schedule-task-item ${isFirstInGroup ? 'first-in-group' : ''}`}
     >
       <div className="drag-handle" {...attributes} {...listeners}>
-        <GripVertical size={20} style={{ color: 'var(--black)' }} />
+        <GripVertical size={20} className="drag-handle-icon" />
       </div>
       
       <div className="task-content">
         {isFirstInGroup && (
           <div className="context-header" style={{ borderLeftColor: contextColor }}>
-            <span className="context-badge" style={{ backgroundColor: contextColor, color: 'var(--black)' }}>
+            <span className="context-badge context-badge-dynamic" style={{ backgroundColor: contextColor }}>
               {contextName}
             </span>
           </div>
@@ -69,22 +69,10 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
         <div className="task-details">
           <div className="task-header-row">
             <div>
-              <h4 style={{ 
-                color: 'var(--black)', 
-                textDecoration: item.task.status === TaskStatus.Completed ? 'line-through' : 'none',
-                opacity: item.task.status === TaskStatus.Completed ? 0.6 : 1
-              }}>
+              <h4 className={item.task.status === TaskStatus.Completed ? 'task-title-completed' : 'task-title-normal'}>
                 {item.task.title}
                 {item.task.status === TaskStatus.Completed && (
-                  <span style={{ 
-                    marginLeft: '8px', 
-                    fontSize: '0.75rem', 
-                    padding: '2px 6px', 
-                    background: 'var(--success)', 
-                    color: 'var(--black)', 
-                    border: '1px solid var(--black)',
-                    fontWeight: '600'
-                  }}>
+                  <span className="completed-badge">
                     ✓ Completed
                   </span>
                 )}
@@ -100,7 +88,6 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Removing task:', item.task.id);
                 onRemove(item.task.id);
               }}
               onMouseDown={(e) => {
@@ -113,17 +100,17 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
             </button>
           </div>
           {item.task.description && (
-            <p className="task-description" style={{ color: 'var(--black)' }}>{item.task.description}</p>
+            <p className="task-description">{item.task.description}</p>
           )}
           
           <div className="task-meta">
-            <span className="time-estimate" style={{ color: 'var(--black)' }}>
-              <Clock size={14} style={{ color: 'var(--black)' }} />
+            <span className="time-estimate">
+              <Clock size={14} />
               {item.task.estimatedMinutes} min
             </span>
             {item.reasoning && (
-              <span className="ai-reasoning" style={{ color: 'var(--black)' }}>
-                <Zap size={14} style={{ color: 'var(--black)' }} />
+              <span className="ai-reasoning">
+                <Zap size={14} />
                 {item.reasoning}
               </span>
             )}
@@ -375,41 +362,41 @@ export default function ScheduleView() {
         </div>
       </div>
 
-      {error && <div className="error-message" style={{ color: 'var(--black)', background: '#fee', border: '2px solid var(--accent-orange)' }}>{error}</div>}
+      {error && <div className="error-message">{error}</div>}
 
       {loading ? (
-        <div className="loading-state" style={{ color: 'var(--black)' }}>Loading session plan...</div>
+        <div className="loading-state">Loading session plan...</div>
       ) : !sessionPlan ? (
         <div className="empty-state">
-          <Calendar size={48} style={{ color: 'var(--black)' }} />
-          <h3 style={{ color: 'var(--black)' }}>No session plan for this date</h3>
-          <p style={{ color: 'var(--black)' }}>Generate an AI-powered session plan to organize your tasks</p>
+          <Calendar size={48} className="empty-state-icon" />
+          <h3 className="empty-state-title">No session plan for this date</h3>
+          <p className="empty-state-text">Generate an AI-powered session plan to organize your tasks</p>
         </div>
       ) : (
         <div className="session-plan-content">
           <div className="session-summary">
             <div className="summary-item">
-              <span className="label" style={{ color: 'var(--black)' }}>Total Tasks:</span>
-              <span className="value" style={{ color: 'var(--black)' }}>{sessionPlan.items.length}</span>
+              <span className="label summary-label">Total Tasks:</span>
+              <span className="value summary-value">{sessionPlan.items.length}</span>
             </div>
             <div className="summary-item">
-              <span className="label" style={{ color: 'var(--black)' }}>Estimated Time:</span>
-              <span className="value" style={{ color: 'var(--black)' }}>
+              <span className="label summary-label">Estimated Time:</span>
+              <span className="value summary-value">
                 {hours > 0 && `${hours}h `}
                 {minutes}m
               </span>
             </div>
             <div className="summary-item">
-              <span className="label" style={{ color: 'var(--black)' }}>Status:</span>
-              <span className={`value ${sessionPlan.isCustomized ? 'customized' : 'ai-generated'}`} style={{ color: 'var(--black)' }}>
+              <span className="label summary-label">Status:</span>
+              <span className={`value summary-value ${sessionPlan.isCustomized ? 'customized' : 'ai-generated'}`}>
                 {sessionPlan.isCustomized ? 'Customized' : 'AI Generated'}
               </span>
             </div>
           </div>
 
-          <div className="drag-instructions" style={{ background: 'var(--accent-yellow)', color: 'var(--black)' }}>
-            <GripVertical size={16} style={{ color: 'var(--black)' }} />
-            <span style={{ color: 'var(--black)' }}>Drag tasks to reorder your session</span>
+          <div className="drag-instructions">
+            <GripVertical size={16} className="drag-instructions-icon" />
+            <span className="drag-instructions-text">Drag tasks to reorder your session</span>
           </div>
 
           <DndContext

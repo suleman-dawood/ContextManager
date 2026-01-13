@@ -125,7 +125,7 @@ export interface SessionPlan {
   lastModifiedAt?: string;
   isCustomized: boolean;
   items: SessionPlanItem[];
-  totalEstimatedMinutes: number;
+  totalEstimatedMinutes?: number;
 }
 
 export interface GenerateSessionPlanRequest {

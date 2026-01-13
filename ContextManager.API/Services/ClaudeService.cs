@@ -79,7 +79,6 @@ namespace ContextManager.API.Services
             // - Not already in a session plan
             var tasks = await _db.Tasks
                 .Include(t => t.Context)
-                .Include(t => t.User)
                 .Where(t => t.UserId == userId 
                     && t.Status != Models.TaskStatus.Completed
                     && (t.DueDate == null || t.DueDate >= now)

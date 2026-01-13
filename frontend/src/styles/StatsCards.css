@@ -1,0 +1,46 @@
+/* Stats Cards component styles - extends base classes from index.css */
+
+.stats-cards {
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  border: 2px solid var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon-yellow {
+  background: #FFD700;
+}
+
+.stat-icon-orange {
+  background: #FF8C00;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+}
+
