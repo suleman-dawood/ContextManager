@@ -2,13 +2,11 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using ContextManager.API.Data;
 using ContextManager.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Database Configuration
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 if (!string.IsNullOrEmpty(connectionString))
 {
@@ -49,14 +47,15 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ClaudeService>();
 builder.Services.AddScoped<SessionPlanService>();
+builder.Services.AddScoped<TaskService>();
+builder.Services.AddScoped<AnalyticsService>();
 builder.Services.AddScoped<DatabaseMigrationService>();
 builder.Services.AddHttpClient();
 
-// CORS Configuration
+// CORS config
 var allowedOrigins = new List<string> { "http://localhost:3000", "http://localhost:5173" };
 var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
 if (!string.IsNullOrEmpty(frontendUrl))
@@ -88,43 +87,12 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Controllers and Swagger
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "Context Manager API", 
-        Version = "v1",
-        Description = "AI-powered task management with mental context classification"
-    });
-
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "JWT Authorization header using the Bearer scheme.",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
 
 var app = builder.Build();
 
-// Run database migrations on startup
+// database migrations on startup
 using (var scope = app.Services.CreateScope())
 {
     var migrationService = scope.ServiceProvider.GetRequiredService<DatabaseMigrationService>();
@@ -149,13 +117,6 @@ app.UseExceptionHandler(appBuilder =>
             error = app.Environment.IsDevelopment() ? exception?.ToString() : null
         }));
     });
-});
-
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Context Manager API v1");
-    c.RoutePrefix = string.Empty;
 });
 
 app.UseAuthentication();

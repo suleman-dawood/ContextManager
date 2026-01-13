@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Plus, LogOut, Calendar } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TaskList } from '../components/TaskList';
 import { ContextFilter } from '../components/ContextFilter';
 import { CreateTaskModal } from '../components/CreateTaskModal';
 import { EditTaskModal } from '../components/EditTaskModal';
 import { StatsCards } from '../components/StatsCards';
+import { AppHeader } from '../components/AppHeader';
 import { tasksApi, contextsApi } from '../services/api';
-import { getCurrentUser, logout } from '../services/auth';
+import { getCurrentUser } from '../services/auth';
 import type { Task, Context, CreateTaskRequest, UpdateTaskRequest } from '../types';
 import { TaskStatus } from '../types';
 import '../styles/Dashboard.css';
@@ -90,11 +91,6 @@ export const Dashboard = () => {
     await handleUpdateTask(taskId, updates);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   // Filter tasks based on selected context
   const filteredTasks = selectedContext
     ? tasks.filter(t => t.contextId === selectedContext)
@@ -106,23 +102,7 @@ export const Dashboard = () => {
 
   return (
     <div className="dashboard page-wrapper">
-      <header className="dashboard-header header-base">
-        <div>
-          <h1 className="heading-primary">Welcome back, {user?.name}!</h1>
-          <p className="text-secondary">Manage your tasks by mental context</p>
-        </div>
-        <div className="header-actions">
-          <button className="btn btn-primary" onClick={() => navigate('/schedule')}>
-            <Calendar size={18} /> Session Planner
-          </button>
-          <button className="btn btn-secondary" onClick={() => navigate('/analytics')}>
-            Analytics
-          </button>
-          <button className="btn btn-secondary" onClick={handleLogout}>
-            <LogOut size={18} /> Logout
-          </button>
-        </div>
-      </header>
+      <AppHeader />
 
       <div className="container">
         <StatsCards tasks={tasks} />

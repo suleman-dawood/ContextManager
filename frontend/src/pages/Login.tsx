@@ -165,7 +165,7 @@ export const Login = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: var(--black);
+          background: var(--white);
           padding: 20px;
         }
 

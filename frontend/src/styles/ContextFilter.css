@@ -1,7 +1,55 @@
 /* Context Filter - Filter tasks by context */
 
 .context-filter {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
   margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 2px solid var(--black);
+}
+
+.filter-btn {
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--black);
+  background: var(--white);
+  border: 2px solid var(--black);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.filter-btn:hover {
+  background: var(--gray-light);
+}
+
+.filter-btn.active {
+  background: var(--yellow);
+  border-color: var(--black);
+  position: relative;
+}
+
+.filter-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--black);
+}
+
+.filter-btn.active:hover {
+  background: var(--black);
+  color: var(--yellow);
+  border-color: var(--yellow);
+}
+
+.filter-btn.active:hover::after {
+  background: var(--yellow);
 }
 
 .context-filter-label {

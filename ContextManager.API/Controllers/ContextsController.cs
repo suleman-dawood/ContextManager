@@ -6,10 +6,6 @@ using ContextManager.API.Models;
 
 namespace ContextManager.API.Controllers
 {
-    /// <summary>
-    /// Handles operations for contexts (mental modes)
-    /// Contexts are pre-seeded and read-only
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -22,10 +18,7 @@ namespace ContextManager.API.Controllers
             _db = db;
         }
 
-        /// <summary>
-        /// Get all available contexts
         /// GET /api/contexts
-        /// </summary>
         [HttpGet]
         public async Task<ActionResult<List<Context>>> GetContexts()
         {

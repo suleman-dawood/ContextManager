@@ -5,9 +5,6 @@ using ContextManager.API.Services;
 
 namespace ContextManager.API.Controllers
 {
-    /// <summary>
-    /// Handles AI-powered task categorization
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -20,11 +17,7 @@ namespace ContextManager.API.Controllers
             _claudeService = claudeService;
         }
 
-        /// <summary>
-        /// AI-powered task categorization - Categorizes a task into the appropriate context
-        /// This is the core feature: intelligent task classification using Claude AI
         /// POST /api/suggestions/categorize
-        /// </summary>
         [HttpPost("categorize")]
         public async Task<ActionResult<ContextCategorizationResponse>> CategorizeTask([FromBody] CategorizeTaskRequest request)
         {
@@ -51,5 +44,5 @@ namespace ContextManager.API.Controllers
                 return StatusCode(500, new { message = "Failed to categorize task", error = ex.Message });
             }
         }
-        }
     }
+}

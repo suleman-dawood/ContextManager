@@ -27,9 +27,6 @@ export const ContextFilter = ({
         <button
           key={context.id}
           className={`filter-btn ${selectedContext === context.id ? 'active' : ''}`}
-          style={{
-            borderBottomColor: selectedContext === context.id ? context.color : undefined
-          }}
           onClick={() => onSelectContext(context.id)}
         >
           {context.name}

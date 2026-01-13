@@ -79,8 +79,8 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           <button className="btn btn-secondary btn-small" onClick={() => onEdit(task)}>
             Edit
           </button>
-          <button className="btn-icon" onClick={() => onDelete(task.id)} title="Delete task">
-            <Trash2 size={16} />
+          <button className="btn btn-secondary btn-small" onClick={() => onDelete(task.id)} title="Delete task">
+            <Trash2 size={16} /> Delete
           </button>
         </div>
       </div>

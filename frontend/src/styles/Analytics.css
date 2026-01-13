@@ -18,6 +18,7 @@
   font-size: var(--font-size-2xl);
   color: var(--black);
   margin-bottom: var(--space-lg);
+  margin-top: var(--space-xl);
 }
 
 /* Chart Section */

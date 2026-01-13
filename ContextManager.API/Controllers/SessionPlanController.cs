@@ -9,10 +9,6 @@ using ContextManager.API.Services;
 
 namespace ContextManager.API.Controllers
 {
-    /// <summary>
-    /// API controller for managing AI-powered session plans
-    /// Handles generation, retrieval, and customization of daily task schedules
-    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -25,17 +21,13 @@ namespace ContextManager.API.Controllers
             _sessionPlanService = sessionPlanService;
         }
 
-        /// <summary>
-        /// Generates a new AI-powered session plan for a specific date
         /// POST /api/sessionplan/generate
-        /// </summary>
         [HttpPost("generate")]
         public async Task<ActionResult<SessionPlanResponse>> GenerateSessionPlan([FromBody] GenerateSessionPlanRequest request)
         {
             try
             {
                 var userId = GetCurrentUserId();
-                // Ensure date is treated as UTC
                 var planDate = request.PlanDate.Kind == DateTimeKind.Unspecified 
                     ? DateTime.SpecifyKind(request.PlanDate, DateTimeKind.Utc)
                     : request.PlanDate.ToUniversalTime();
@@ -56,17 +48,13 @@ namespace ContextManager.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Gets an existing session plan for a specific date
         /// GET /api/sessionplan?date=2024-01-15
-        /// </summary>
         [HttpGet]
         public async Task<ActionResult<SessionPlanResponse>> GetSessionPlan([FromQuery] DateTime date)
         {
             try
             {
                 var userId = GetCurrentUserId();
-                // Ensure date is treated as UTC
                 var planDate = date.Kind == DateTimeKind.Unspecified 
                     ? DateTime.SpecifyKind(date, DateTimeKind.Utc)
                     : date.ToUniversalTime();
@@ -85,10 +73,7 @@ namespace ContextManager.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Gets all session plans within a date range
         /// GET /api/sessionplan/range?startDate=2024-01-01&endDate=2024-01-31
-        /// </summary>
         [HttpGet("range")]
         public async Task<ActionResult<List<SessionPlanResponse>>> GetSessionPlansInRange(
             [FromQuery] DateTime startDate, 
@@ -97,7 +82,6 @@ namespace ContextManager.API.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                // Ensure dates are treated as UTC
                 var start = startDate.Kind == DateTimeKind.Unspecified 
                     ? DateTime.SpecifyKind(startDate, DateTimeKind.Utc)
                     : startDate.ToUniversalTime();
@@ -113,10 +97,7 @@ namespace ContextManager.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Updates the order of tasks in a session plan (after user drag-and-drop)
         /// PUT /api/sessionplan/{id}/order
-        /// </summary>
         [HttpPut("{id}/order")]
         public async Task<ActionResult<SessionPlanResponse>> UpdateSessionPlanOrder(
             Guid id, 
@@ -138,9 +119,7 @@ namespace ContextManager.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Helper method to extract user ID from JWT token claims
-        /// </summary>
+        /// helper method to extract user ID from JWT token claims
         private Guid GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
