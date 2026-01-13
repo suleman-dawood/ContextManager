@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { analyticsApi } from '../services/api';
 import type { ContextDistribution, CompletionRate } from '../types';
 import { AppHeader } from '../components/AppHeader';
@@ -96,35 +96,6 @@ export const Analytics = () => {
               </ResponsiveContainer>
             ) : (
               <div className="empty-chart">No task data available</div>
-            )}
-          </div>
-
-          {/* Chart 2: Completion Rate Over Time */}
-          <div className="chart-card">
-            <h2>Completion Rate (Last 7 Days)</h2>
-            <p className="chart-description">Your daily task completion percentage</p>
-            {completionRate.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={completionRate}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip 
-                    formatter={(value: number) => `${value}%`}
-                    labelFormatter={(label) => `Date: ${label}`}
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="rate" 
-                    stroke="#FFD700" 
-                    strokeWidth={2}
-                    name="Completion Rate (%)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="empty-chart">No completion data available</div>
             )}
           </div>
         </div>

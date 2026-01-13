@@ -53,13 +53,13 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
       className={`schedule-task-item ${isFirstInGroup ? 'first-in-group' : ''}`}
     >
       <div className="drag-handle" {...attributes} {...listeners}>
-        <GripVertical size={20} />
+        <GripVertical size={20} style={{ color: 'var(--black)' }} />
       </div>
       
       <div className="task-content">
         {isFirstInGroup && (
           <div className="context-header" style={{ borderLeftColor: contextColor }}>
-            <span className="context-badge" style={{ backgroundColor: contextColor }}>
+            <span className="context-badge" style={{ backgroundColor: contextColor, color: 'var(--black)' }}>
               {contextName}
             </span>
           </div>
@@ -68,9 +68,9 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
         <div className="task-details">
           <div className="task-header-row">
             <div>
-              <h4>{item.task.title}</h4>
+              <h4 style={{ color: 'var(--black)' }}>{item.task.title}</h4>
               {item.startTime && (
-                <span className="task-time-range" style={{ color: 'var(--black)', fontSize: '0.875rem', opacity: 0.8 }}>
+                <span className="task-time-range">
                   {item.startTime} - {item.endTime}
                 </span>
               )}
@@ -78,26 +78,32 @@ function SortableTaskItem({ item, isFirstInGroup, contextName, contextColor, onR
             <button 
               className="btn-remove-task" 
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
+                console.log('Removing task:', item.task.id);
                 onRemove(item.task.id);
               }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+              }}
               title="Remove from plan"
+              type="button"
             >
               ×
             </button>
           </div>
           {item.task.description && (
-            <p className="task-description">{item.task.description}</p>
+            <p className="task-description" style={{ color: 'var(--black)' }}>{item.task.description}</p>
           )}
           
           <div className="task-meta">
-            <span className="time-estimate">
-              <Clock size={14} />
+            <span className="time-estimate" style={{ color: 'var(--black)' }}>
+              <Clock size={14} style={{ color: 'var(--black)' }} />
               {item.task.estimatedMinutes} min
             </span>
             {item.reasoning && (
-              <span className="ai-reasoning">
-                <Zap size={14} />
+              <span className="ai-reasoning" style={{ color: 'var(--black)' }}>
+                <Zap size={14} style={{ color: 'var(--black)' }} />
                 {item.reasoning}
               </span>
             )}
@@ -338,41 +344,41 @@ export default function ScheduleView() {
         </div>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message" style={{ color: 'var(--black)', background: '#fee', border: '2px solid var(--accent-orange)' }}>{error}</div>}
 
       {loading ? (
-        <div className="loading-state">Loading session plan...</div>
+        <div className="loading-state" style={{ color: 'var(--black)' }}>Loading session plan...</div>
       ) : !sessionPlan ? (
         <div className="empty-state">
-          <Calendar size={48} />
-          <h3>No session plan for this date</h3>
-          <p>Generate an AI-powered session plan to organize your tasks</p>
+          <Calendar size={48} style={{ color: 'var(--black)' }} />
+          <h3 style={{ color: 'var(--black)' }}>No session plan for this date</h3>
+          <p style={{ color: 'var(--black)' }}>Generate an AI-powered session plan to organize your tasks</p>
         </div>
       ) : (
         <div className="session-plan-content">
           <div className="session-summary">
             <div className="summary-item">
-              <span className="label">Total Tasks:</span>
-              <span className="value">{sessionPlan.items.length}</span>
+              <span className="label" style={{ color: 'var(--black)' }}>Total Tasks:</span>
+              <span className="value" style={{ color: 'var(--black)' }}>{sessionPlan.items.length}</span>
             </div>
             <div className="summary-item">
-              <span className="label">Estimated Time:</span>
-              <span className="value">
+              <span className="label" style={{ color: 'var(--black)' }}>Estimated Time:</span>
+              <span className="value" style={{ color: 'var(--black)' }}>
                 {hours > 0 && `${hours}h `}
                 {minutes}m
               </span>
             </div>
             <div className="summary-item">
-              <span className="label">Status:</span>
-              <span className={`value ${sessionPlan.isCustomized ? 'customized' : 'ai-generated'}`}>
+              <span className="label" style={{ color: 'var(--black)' }}>Status:</span>
+              <span className={`value ${sessionPlan.isCustomized ? 'customized' : 'ai-generated'}`} style={{ color: 'var(--black)' }}>
                 {sessionPlan.isCustomized ? 'Customized' : 'AI Generated'}
               </span>
             </div>
           </div>
 
-          <div className="drag-instructions">
-            <GripVertical size={16} />
-            Drag tasks to reorder your session
+          <div className="drag-instructions" style={{ background: 'var(--accent-yellow)', color: 'var(--black)' }}>
+            <GripVertical size={16} style={{ color: 'var(--black)' }} />
+            <span style={{ color: 'var(--black)' }}>Drag tasks to reorder your session</span>
           </div>
 
           <DndContext
