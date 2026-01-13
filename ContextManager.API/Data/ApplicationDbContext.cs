@@ -27,6 +27,12 @@ namespace ContextManager.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Explicitly set table names (PostgreSQL case sensitivity)
+            modelBuilder.Entity<User>().ToTable("Users");
+            modelBuilder.Entity<Context>().ToTable("Contexts");
+            modelBuilder.Entity<Models.Task>().ToTable("Tasks");
+            modelBuilder.Entity<TaskSuggestion>().ToTable("TaskSuggestions");
+
             // Configure User entity
             modelBuilder.Entity<User>(entity =>
             {

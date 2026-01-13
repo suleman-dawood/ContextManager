@@ -244,11 +244,36 @@ using (var scope = app.Services.CreateScope())
             
             if (!usersTableExists)
             {
-                // If tables don't exist, create them using EnsureCreated
-                // This will create all tables based on DbContext models
-                Console.WriteLine("🔄 Creating database tables (no migrations found)...");
-                await db.Database.EnsureCreatedAsync();
-                Console.WriteLine("✅ Database tables created successfully");
+                // If tables don't exist, apply migrations
+                // This uses proper EF Core migrations (clean approach)
+                Console.WriteLine("🔄 Creating database tables using migrations...");
+                try
+                {
+                    // Apply all pending migrations (will create tables and seed data)
+                    await db.Database.MigrateAsync();
+                    Console.WriteLine("✅ Database migrations applied successfully");
+                    
+                    // Verify Users table was created
+                    try
+                    {
+                        await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
+                        Console.WriteLine("✅ Verified: Users table exists");
+                    }
+                    catch (Exception verifyEx)
+                    {
+                        Console.WriteLine($"⚠️  Warning: Could not verify Users table: {verifyEx.Message}");
+                    }
+                }
+                catch (Exception migrateEx)
+                {
+                    Console.WriteLine($"❌ ERROR applying migrations:");
+                    Console.WriteLine($"   Error: {migrateEx.Message}");
+                    Console.WriteLine($"   Type: {migrateEx.GetType().Name}");
+                    if (migrateEx.InnerException != null)
+                    {
+                        Console.WriteLine($"   Inner: {migrateEx.InnerException.Message}");
+                    }
+                }
             }
             else if (pendingList.Any())
             {
