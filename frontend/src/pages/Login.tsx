@@ -31,10 +31,17 @@ export const Login = () => {
     setError('');
     try {
       const response = await authApi.login(loginData);
-      saveAuth(response);
-      navigate('/dashboard');
+      console.log('Login response:', response); // Debug log
+      if (response && response.token) {
+        saveAuth(response);
+        navigate('/dashboard');
+      } else {
+        setError('Invalid response from server');
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      console.error('Login error:', err); // Debug log
+      const errorMessage = err.response?.data?.message || err.message || 'Login failed';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

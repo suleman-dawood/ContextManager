@@ -31,13 +31,18 @@ api.interceptors.request.use((config) => {
 });
 
 // Handle 401 errors (unauthorized - redirect to login)
+// Don't redirect for auth endpoints - they return 401 for invalid credentials
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      const url = error.config?.url || '';
+      // Don't redirect if it's a login/register attempt - let the component handle the error
+      if (!url.includes('/auth/login') && !url.includes('/auth/register')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
