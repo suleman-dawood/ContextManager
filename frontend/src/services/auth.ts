@@ -1,31 +1,19 @@
 import type { AuthResponse, User } from '../types';
 
-/**
- * Save authentication data to localStorage
- */
-export const saveAuth = (authData: AuthResponse | any): void => {
-  // Handle both camelCase (token) and PascalCase (Token) for compatibility
-  const token = authData.token || authData.Token;
-  const userId = authData.userId || authData.UserId;
-  const email = authData.email || authData.Email;
-  const name = authData.name || authData.Name;
-  
-  if (!token) {
+export function saveAuth(authData: AuthResponse): void {
+  if (!authData.token) {
     throw new Error('Invalid authentication response');
   }
   
-  localStorage.setItem('token', token);
+  localStorage.setItem('token', authData.token);
   localStorage.setItem('user', JSON.stringify({
-    id: userId,
-    email: email,
-    name: name
+    id: authData.userId,
+    email: authData.email,
+    name: authData.name
   }));
-};
+}
 
-/**
- * Get current user from localStorage
- */
-export const getCurrentUser = (): User | null => {
+export function getCurrentUser(): User | null {
   const userJson = localStorage.getItem('user');
   if (!userJson) return null;
   
@@ -34,27 +22,18 @@ export const getCurrentUser = (): User | null => {
   } catch {
     return null;
   }
-};
+}
 
-/**
- * Get auth token from localStorage
- */
-export const getToken = (): string | null => {
+export function getToken(): string | null {
   return localStorage.getItem('token');
-};
+}
 
-/**
- * Check if user is authenticated
- */
-export const isAuthenticated = (): boolean => {
+export function isAuthenticated(): boolean {
   return getToken() !== null;
-};
+}
 
-/**
- * Logout and clear authentication data
- */
-export const logout = (): void => {
+export function logout(): void {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-};
+}
 

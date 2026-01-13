@@ -16,7 +16,7 @@ import type {
   UpdateSessionPlanOrderRequest
 } from '../types';
 
-// Create axios instance with base configuration
+// axios instance with base configuration
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   headers: {
@@ -25,9 +25,9 @@ const api = axios.create({
   withCredentials: true
 });
 
-// Add token to requests if it exists
-api.interceptors.request.use((config) => {
-  // Skip auth header for login/register endpoints
+// intercepts every API request and runs before it
+api.interceptors.request.use(function(config) {
+  // skip authentican header for login/register endpoints
   if (config.url?.includes('/auth/login') || config.url?.includes('/auth/register')) {
     return config;
   }
@@ -39,55 +39,39 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 errors (unauthorized - redirect to login)
-// Don't redirect for auth endpoints - they return 401 for invalid credentials
+// runs after every API response
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+  function(response) {
+    return response;
+  },
+  function(error) {
+    if (error.response?.status === 401) { //login error
       const url = error.config?.url || '';
-      // Don't redirect if it's a login/register attempt - let the component handle the error
       if (!url.includes('/auth/login') && !url.includes('/auth/register')) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';
       }
     }
+    // rethrowing the error for components
     return Promise.reject(error);
   }
 );
 
-// ========================================
-// Authentication API
-// ========================================
-
 export const authApi = {
-  /**
-   * Register a new user account
-   */
-  register: async (data: RegisterRequest): Promise<AuthResponse> => {
+  register: async function(data: RegisterRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>('/auth/register', data);
     return response.data;
   },
 
-  /**
-   * Login with existing credentials
-   */
-  login: async (data: LoginRequest): Promise<AuthResponse> => {
+  login: async function(data: LoginRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>('/auth/login', data);
     return response.data;
   }
 };
 
-// ========================================
-// Tasks API
-// ========================================
-
 export const tasksApi = {
-  /**
-   * Get all tasks with optional filters
-   */
-  getTasks: async (contextId?: string, status?: number): Promise<Task[]> => {
+  getTasks: async function(contextId?: string, status?: number): Promise<Task[]> {
     const params = new URLSearchParams();
     if (contextId) params.append('contextId', contextId);
     if (status !== undefined) params.append('status', status.toString());
@@ -96,123 +80,68 @@ export const tasksApi = {
     return response.data;
   },
 
-  /**
-   * Get a single task by ID
-   */
-  getTask: async (id: string): Promise<Task> => {
+  getTask: async function(id: string): Promise<Task> {
     const response = await api.get<Task>(`/tasks/${id}`);
     return response.data;
   },
 
-  /**
-   * Create a new task
-   */
-  createTask: async (data: CreateTaskRequest): Promise<Task> => {
+  createTask: async function(data: CreateTaskRequest): Promise<Task> {
     const response = await api.post<Task>('/tasks', data);
     return response.data;
   },
 
-  /**
-   * Update an existing task
-   */
-  updateTask: async (id: string, data: UpdateTaskRequest): Promise<Task> => {
+  updateTask: async function(id: string, data: UpdateTaskRequest): Promise<Task> {
     const response = await api.put<Task>(`/tasks/${id}`, data);
     return response.data;
   },
 
-  /**
-   * Delete a task
-   */
-  deleteTask: async (id: string): Promise<void> => {
+  deleteTask: async function(id: string): Promise<void> {
     await api.delete(`/tasks/${id}`);
   }
 };
 
-// ========================================
-// Contexts API
-// ========================================
-
 export const contextsApi = {
-  /**
-   * Get all available contexts
-   */
-  getContexts: async (): Promise<Context[]> => {
+  getContexts: async function(): Promise<Context[]> {
     const response = await api.get<Context[]>('/contexts');
     return response.data;
   }
 };
 
-// ========================================
-// AI Suggestions API
-// ========================================
-
 export const suggestionsApi = {
-  /**
-   * AI-powered context categorization - Categorizes a task into the appropriate context
-   * This is the core feature: intelligent task classification using Claude AI
-   */
-  categorizeTask: async (data: CategorizeTaskRequest): Promise<ContextCategorizationResponse> => {
+  categorizeTask: async function(data: CategorizeTaskRequest): Promise<ContextCategorizationResponse> {
     const response = await api.post<ContextCategorizationResponse>('/suggestions/categorize', data);
     return response.data;
   }
 };
 
-// ========================================
-// Session Planning API (Star Feature!)
-// ========================================
-
 export const sessionPlanApi = {
-  /**
-   * Generate a new AI-powered session plan for a specific date
-   * This is the star feature: intelligently orders tasks for the day with context grouping
-   */
-  generateSessionPlan: async (data: GenerateSessionPlanRequest): Promise<SessionPlan> => {
+  generateSessionPlan: async function(data: GenerateSessionPlanRequest): Promise<SessionPlan> {
     const response = await api.post<SessionPlan>('/sessionplan/generate', data);
     return response.data;
   },
 
-  /**
-   * Get an existing session plan for a specific date
-   */
-  getSessionPlan: async (date: string): Promise<SessionPlan> => {
+  getSessionPlan: async function(date: string): Promise<SessionPlan> {
     const response = await api.get<SessionPlan>(`/sessionplan?date=${date}`);
     return response.data;
   },
-
-  /**
-   * Get all session plans within a date range (for calendar view)
-   */
-  getSessionPlansInRange: async (startDate: string, endDate: string): Promise<SessionPlan[]> => {
+  getSessionPlansInRange: async function(startDate: string, endDate: string): Promise<SessionPlan[]> {
     const response = await api.get<SessionPlan[]>(`/sessionplan/range?startDate=${startDate}&endDate=${endDate}`);
     return response.data;
   },
 
-  /**
-   * Update the order of tasks in a session plan (after user drag-and-drop)
-   */
-  updateSessionPlanOrder: async (sessionPlanId: string, data: UpdateSessionPlanOrderRequest): Promise<SessionPlan> => {
+  updateSessionPlanOrder: async function(sessionPlanId: string, data: UpdateSessionPlanOrderRequest): Promise<SessionPlan> {
     const response = await api.put<SessionPlan>(`/sessionplan/${sessionPlanId}/order`, data);
     return response.data;
   }
 };
 
-// ========================================
-// Analytics API
-// ========================================
-
 export const analyticsApi = {
-  /**
-   * Get task distribution across contexts
-   */
-  getContextDistribution: async (activeOnly: boolean = false): Promise<ContextDistribution[]> => {
+  getContextDistribution: async function(activeOnly: boolean = false): Promise<ContextDistribution[]> {
     const response = await api.get<ContextDistribution[]>(`/analytics/context-distribution?activeOnly=${activeOnly}`);
     return response.data;
   },
 
-  /**
-   * Get completion rate over last 7 days
-   */
-  getCompletionRate: async (): Promise<CompletionRate[]> => {
+  getCompletionRate: async function(): Promise<CompletionRate[]> {
     const response = await api.get<CompletionRate[]>('/analytics/completion-rate');
     return response.data;
   }
