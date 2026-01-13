@@ -7,7 +7,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Black, white, yellow theme
         primary: {
           DEFAULT: '#FFD700',
           dark: '#FFC107',
@@ -23,7 +22,6 @@ export default {
           medium: '#CCCCCC',
           dark: '#333333',
         },
-        // Semantic colors using theme
         success: '#FFD700',
         warning: '#FF8C00',
         danger: '#FF8C00',

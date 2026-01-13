@@ -6,19 +6,15 @@ import { Schedule } from './pages/Schedule';
 import { isAuthenticated } from './services/auth';
 import type { ReactNode } from 'react';
 
-/**
- * Protected route component - redirects to login if not authenticated
- */
-const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+
+// redirects to login if not authenticated
+function ProtectedRoute ({ children }: { children: ReactNode }) {
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
   return <>{children}</>;
-};
+}
 
-/**
- * Main App component with routing
- */
 function App() {
   return (
     <BrowserRouter>

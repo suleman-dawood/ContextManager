@@ -1,4 +1,3 @@
-// Enums matching backend
 export enum Priority {
   Low = 0,
   Medium = 1,
@@ -11,7 +10,6 @@ export enum TaskStatus {
   Completed = 2
 }
 
-// Core entities
 export interface User {
   id: string;
   email: string;
@@ -42,7 +40,6 @@ export interface Task {
   completedAt?: string;
 }
 
-// Analytics
 export interface ContextDistribution {
   context: string;
   color: string;
@@ -56,7 +53,6 @@ export interface CompletionRate {
   total: number;
 }
 
-// API Request/Response types
 export interface LoginRequest {
   email: string;
   password: string;
@@ -94,7 +90,6 @@ export interface UpdateTaskRequest {
   dueDate?: string;
 }
 
-// AI Categorization
 export interface ContextCategorizationResponse {
   contextId: string;
   contextName: string;
@@ -107,7 +102,6 @@ export interface CategorizeTaskRequest {
   description: string;
 }
 
-// Session Planning
 export interface SessionPlanItem {
   id: string;
   task: Task;
