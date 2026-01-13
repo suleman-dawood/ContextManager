@@ -164,14 +164,6 @@ app.UseExceptionHandler(appBuilder =>
         var exception = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
         var errorMessage = exception?.Message ?? "An internal server error occurred";
         
-        // Log the full error for debugging
-        Console.WriteLine($"Unhandled exception: {exception?.GetType().Name}: {errorMessage}");
-        if (exception?.InnerException != null)
-        {
-            Console.WriteLine($"Inner exception: {exception.InnerException.Message}");
-        }
-        Console.WriteLine($"Stack trace: {exception?.StackTrace}");
-        
         await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
         {
             message = errorMessage,

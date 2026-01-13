@@ -27,6 +27,7 @@ namespace ContextManager.API.Services
             _db = db;
             
             // Set up HTTP client for Claude API
+            _httpClient.BaseAddress = new Uri("https://api.anthropic.com/");
             _httpClient.DefaultRequestHeaders.Add("x-api-key", _apiKey);
             _httpClient.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
         }
@@ -154,7 +155,7 @@ Important:
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(
-                "https://api.anthropic.com/v1/messages",
+                "v1/messages",
                 content
             );
 

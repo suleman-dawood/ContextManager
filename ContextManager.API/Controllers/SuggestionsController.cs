@@ -52,10 +52,18 @@ namespace ContextManager.API.Controllers
 
                 if (!suggestions.Any())
                 {
-                    return Ok(new { message = "No pending tasks found for this context", suggestions = new List<TaskSuggestionResponse>() });
+                    return Ok(new List<TaskSuggestionResponse>());
                 }
 
                 return Ok(suggestions);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(502, new { message = "AI service unavailable", error = ex.Message });
             }
             catch (Exception ex)
             {

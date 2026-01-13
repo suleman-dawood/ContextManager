@@ -14,13 +14,20 @@ interface EditTaskModalProps {
  */
 export const EditTaskModal = ({ task, onClose, onSubmit }: EditTaskModalProps) => {
   const [loading, setLoading] = useState(false);
+  
+  // Convert ISO datetime to YYYY-MM-DD format for date input
+  const formatDateForInput = (isoDate?: string) => {
+    if (!isoDate) return undefined;
+    return isoDate.split('T')[0];
+  };
+  
   const [formData, setFormData] = useState<UpdateTaskRequest>({
     title: task.title,
     description: task.description,
     estimatedMinutes: task.estimatedMinutes,
     priority: task.priority,
     status: task.status,
-    dueDate: task.dueDate
+    dueDate: formatDateForInput(task.dueDate)
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
