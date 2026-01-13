@@ -46,8 +46,9 @@ namespace ContextManager.API.Services
         /// </summary>
         public string GenerateJwtToken(User user)
         {
-            // Get JWT secret from configuration (must be at least 32 characters)
-            var jwtSecret = _configuration["JwtSettings:Secret"] 
+            // Get JWT secret from environment variable or configuration (must be at least 32 characters)
+            var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
+                ?? _configuration["JwtSettings:Secret"] 
                 ?? throw new InvalidOperationException("JWT Secret not configured");
             
             var jwtIssuer = _configuration["JwtSettings:Issuer"] ?? "ContextManager";
