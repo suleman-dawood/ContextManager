@@ -5,7 +5,7 @@ import type { Context, CreateTaskRequest, ContextCategorizationResponse } from '
 import { Priority } from '../types';
 
 interface CreateTaskModalProps {
-  contexts: Context[];
+  contexts?: Context[]; // Optional, no longer used but kept for backward compatibility
   onClose: () => void;
   onSubmit: (task: CreateTaskRequest) => Promise<void>;
 }
@@ -13,12 +13,12 @@ interface CreateTaskModalProps {
 /**
  * Modal for creating a new task
  */
-export const CreateTaskModal = ({ contexts, onClose, onSubmit }: CreateTaskModalProps) => {
+export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => {
   const [loading, setLoading] = useState(false);
   const [categorizing, setCategorizing] = useState(false);
   const [categorization, setCategorization] = useState<ContextCategorizationResponse | null>(null);
-  const [formData, setFormData] = useState<CreateTaskRequest>({
-    contextId: contexts[0]?.id || '',
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<Omit<CreateTaskRequest, 'contextId'>>({
     title: '',
     description: '',
     estimatedMinutes: 30,
@@ -26,40 +26,40 @@ export const CreateTaskModal = ({ contexts, onClose, onSubmit }: CreateTaskModal
     dueDate: undefined
   });
 
-  // Handle AI categorization
-  const handleCategorize = async () => {
+  // Auto-categorize task on submit
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!formData.title.trim()) {
-      alert('Please enter a task title first');
+      setError('Please enter a task title');
       return;
     }
 
-    setCategorizing(true);
-    setCategorization(null);
+    setLoading(true);
+    setError(null);
+    
     try {
+      // First, categorize the task with AI
+      setCategorizing(true);
       const result = await suggestionsApi.categorizeTask({
         title: formData.title,
         description: formData.description
       });
       setCategorization(result);
-      // Auto-select the suggested context
-      setFormData({ ...formData, contextId: result.contextId });
-    } catch (error: any) {
-      console.error('Failed to categorize task:', error);
-      alert(error.response?.data?.message || 'Failed to categorize task. Please try again.');
-    } finally {
       setCategorizing(false);
-    }
-  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await onSubmit(formData);
+      // Then submit with the AI-selected context
+      const taskData: CreateTaskRequest = {
+        ...formData,
+        contextId: result.contextId
+      };
+      
+      await onSubmit(taskData);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create task:', error);
-      alert('Failed to create task. Please try again.');
+      setCategorizing(false);
+      setError(error.response?.data?.message || 'Failed to create task. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -88,51 +88,55 @@ export const CreateTaskModal = ({ contexts, onClose, onSubmit }: CreateTaskModal
             />
           </div>
 
-          <div className="form-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <label className="label" style={{ margin: 0 }}>Context *</label>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={handleCategorize}
-                disabled={categorizing || !formData.title.trim()}
-                style={{ padding: '6px 12px', fontSize: '12px' }}
-              >
-                <Sparkles size={14} />
-                {categorizing ? 'AI Analyzing...' : 'Auto-Categorize with AI'}
-              </button>
+          {categorization && (
+            <div style={{
+              padding: '12px',
+              marginBottom: '12px',
+              backgroundColor: '#FFD700',
+              border: '2px solid #000000',
+              borderRadius: 0,
+              fontSize: '13px',
+              color: 'var(--black)'
+            }}>
+              <strong>AI Selected Context: {categorization.contextName}</strong>
+              <br />
+              <span style={{ opacity: 0.8 }}>{categorization.reasoning}</span>
+              <br />
+              <span style={{ fontSize: '11px', opacity: 0.7 }}>
+                Confidence: {Math.round(categorization.confidence * 100)}%
+              </span>
             </div>
-            {categorization && (
-              <div style={{
-                padding: '12px',
-                marginBottom: '12px',
-                backgroundColor: '#FFD700',
-                border: '2px solid #000000',
-                borderRadius: 0,
-                fontSize: '13px'
-              }}>
-                <strong>AI Suggestion: {categorization.contextName}</strong>
-                <br />
-                <span style={{ opacity: 0.8 }}>{categorization.reasoning}</span>
-                <br />
-                <span style={{ fontSize: '11px', opacity: 0.7 }}>
-                  Confidence: {Math.round(categorization.confidence * 100)}%
-                </span>
-              </div>
-            )}
-            <select
-              className="input"
-              value={formData.contextId}
-              onChange={(e) => setFormData({ ...formData, contextId: e.target.value })}
-              required
-            >
-              {contexts.map(context => (
-                <option key={context.id} value={context.id}>
-                  {context.name} - {context.description}
-                </option>
-              ))}
-            </select>
-          </div>
+          )}
+          
+          {categorizing && (
+            <div style={{
+              padding: '12px',
+              marginBottom: '12px',
+              backgroundColor: '#FFD700',
+              border: '2px solid #000000',
+              borderRadius: 0,
+              fontSize: '13px',
+              color: 'var(--black)',
+              textAlign: 'center'
+            }}>
+              <Sparkles size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+              AI is analyzing your task...
+            </div>
+          )}
+          
+          {error && (
+            <div style={{
+              padding: '12px',
+              marginBottom: '12px',
+              backgroundColor: '#FF6B6B',
+              border: '2px solid #000000',
+              borderRadius: 0,
+              fontSize: '13px',
+              color: 'var(--black)'
+            }}>
+              {error}
+            </div>
+          )}
 
           <div className="form-group">
             <label className="label">Description</label>

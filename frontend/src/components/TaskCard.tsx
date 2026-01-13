@@ -31,9 +31,10 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
     const now = new Date();
     const isOverdue = dueDate < now && task.status !== TaskStatus.Completed;
     const formatted = dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const textColor = isOverdue ? 'var(--accent-orange)' : 'var(--black)';
     return (
-      <span className={isOverdue ? 'text-danger' : ''}>
-        <Calendar size={14} /> {formatted}
+      <span style={{ color: textColor, display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <Calendar size={14} style={{ color: textColor }} /> {formatted}
       </span>
     );
   };
@@ -67,8 +68,8 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
         <span className="context-badge" style={{ background: task.contextColor }}>
           {task.contextName}
         </span>
-        <span>
-          <Clock size={14} /> {task.estimatedMinutes}min
+        <span style={{ color: 'var(--black)' }}>
+          <Clock size={14} style={{ color: 'var(--black)' }} /> {task.estimatedMinutes}min
         </span>
         {formatDueDate(task.dueDate)}
         <span className={`status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
@@ -130,15 +131,18 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           gap: 16px;
           align-items: center;
           font-size: 13px;
-          color: var(--black);
           margin-bottom: 12px;
-          opacity: 0.8;
         }
 
         .task-meta span {
           display: flex;
           align-items: center;
           gap: 4px;
+          color: var(--black);
+        }
+
+        .task-meta svg {
+          color: var(--black);
         }
 
         .context-badge {
