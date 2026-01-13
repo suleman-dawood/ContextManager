@@ -115,9 +115,6 @@ namespace ContextManager.API.Services
                 .Include(sp => sp.Items)
                     .ThenInclude(spi => spi.Task)
                         .ThenInclude(t => t.Context)
-                .Include(sp => sp.Items)
-                    .ThenInclude(spi => spi.Task)
-                        .ThenInclude(t => t.User)
                 .FirstOrDefaultAsync(sp => sp.UserId == userId && sp.PlanDate == planDate);
             
             if (sessionPlan == null)
@@ -214,9 +211,6 @@ namespace ContextManager.API.Services
                 .Include(sp => sp.Items)
                     .ThenInclude(spi => spi.Task)
                         .ThenInclude(t => t.Context)
-                .Include(sp => sp.Items)
-                    .ThenInclude(spi => spi.Task)
-                        .ThenInclude(t => t.User)
                 .Where(sp => sp.UserId == userId && sp.PlanDate >= startDate && sp.PlanDate <= endDate)
                 .OrderBy(sp => sp.PlanDate)
                 .ToListAsync();
@@ -248,6 +242,11 @@ namespace ContextManager.API.Services
         /// </summary>
         private TaskResponse MapTaskToDTO(Models.Task task)
         {
+            if (task == null)
+            {
+                throw new ArgumentNullException(nameof(task));
+            }
+
             return new TaskResponse
             {
                 Id = task.Id,
@@ -255,8 +254,8 @@ namespace ContextManager.API.Services
                 ContextId = task.ContextId,
                 ContextName = task.Context?.Name ?? "",
                 ContextColor = task.Context?.Color ?? "",
-                Title = task.Title,
-                Description = task.Description,
+                Title = task.Title ?? "",
+                Description = task.Description ?? "",
                 EstimatedMinutes = task.EstimatedMinutes,
                 Priority = task.Priority,
                 Status = task.Status,

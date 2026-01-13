@@ -148,46 +148,72 @@ namespace ContextManager.API.Controllers
         /// </summary>
         [HttpPost]
         public async Task<ActionResult<TaskResponse>> CreateTask([FromBody] CreateTaskRequest request)
+        {
+            try
             {
                 var userId = _authService.GetUserIdFromClaims(User);
+
+                // Validate request
+                if (request.ContextId == Guid.Empty)
+                {
+                    return BadRequest(new { message = "ContextId is required" });
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Title))
+                {
+                    return BadRequest(new { message = "Title is required" });
+                }
+
+                // Verify context exists
+                var context = await _db.Contexts.FindAsync(request.ContextId);
+                if (context == null)
+                {
+                    return BadRequest(new { message = "Invalid context ID" });
+                }
 
                 var task = new Models.Task
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
                     ContextId = request.ContextId,
-                Title = request.Title,
-                Description = request.Description,
+                    Title = request.Title,
+                    Description = request.Description ?? string.Empty,
                     EstimatedMinutes = request.EstimatedMinutes,
                     Priority = request.Priority,
-                Status = TaskStatus.Todo,
-                DueDate = request.DueDate,
+                    Status = TaskStatus.Todo,
+                    DueDate = request.DueDate,
                     CreatedAt = DateTime.UtcNow
                 };
 
                 _db.Tasks.Add(task);
                 await _db.SaveChangesAsync();
 
-            var context = await _db.Contexts.FindAsync(request.ContextId);
-            
-            var response = new TaskResponse
-                    {
-                        Id = task.Id,
-                        UserId = task.UserId,
-                        ContextId = task.ContextId,
-                ContextName = context?.Name ?? "",
-                ContextColor = context?.Color ?? "",
-                        Title = task.Title,
-                        Description = task.Description,
-                        EstimatedMinutes = task.EstimatedMinutes,
-                        Priority = task.Priority,
-                        Status = task.Status,
-                        DueDate = task.DueDate,
-                        CreatedAt = task.CreatedAt,
-                        CompletedAt = task.CompletedAt
-            };
-            
-            return CreatedAtAction(nameof(GetTask), new { id = task.Id }, response);
+                // Reload context to ensure we have the latest data
+                context = await _db.Contexts.FindAsync(request.ContextId);
+                
+                var response = new TaskResponse
+                {
+                    Id = task.Id,
+                    UserId = task.UserId,
+                    ContextId = task.ContextId,
+                    ContextName = context?.Name ?? "",
+                    ContextColor = context?.Color ?? "",
+                    Title = task.Title,
+                    Description = task.Description,
+                    EstimatedMinutes = task.EstimatedMinutes,
+                    Priority = task.Priority,
+                    Status = task.Status,
+                    DueDate = task.DueDate,
+                    CreatedAt = task.CreatedAt,
+                    CompletedAt = task.CompletedAt
+                };
+                
+                return CreatedAtAction(nameof(GetTask), new { id = task.Id }, response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to create task", error = ex.Message });
+            }
         }
 
         /// <summary>
