@@ -106,6 +106,7 @@ namespace ContextManager.API.Services
         /// <summary>
         /// Retrieves an existing session plan for a specific date
         /// Returns null if no plan exists
+        /// Automatically filters out completed tasks
         /// </summary>
         public async Task<SessionPlanResponse?> GetSessionPlanAsync(Guid userId, DateTime planDate)
         {
@@ -123,14 +124,75 @@ namespace ContextManager.API.Services
                 return null;
             }
             
-            // Map to response DTO with calculated start/end times
-            var orderedItems = sessionPlan.Items.OrderBy(spi => spi.Order).ToList();
+            // Filter out completed tasks and remove them from the plan
+            var completedItems = sessionPlan.Items
+                .Where(spi => spi.Task.Status == Models.TaskStatus.Completed)
+                .ToList();
+            
+            if (completedItems.Any())
+            {
+                // Remove completed tasks from the plan
+                foreach (var item in completedItems)
+                {
+                    _context.SessionPlanItems.Remove(item);
+                    sessionPlan.Items.Remove(item);
+                }
+                
+                // If all tasks were completed, delete the entire plan
+                if (!sessionPlan.Items.Any())
+                {
+                    _context.SessionPlans.Remove(sessionPlan);
+                    await _context.SaveChangesAsync();
+                    return null;
+                }
+                
+                // Reorder remaining items
+                var remainingItems = sessionPlan.Items.OrderBy(spi => spi.Order).ToList();
+                for (int i = 0; i < remainingItems.Count; i++)
+                {
+                    remainingItems[i].Order = i;
+                }
+                
+                // Recalculate group numbers
+                int groupNumber = 0;
+                Guid? lastContextId = null;
+                foreach (var item in remainingItems.OrderBy(spi => spi.Order))
+                {
+                    if (lastContextId.HasValue && lastContextId.Value != item.Task.ContextId)
+                    {
+                        groupNumber++;
+                    }
+                    item.GroupNumber = groupNumber;
+                    lastContextId = item.Task.ContextId;
+                }
+                
+                sessionPlan.IsCustomized = true;
+                sessionPlan.LastModifiedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
+            
+            // Map to response DTO with calculated start/end times (only non-completed tasks)
+            var orderedItems = sessionPlan.Items
+                .Where(spi => spi.Task.Status != Models.TaskStatus.Completed)
+                .OrderBy(spi => spi.Order)
+                .ToList();
+            
             var currentTime = new TimeSpan(9, 0, 0); // Start at 9 AM
             
             var itemsWithTimes = orderedItems.Select(spi =>
             {
                 var startTime = currentTime;
                 var endTime = currentTime.Add(TimeSpan.FromMinutes(spi.Task.EstimatedMinutes));
+                
+                // Ensure we don't exceed 5 PM (17:00 = 17 hours = 1020 minutes from midnight)
+                // 9 AM = 9 * 60 = 540 minutes from midnight
+                // 5 PM = 17 * 60 = 1020 minutes from midnight
+                var maxTime = new TimeSpan(17, 0, 0);
+                if (endTime > maxTime)
+                {
+                    endTime = maxTime;
+                }
+                
                 currentTime = endTime;
                 
                 return new SessionPlanItemResponse
@@ -153,7 +215,7 @@ namespace ContextManager.API.Services
                 LastModifiedAt = sessionPlan.LastModifiedAt,
                 IsCustomized = sessionPlan.IsCustomized,
                 Items = itemsWithTimes,
-                TotalEstimatedMinutes = sessionPlan.Items.Sum(spi => spi.Task.EstimatedMinutes)
+                TotalEstimatedMinutes = itemsWithTimes.Sum(item => item.Task.EstimatedMinutes)
             };
             
             return response;
@@ -190,7 +252,14 @@ namespace ContextManager.API.Services
                 throw new InvalidOperationException("Session plan not found");
             }
             
-            // Update order of items based on taskIds array
+            // Remove items that are not in the taskIds list (user removed them)
+            var itemsToRemove = sessionPlan.Items.Where(spi => !taskIds.Contains(spi.TaskId)).ToList();
+            foreach (var item in itemsToRemove)
+            {
+                _context.SessionPlanItems.Remove(item);
+            }
+            
+            // Update order of remaining items based on taskIds array
             for (int i = 0; i < taskIds.Count; i++)
             {
                 var item = sessionPlan.Items.FirstOrDefault(spi => spi.TaskId == taskIds[i]);
@@ -200,8 +269,11 @@ namespace ContextManager.API.Services
                 }
             }
             
-            // Recalculate group numbers based on new order
-            var orderedItems = sessionPlan.Items.OrderBy(spi => spi.Order).ToList();
+            // Recalculate group numbers based on new order (only for remaining items)
+            var orderedItems = sessionPlan.Items
+                .Where(spi => taskIds.Contains(spi.TaskId))
+                .OrderBy(spi => spi.Order)
+                .ToList();
             int groupNumber = 0;
             Guid? lastContextId = null;
             

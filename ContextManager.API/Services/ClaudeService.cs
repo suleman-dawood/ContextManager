@@ -101,6 +101,40 @@ namespace ContextManager.API.Services
 
             // Parse session plan
             var sessionPlan = ParseSessionPlanResponse(claudeResponse, tasks);
+            
+            // Validate total time doesn't exceed 8 hours (480 minutes)
+            var totalMinutes = sessionPlan.Items.Sum(item => item.Task.EstimatedMinutes);
+            if (totalMinutes > 480)
+            {
+                // If Claude returned too many tasks, trim to fit within 480 minutes
+                // Prioritize keeping high priority tasks and those with due dates
+                var originalItems = sessionPlan.Items.ToList();
+                var sortedItems = originalItems
+                    .OrderByDescending(item => item.Task.Priority)
+                    .ThenBy(item => item.Task.DueDate ?? DateTime.MaxValue)
+                    .ToList();
+                
+                var trimmedItems = new List<SessionPlanItemResponse>();
+                var runningTotal = 0;
+                
+                foreach (var item in sortedItems)
+                {
+                    if (runningTotal + item.Task.EstimatedMinutes <= 480)
+                    {
+                        trimmedItems.Add(item);
+                        runningTotal += item.Task.EstimatedMinutes;
+                    }
+                }
+                
+                // Preserve original order from Claude's response for remaining items
+                var trimmedTaskIds = trimmedItems.Select(item => item.Task.Id).ToHashSet();
+                sessionPlan.Items = originalItems
+                    .Where(item => trimmedTaskIds.Contains(item.Task.Id))
+                    .ToList();
+                
+                // Recalculate total
+                sessionPlan.TotalEstimatedMinutes = sessionPlan.Items.Sum(item => item.Task.EstimatedMinutes);
+            }
 
             return sessionPlan;
         }

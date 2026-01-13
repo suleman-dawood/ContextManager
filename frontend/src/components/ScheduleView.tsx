@@ -142,6 +142,17 @@ export default function ScheduleView() {
     loadSessionPlan();
   }, [selectedDate]);
 
+  // Refresh session plan periodically to catch task status changes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (sessionPlan) {
+        loadSessionPlan();
+      }
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [sessionPlan, selectedDate]);
+
   const loadPendingTasksCount = async () => {
     setLoadingCount(true);
     try {
