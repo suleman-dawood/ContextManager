@@ -23,9 +23,15 @@ const api = axios.create({
 
 // Add token to requests if it exists
 api.interceptors.request.use((config) => {
+  // Skip auth header for login/register endpoints
+  if (config.url?.includes('/auth/login') || config.url?.includes('/auth/register')) {
+    return config;
+  }
+  
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    console.log('Token added to request:', config.url, token.substring(0, 20) + '...');
   } else {
     console.warn('No token found for request to:', config.url);
   }

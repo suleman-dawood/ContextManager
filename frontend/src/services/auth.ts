@@ -21,6 +21,10 @@ export const saveAuth = (authData: AuthResponse | any): void => {
     email: email,
     name: name
   }));
+  
+  // Verify token was saved
+  const savedToken = localStorage.getItem('token');
+  console.log('Token saved to localStorage:', savedToken ? 'Yes' : 'No', savedToken?.substring(0, 20) + '...');
 };
 
 /**
