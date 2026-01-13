@@ -182,7 +182,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Apply database migrations automatically on startup
+// Initialize database using direct SQL script (simpler and more reliable)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -194,97 +194,109 @@ using (var scope = app.Services.CreateScope())
         {
             Console.WriteLine("✅ Database connection successful!");
             
-            // Get pending migrations
-            var pendingMigrations = await db.Database.GetPendingMigrationsAsync();
-            var pendingList = pendingMigrations.ToList();
-            
-            if (pendingList.Any())
-            {
-                Console.WriteLine($"📦 Found {pendingList.Count} pending migration(s):");
-                foreach (var migration in pendingList)
-                {
-                    Console.WriteLine($"   - {migration}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("✅ No pending migrations");
-            }
-            
-            // Get applied migrations
-            var appliedMigrations = await db.Database.GetAppliedMigrationsAsync();
-            var appliedList = appliedMigrations.ToList();
-            
-            if (appliedList.Any())
-            {
-                Console.WriteLine($"📋 Applied migrations ({appliedList.Count}):");
-                foreach (var migration in appliedList)
-                {
-                    Console.WriteLine($"   - {migration}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("⚠️  No migrations have been applied yet!");
-            }
-            
-            // Check if tables exist by trying to query Users table
+            // Check if Users table exists
             bool usersTableExists = false;
             try
             {
                 await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
                 usersTableExists = true;
-                Console.WriteLine("✅ Users table exists");
+                Console.WriteLine("✅ Users table exists - database already initialized");
             }
             catch
             {
                 usersTableExists = false;
-                Console.WriteLine("⚠️  Users table does not exist");
+                Console.WriteLine("⚠️  Users table does not exist - initializing database...");
             }
             
             if (!usersTableExists)
             {
-                // If tables don't exist, apply migrations
-                // This uses proper EF Core migrations (clean approach)
-                Console.WriteLine("🔄 Creating database tables using migrations...");
+                // Read and execute the SQL initialization script
+                Console.WriteLine("🔄 Creating database tables using SQL script...");
                 try
                 {
-                    // Apply all pending migrations (will create tables and seed data)
-                    await db.Database.MigrateAsync();
-                    Console.WriteLine("✅ Database migrations applied successfully");
+                    // Try multiple possible paths for the SQL script
+                    // Railway: AppContext.BaseDirectory (usually /app/out)
+                    // Local dev: Directory.GetCurrentDirectory() or AppContext.BaseDirectory
+                    var possiblePaths = new[]
+                    {
+                        Path.Combine(AppContext.BaseDirectory, "Scripts", "init.sql"),
+                        Path.Combine(Directory.GetCurrentDirectory(), "Scripts", "init.sql"),
+                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "init.sql"),
+                        // Also try without Scripts subdirectory (in case it's in root)
+                        Path.Combine(AppContext.BaseDirectory, "init.sql"),
+                    };
                     
-                    // Verify Users table was created
+                    string? sqlScriptPath = null;
+                    foreach (var path in possiblePaths)
+                    {
+                        if (File.Exists(path))
+                        {
+                            sqlScriptPath = path;
+                            break;
+                        }
+                    }
+                    
+                    // If file exists, read and execute it
+                    if (sqlScriptPath != null && File.Exists(sqlScriptPath))
+                    {
+                        Console.WriteLine($"📄 Reading SQL script from: {sqlScriptPath}");
+                        var sqlScript = await File.ReadAllTextAsync(sqlScriptPath);
+                        
+                        // Execute the SQL script
+                        // PostgreSQL allows multiple statements in one ExecuteSqlRawAsync call
+                        await db.Database.ExecuteSqlRawAsync(sqlScript);
+                        Console.WriteLine("✅ Database tables created successfully!");
+                        
+                        // Verify Users table was created
+                        try
+                        {
+                            await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
+                            Console.WriteLine("✅ Verified: Users table exists");
+                        }
+                        catch (Exception verifyEx)
+                        {
+                            Console.WriteLine($"⚠️  Warning: Could not verify Users table: {verifyEx.Message}");
+                        }
+                    }
+                    else
+                    {
+                        // Fallback to EnsureCreated if SQL file doesn't exist
+                        Console.WriteLine($"⚠️  SQL script not found. Tried paths:");
+                        foreach (var path in possiblePaths)
+                        {
+                            Console.WriteLine($"     - {path}");
+                        }
+                        Console.WriteLine("   Falling back to EF Core EnsureCreated...");
+                        await db.Database.EnsureCreatedAsync();
+                        Console.WriteLine("✅ Database created using EnsureCreated (fallback)");
+                    }
+                }
+                catch (Exception sqlEx)
+                {
+                    Console.WriteLine($"❌ ERROR executing SQL script:");
+                    Console.WriteLine($"   Error: {sqlEx.Message}");
+                    Console.WriteLine($"   Type: {sqlEx.GetType().Name}");
+                    if (sqlEx.InnerException != null)
+                    {
+                        Console.WriteLine($"   Inner: {sqlEx.InnerException.Message}");
+                    }
+                    
+                    // Fallback to EnsureCreated
+                    Console.WriteLine("   Trying EnsureCreated as fallback...");
                     try
                     {
-                        await db.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
-                        Console.WriteLine("✅ Verified: Users table exists");
+                        await db.Database.EnsureCreatedAsync();
+                        Console.WriteLine("✅ Database created using EnsureCreated (fallback)");
                     }
-                    catch (Exception verifyEx)
+                    catch (Exception ensureEx)
                     {
-                        Console.WriteLine($"⚠️  Warning: Could not verify Users table: {verifyEx.Message}");
+                        Console.WriteLine($"❌ EnsureCreated also failed: {ensureEx.Message}");
                     }
                 }
-                catch (Exception migrateEx)
-                {
-                    Console.WriteLine($"❌ ERROR applying migrations:");
-                    Console.WriteLine($"   Error: {migrateEx.Message}");
-                    Console.WriteLine($"   Type: {migrateEx.GetType().Name}");
-                    if (migrateEx.InnerException != null)
-                    {
-                        Console.WriteLine($"   Inner: {migrateEx.InnerException.Message}");
-                    }
-                }
-            }
-            else if (pendingList.Any())
-            {
-                // Tables exist but there are pending migrations - apply them
-                Console.WriteLine("🔄 Applying pending migrations...");
-                await db.Database.MigrateAsync();
-                Console.WriteLine("✅ Migrations applied successfully");
             }
             else
             {
-                Console.WriteLine("✅ Database is up to date");
+                Console.WriteLine("✅ Database is already initialized and up to date");
             }
         }
         else
@@ -294,14 +306,14 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Database connection/migration failed:");
+        Console.WriteLine($"❌ Database initialization failed:");
         Console.WriteLine($"   Error: {ex.Message}");
         Console.WriteLine($"   Type: {ex.GetType().Name}");
         if (ex.InnerException != null)
         {
             Console.WriteLine($"   Inner: {ex.InnerException.Message}");
         }
-        // Don't throw - let the app start anyway
+        // Don't throw - let the app start anyway (might be a temporary connection issue)
     }
 }
 
