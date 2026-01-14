@@ -1,14 +1,11 @@
-/* Task List - List container for tasks */
-
 .task-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
-.task-list-empty {
-  text-align: center;
-  padding: var(--space-xl);
-  color: var(--black);
-  opacity: 0.7;
+.divider-bottom {
+  border-bottom: 1px solid var(--black);
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-sm);
 }

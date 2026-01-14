@@ -27,11 +27,11 @@ export function Analytics() {
       <div className="container">
         <h1 className="analytics-title">Productivity Analytics</h1>
         <div className="charts-grid">
-          <div className="chart-card content-section">
+          <div className="chart-card">
             <div className="chart-header flex-between">
               <div>
-                <h2 className="heading-tertiary">Tasks by Context</h2>
-                <p className="chart-description text-secondary">Distribution of your tasks across different contexts</p>
+                <h2>Tasks by Context</h2>
+                <p className="chart-description">Distribution of your tasks across different contexts</p>
               </div>
               <div className="chart-actions">
                 <button 
@@ -65,20 +65,20 @@ export function Analytics() {
           </div>
         </div>
 
-        <div className="summary-section content-section">
-          <h2 className="heading-tertiary divider-bottom">Summary</h2>
+        <div className="summary-section">
+          <h2 className="divider-bottom">Summary</h2>
           <div className="summary-grid grid-auto-fit">
-            <div className="summary-card card-base">
+            <div className="summary-card">
               <div className="summary-value">{totalTasks}</div>
-              <div className="summary-label text-secondary">Total Tasks</div>
+              <div className="summary-label">Total Tasks</div>
             </div>
-            <div className="summary-card card-base">
+            <div className="summary-card">
               <div className="summary-value">{avgCompletionRate}%</div>
-              <div className="summary-label text-secondary">Average Completion Rate</div>
+              <div className="summary-label">Average Completion Rate</div>
             </div>
-            <div className="summary-card card-base">
+            <div className="summary-card">
               <div className="summary-value">{contextDistribution.length}</div>
-              <div className="summary-label text-secondary">Active Contexts</div>
+              <div className="summary-label">Active Contexts</div>
             </div>
           </div>
         </div>

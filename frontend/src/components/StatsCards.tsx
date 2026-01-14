@@ -22,8 +22,8 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
           <ListChecks size={20} color="#000000" />
         </div>
         <div className="stat-content">
-          <div className="stat-value text-black">{totalTasks}</div>
-          <div className="stat-label text-secondary">Total Tasks</div>
+          <div className="stat-value">{totalTasks}</div>
+          <div className="stat-label">Total Tasks</div>
         </div>
       </div>
 
@@ -32,8 +32,8 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
           <CheckCircle2 size={20} color="#000000" />
         </div>
         <div className="stat-content">
-          <div className="stat-value text-black">{completedTasks}</div>
-          <div className="stat-label text-secondary">Completed</div>
+          <div className="stat-value">{completedTasks}</div>
+          <div className="stat-label">Completed</div>
         </div>
       </div>
 
@@ -42,8 +42,8 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
           <TrendingUp size={20} color="#000000" />
         </div>
         <div className="stat-content">
-          <div className="stat-value text-black">{completionRate}%</div>
-          <div className="stat-label text-secondary">Completion Rate</div>
+          <div className="stat-value">{completionRate}%</div>
+          <div className="stat-label">Completion Rate</div>
         </div>
       </div>
 
@@ -52,8 +52,8 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
           <Clock size={20} color="#000000" />
         </div>
         <div className="stat-content">
-          <div className="stat-value text-black">{Math.round(totalMinutes / 60)}h</div>
-          <div className="stat-label text-secondary">Pending Work</div>
+          <div className="stat-value">{Math.round(totalMinutes / 60)}h</div>
+          <div className="stat-label">Pending Work</div>
         </div>
       </div>
     </div>

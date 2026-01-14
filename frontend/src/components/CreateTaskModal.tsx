@@ -61,7 +61,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header flex-between divider-bottom">
-          <h2 className="heading-primary">Create New Task</h2>
+          <h2>Create New Task</h2>
           <button className="btn-icon" onClick={onClose}>
             <X size={24} />
           </button>
@@ -148,7 +148,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
             />
           </div>
 
-          <div className="modal-actions flex-center divider-top">
+          <div className="modal-actions flex-center">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
               Cancel
             </button>

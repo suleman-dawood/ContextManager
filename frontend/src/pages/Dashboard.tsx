@@ -75,9 +75,9 @@ export function Dashboard() {
       <div className="container">
         <StatsCards tasks={tasks} />
 
-        <div className="main-content content-section">
-          <div className="content-header flex-between divider-bottom">
-            <h2 className="heading-secondary">Your Tasks</h2>
+        <div className="main-content">
+          <div className="flex-between divider-bottom">
+            <h2>Your Tasks</h2>
             <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
               <Plus size={18} /> New Task
             </button>

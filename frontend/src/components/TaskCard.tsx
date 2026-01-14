@@ -18,7 +18,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
       [Priority.Low]: { text: 'Low', class: 'priority-low' }
     };
     const badge = badges[task.priority];
-    return <span className={`badge badge-base ${badge.class}`}>{badge.text}</span>;
+    return <span className={`badge ${badge.class}`}>{badge.text}</span>;
   };
 
   const formatDueDate = (date?: string) => {
@@ -36,7 +36,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
   };
 
   return (
-    <div className="task-card card-base" style={{ borderLeft: `4px solid ${task.contextColor}` }}>
+    <div className="task-card" style={{ borderLeft: `4px solid ${task.contextColor}` }}>
       <div className="task-header">
         <div className="task-title-row">
           <input
@@ -59,14 +59,14 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
 
       <div className="task-footer">
         <div className="task-meta">
-          <span className="context-badge badge-base" style={{ backgroundColor: task.contextColor, color: '#000000' }}>
+          <span className="context-badge" style={{ backgroundColor: task.contextColor, color: '#000000' }}>
             {task.contextName}
           </span>
-          <span className="text-black">
+          <span>
             <Clock size={12} /> {task.estimatedMinutes}min
           </span>
           {formatDueDate(task.dueDate)}
-          <span className={`badge-base status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
+          <span className={`status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
             {TaskStatus[task.status]}
           </span>
         </div>

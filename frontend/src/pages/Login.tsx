@@ -48,7 +48,7 @@ export function Login() {
             error={error || ''}
             onChange={setRegisterData}
             onSubmit={() => register(registerData)}
-          />
+              />
         )}
       </div>
     </div>

@@ -1,5 +1,3 @@
-/* Schedule View - Main schedule interface with drag and drop */
-
 .schedule-view {
   padding: var(--space-xl);
   max-width: 1200px;
@@ -8,7 +6,6 @@
   min-height: 100vh;
 }
 
-/* Header Section */
 .schedule-header {
   display: flex;
   justify-content: space-between;
@@ -99,22 +96,19 @@
   color: var(--black);
 }
 
-/* Drag Instructions */
 .drag-instructions {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-md);
-  background: var(--yellow);
   color: var(--black);
-  border: 2px solid var(--black);
+  opacity: 0.8;
   margin-bottom: var(--space-md);
-  font-weight: 600;
+  font-weight: 400;
   font-size: var(--font-size-base);
   border-radius: 0;
 }
 
-/* Schedule Tasks */
 .schedule-tasks {
   display: flex;
   flex-direction: column;
@@ -142,7 +136,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Drag Handle */
 .drag-handle {
   display: flex;
   align-items: center;
@@ -161,7 +154,6 @@
   cursor: grabbing;
 }
 
-/* Task Content */
 .task-content {
   flex: 1;
   min-width: 0;
@@ -266,7 +258,6 @@
   border-color: var(--orange);
 }
 
-/* Completed Task Styles */
 .task-title-completed {
   text-decoration: line-through;
   opacity: 0.6;
@@ -283,7 +274,6 @@
   border-radius: 0;
 }
 
-/* Empty State */
 .empty-state {
   text-align: center;
   padding: 60px var(--space-lg);
@@ -304,7 +294,6 @@
   margin-bottom: var(--space-lg);
 }
 
-/* Loading State */
 .loading-state {
   text-align: center;
   padding: 60px var(--space-lg);
@@ -312,7 +301,6 @@
   font-size: var(--font-size-lg);
 }
 
-/* Error Message */
 .error-message {
   padding: var(--space-md);
   margin-bottom: var(--space-md);
@@ -320,37 +308,4 @@
   border: 2px solid var(--black);
   color: var(--black);
   border-radius: 0;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .schedule-view {
-    padding: var(--space-md);
-  }
-  
-  .schedule-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .date-navigation {
-    justify-content: center;
-  }
-  
-  .header-actions {
-    justify-content: center;
-  }
-  
-  .session-summary {
-    flex-direction: column;
-    gap: var(--space-md);
-  }
-  
-  .schedule-task-item {
-    padding: var(--space-sm);
-  }
-  
-  .drag-handle {
-    padding: var(--space-xs) 0;
-  }
 }

@@ -14,7 +14,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
   if (tasks.length === 0) {
     return (
       <div className="empty-state">
-        <p className="text-secondary">No tasks yet. Create your first task to get started!</p>
+        <p>No tasks yet. Create your first task to get started!</p>
       </div>
     );
   }
@@ -27,7 +27,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
     <div className="task-list">
       {inProgressTasks.length > 0 && (
         <div className="task-section">
-          <h3 className="heading-tertiary divider-bottom">In Progress ({inProgressTasks.length})</h3>
+          <h3 className="divider-bottom">In Progress ({inProgressTasks.length})</h3>
           {inProgressTasks.map(task => (
             <TaskCard
               key={task.id}
@@ -42,7 +42,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
 
       {todoTasks.length > 0 && (
         <div className="task-section">
-          <h3 className="heading-tertiary divider-bottom">To Do ({todoTasks.length})</h3>
+          <h3 className="divider-bottom">To Do ({todoTasks.length})</h3>
           {todoTasks.map(task => (
             <TaskCard
               key={task.id}
@@ -57,7 +57,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
 
       {completedTasks.length > 0 && (
         <div className="task-section">
-          <h3 className="heading-tertiary divider-bottom">Completed ({completedTasks.length})</h3>
+          <h3 className="divider-bottom">Completed ({completedTasks.length})</h3>
           {completedTasks.map(task => (
             <TaskCard
               key={task.id}

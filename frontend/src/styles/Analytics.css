@@ -1,5 +1,3 @@
-/* Analytics Page - Data visualization and statistics */
-
 .analytics-page {
   padding: var(--space-xl) 0;
   min-height: 100vh;
@@ -141,12 +139,3 @@
   opacity: 0.8;
 }
 
-@media (max-width: 768px) {
-  .charts-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .summary-grid {
-    grid-template-columns: 1fr;
-  }
-}

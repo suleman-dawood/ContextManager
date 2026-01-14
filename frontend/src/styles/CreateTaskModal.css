@@ -1,5 +1,3 @@
-/* Create Task Modal - Task creation form */
-
 .create-task-modal .modal-header h2 {
   font-size: var(--font-size-xl);
   color: var(--black);
@@ -16,7 +14,7 @@
 }
 
 .ai-categorization-reasoning {
-  opacity: 0.9;
+  opacity: 0.8;
   margin-top: var(--space-xs);
   font-size: var(--font-size-sm);
 }
