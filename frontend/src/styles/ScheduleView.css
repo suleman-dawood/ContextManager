@@ -185,6 +185,19 @@
   margin-bottom: var(--space-sm);
 }
 
+.task-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+}
+
+.task-title-row input[type="checkbox"] {
+  flex-shrink: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
 .task-details h4 {
   font-size: var(--font-size-md);
   font-weight: 600;
@@ -210,8 +223,14 @@
   flex-wrap: wrap;
 }
 
+.task-meta .badge {
+  font-size: var(--font-size-xs);
+  padding: 2px var(--space-xs);
+}
+
 .time-estimate,
-.ai-reasoning {
+.ai-reasoning,
+.due-date-text {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -225,6 +244,33 @@
 .ai-reasoning {
   font-style: italic;
   opacity: 0.8;
+}
+
+.due-date-text {
+  font-size: var(--font-size-xs);
+}
+
+.due-date-overdue {
+  font-weight: 700;
+  padding: 2px var(--space-xs);
+  background: var(--orange);
+  border: 1px solid var(--black);
+}
+
+.due-date-normal {
+  opacity: 0.8;
+}
+
+.priority-high {
+  border-left: 3px solid var(--orange);
+}
+
+.priority-medium {
+  border-left: 3px solid var(--yellow);
+}
+
+.priority-low {
+  border-left: 3px solid var(--black);
 }
 
 .task-time-range {

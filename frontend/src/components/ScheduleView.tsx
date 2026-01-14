@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { Calendar, GripVertical } from 'lucide-react';
 import { useSessionPlan } from '../hooks/useSessionPlan';
+import { useTasks } from '../hooks/useTasks';
 import { ScheduleHeader } from './ScheduleHeader';
 import { ScheduleTaskList } from './ScheduleTaskList';
 import { Loading } from './Loading';
 import { Error } from './Error';
 import { arrayMove } from '@dnd-kit/sortable';
 import type { DragEndEvent } from '@dnd-kit/core';
+import { TaskStatus } from '../types';
+import type { UpdateTaskRequest } from '../types';
 import '../styles/ScheduleView.css';
 
 export default function ScheduleView() {
@@ -21,8 +24,11 @@ export default function ScheduleView() {
     loadingCount,
     generatePlan,
     removeTask,
-    updateOrder
+    updateOrder,
+    loadSessionPlan
   } = useSessionPlan(selectedDate);
+
+  const { updateTask } = useTasks();
 
   function handlePreviousDay() {
     const newDate = new Date(selectedDate);
@@ -57,6 +63,30 @@ export default function ScheduleView() {
       } catch (err) {
         console.error('Failed to update order:', err);
       }
+    }
+  }
+
+  async function handleStatusChange(taskId: string, status: TaskStatus) {
+    if (!sessionPlan) return;
+    
+    const task = sessionPlan.items.find(item => item.task.id === taskId)?.task;
+    if (!task) return;
+
+    const updates: UpdateTaskRequest = {
+      contextId: task.contextId,
+      title: task.title,
+      description: task.description,
+      estimatedMinutes: task.estimatedMinutes,
+      priority: task.priority,
+      status,
+      dueDate: task.dueDate
+    };
+
+    try {
+      await updateTask(taskId, updates);
+      await loadSessionPlan();
+    } catch (err) {
+      console.error('Failed to update task status:', err);
     }
   }
 
@@ -119,7 +149,8 @@ export default function ScheduleView() {
             items={sessionPlan.items}
             onDragEnd={handleDragEnd}
             onRemove={removeTask}
-                    />
+            onStatusChange={handleStatusChange}
+          />
         </div>
       )}
     </div>

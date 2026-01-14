@@ -6,6 +6,5 @@
 
 .divider-bottom {
   border-bottom: 1px solid var(--black);
-  padding-bottom: var(--space-sm);
   margin-bottom: var(--space-sm);
 }

@@ -12,7 +12,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { SessionPlanItem } from '../types';
+import { SessionPlanItem, TaskStatus } from '../types';
 import { SortableTaskItem } from './SortableTaskItem';
 import { sortScheduleItems, isFirstInGroup } from '../utils/scheduleUtils';
 import '../styles/ScheduleView.css';
@@ -21,9 +21,10 @@ interface ScheduleTaskListProps {
   items: SessionPlanItem[];
   onDragEnd: (event: DragEndEvent) => void;
   onRemove: (taskId: string) => void;
+  onStatusChange: (taskId: string, status: TaskStatus) => void;
 }
 
-export function ScheduleTaskList({ items, onDragEnd, onRemove }: ScheduleTaskListProps) {
+export function ScheduleTaskList({ items, onDragEnd, onRemove, onStatusChange }: ScheduleTaskListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -52,6 +53,7 @@ export function ScheduleTaskList({ items, onDragEnd, onRemove }: ScheduleTaskLis
               contextName={item.task.contextName}
               contextColor={item.task.contextColor}
               onRemove={onRemove}
+              onStatusChange={onStatusChange}
             />
           ))}
         </div>
