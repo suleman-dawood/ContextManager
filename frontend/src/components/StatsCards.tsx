@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, TrendingUp } from 'lucide-react';
+import { CheckCircle2, Clock, TrendingUp, ListChecks } from 'lucide-react';
 import type { Task } from '../types';
 import { TaskStatus } from '../types';
 import '../styles/StatsCards.css';
@@ -18,8 +18,8 @@ export const StatsCards = ({ tasks }: StatsCardsProps) => {
   return (
     <div className="stats-cards grid-auto-fit">
       <div className="stat-card">
-        <div className="stat-icon stat-icon-yellow">
-          <Clock size={20} color="#000000" />
+        <div className="stat-icon stat-icon-orange">
+          <ListChecks size={20} color="#000000" />
         </div>
         <div className="stat-content">
           <div className="stat-value text-black">{totalTasks}</div>

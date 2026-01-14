@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { X, Sparkles } from 'lucide-react';
-import { suggestionsApi } from '../services/api';
 import { useTaskForm } from '../hooks/useTaskForm';
-import type { CreateTaskRequest, ContextCategorizationResponse } from '../types';
+import { useTaskCategorization } from '../hooks/useTaskCategorization';
+import { Error } from './Error';
+import type { CreateTaskRequest } from '../types';
 import { Priority } from '../types';
 import '../styles/CreateTaskModal.css';
 
@@ -13,12 +14,11 @@ interface CreateTaskModalProps {
 
 export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => {
   const [loading, setLoading] = useState(false);
-  const [categorizing, setCategorizing] = useState(false);
-  const [categorization, setCategorization] = useState<ContextCategorizationResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { formData, updateTitle, updateDescription, updateEstimatedMinutes, updatePriority, updateDueDate } = useTaskForm();
+  const { categorizing, categorization, error: categorizationError, categorizeTask, reset } = useTaskCategorization();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     
     if (!formData.title.trim()) {
@@ -30,13 +30,16 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
     setError(null);
     
     try {
-      setCategorizing(true);
-      const result = await suggestionsApi.categorizeTask({
+      const result = await categorizeTask({
         title: formData.title,
         description: formData.description
       });
-      setCategorization(result);
-      setCategorizing(false);
+
+      if (!result) {
+        setError(categorizationError || 'Failed to categorize task');
+        setLoading(false);
+        return;
+      }
 
       const taskData: CreateTaskRequest = {
         ...formData,
@@ -44,10 +47,10 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
       };
       
       await onSubmit(taskData);
+      reset();
       onClose();
     } catch (error: any) {
       console.error('Failed to create task:', error);
-      setCategorizing(false);
       setError(error.response?.data?.message || 'Failed to create task. Please try again.');
     } finally {
       setLoading(false);
@@ -96,11 +99,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
             </div>
           )}
           
-          {error && (
-            <div className="error-message alert alert-error">
-              {error}
-            </div>
-          )}
+          {error && <Error message={error} />}
 
           <div className="form-group">
             <label className="label">Description</label>

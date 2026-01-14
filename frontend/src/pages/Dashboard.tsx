@@ -6,6 +6,8 @@ import { CreateTaskModal } from '../components/CreateTaskModal';
 import { EditTaskModal } from '../components/EditTaskModal';
 import { StatsCards } from '../components/StatsCards';
 import { AppHeader } from '../components/AppHeader';
+import { Loading } from '../components/Loading';
+import { Error } from '../components/Error';
 import { useTasks } from '../hooks/useTasks';
 import { useContexts } from '../hooks/useContexts';
 import type { Task, CreateTaskRequest, UpdateTaskRequest } from '../types';
@@ -59,11 +61,11 @@ export function Dashboard() {
   };
 
   if (loading || contextsLoading) {
-    return <div className="loading">Loading...</div>;
+    return <Loading fullPage message="Loading tasks..." />;
   }
 
   if (tasksError) {
-    return <div className="error-message">{tasksError}</div>;
+    return <Error fullPage message={tasksError} onRetry={() => window.location.reload()} />;
   }
 
   return (

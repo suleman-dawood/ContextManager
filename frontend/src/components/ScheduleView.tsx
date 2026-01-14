@@ -3,6 +3,8 @@ import { Calendar, GripVertical } from 'lucide-react';
 import { useSessionPlan } from '../hooks/useSessionPlan';
 import { ScheduleHeader } from './ScheduleHeader';
 import { ScheduleTaskList } from './ScheduleTaskList';
+import { Loading } from './Loading';
+import { Error } from './Error';
 import { arrayMove } from '@dnd-kit/sortable';
 import type { DragEndEvent } from '@dnd-kit/core';
 import '../styles/ScheduleView.css';
@@ -22,23 +24,23 @@ export default function ScheduleView() {
     updateOrder
   } = useSessionPlan(selectedDate);
 
-  const handlePreviousDay = () => {
+  function handlePreviousDay() {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() - 1);
     setSelectedDate(newDate);
-  };
+  }
 
-  const handleNextDay = () => {
+  function handleNextDay() {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() + 1);
     setSelectedDate(newDate);
-  };
+  }
 
-  const handleToday = () => {
+  function handleToday() {
     setSelectedDate(new Date());
-  };
+  }
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+  async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
     if (!over || !sessionPlan) return;
@@ -56,7 +58,7 @@ export default function ScheduleView() {
         console.error('Failed to update order:', err);
       }
     }
-  };
+  }
 
   const totalMinutes = sessionPlan?.totalEstimatedMinutes || 0;
   const hours = Math.floor(totalMinutes / 60);
@@ -76,10 +78,10 @@ export default function ScheduleView() {
         onGeneratePlan={generatePlan}
       />
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <Error message={error} />}
 
       {loading ? (
-        <div className="loading-state">Loading session plan...</div>
+        <Loading message="Loading session plan..." />
       ) : !sessionPlan ? (
         <div className="empty-state">
           <Calendar size={48} className="empty-state-icon" />
@@ -109,7 +111,7 @@ export default function ScheduleView() {
           </div>
 
           <div className="drag-instructions">
-            <GripVertical size={16} className="drag-instructions-icon" />
+            <GripVertical size={12} className="drag-instructions-icon" />
             <span className="drag-instructions-text">Drag tasks to reorder your session</span>
           </div>
 

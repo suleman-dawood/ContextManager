@@ -1,13 +1,14 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { AppHeader } from '../components/AppHeader';
+import { Loading } from '../components/Loading';
 import '../styles/Analytics.css';
 
 export function Analytics() {
   const { contextDistribution, completionRate, loading, showActiveOnly, setShowActiveOnly } = useAnalytics();
 
   if (loading) {
-    return <div className="loading">Loading analytics...</div>;
+    return <Loading fullPage message="Loading analytics..." />;
   }
 
   const totalTasks = contextDistribution.reduce((sum, c) => sum + c.count, 0);

@@ -12,11 +12,11 @@ interface EditTaskModalProps {
   onSubmit: (taskId: string, updates: UpdateTaskRequest) => Promise<void>;
 }
 
-export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskModalProps) => {
+export function EditTaskModal({ task, contexts, onClose, onSubmit }: EditTaskModalProps) {
   const [loading, setLoading] = useState(false);
   const { formData, updateTitle, updateDescription, updateEstimatedMinutes, updatePriority, updateDueDate, updateContextId, updateStatus } = useTaskForm(task);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
@@ -28,7 +28,7 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -143,4 +143,4 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
       </div>
     </div>
   );
-};
+}

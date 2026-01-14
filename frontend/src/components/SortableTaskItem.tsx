@@ -2,7 +2,7 @@ import { TaskStatus } from '../types';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { SessionPlanItem } from '../types';
-import { Clock, Zap, GripVertical } from 'lucide-react';
+import { Clock1, Zap, GripVertical } from 'lucide-react';
 import '../styles/ScheduleView.css';
 
 interface SortableTaskItemProps {
@@ -87,7 +87,7 @@ export function SortableTaskItem({ item, isFirstInGroup, contextName, contextCol
           
           <div className="task-meta">
             <span className="time-estimate">
-              <Clock size={14} />
+              <Clock1 size={14} />
               {item.task.estimatedMinutes} min
             </span>
             {item.reasoning && (

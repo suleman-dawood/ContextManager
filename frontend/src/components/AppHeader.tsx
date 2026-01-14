@@ -2,17 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, BarChart3, Calendar, LogOut } from 'lucide-react';
 import '../styles/AppHeader.css';
 
-/**
- * Shared header component for all pages with navigation and logout
- */
 export const AppHeader = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
-  };
+  }
 
   return (
     <header className="app-header">

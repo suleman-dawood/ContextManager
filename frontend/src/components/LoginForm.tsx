@@ -1,4 +1,5 @@
 import type { LoginRequest } from '../types';
+import { Error } from './Error';
 import '../styles/Login.css';
 
 interface LoginFormProps {
@@ -10,14 +11,14 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ loginData, loading, error, onChange, onSubmit }: LoginFormProps) {
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     await onSubmit();
-  };
+  }
 
   return (
     <>
-      {error && <div className="error-message">{error}</div>}
+      {error && <Error message={error} />}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="label">Email</label>

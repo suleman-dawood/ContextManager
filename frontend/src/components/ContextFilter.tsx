@@ -7,11 +7,11 @@ interface ContextFilterProps {
   onSelectContext: (contextId: string | null) => void;
 }
 
-export const ContextFilter = ({
+export function ContextFilter({
   contexts,
   selectedContext,
   onSelectContext
-}: ContextFilterProps) => {
+}: ContextFilterProps) {
   return (
     <div className="context-filter">
       <button
@@ -31,5 +31,5 @@ export const ContextFilter = ({
       ))}
     </div>
   );
-};
+}
 

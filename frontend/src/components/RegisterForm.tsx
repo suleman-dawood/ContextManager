@@ -1,4 +1,5 @@
 import type { RegisterRequest } from '../types';
+import { Error } from './Error';
 import '../styles/Login.css';
 
 interface RegisterFormProps {
@@ -10,14 +11,15 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ registerData, loading, error, onChange, onSubmit }: RegisterFormProps) {
-  const handleSubmit = async (e: React.FormEvent) => {
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     await onSubmit();
-  };
+  }
 
   return (
     <>
-      {error && <div className="error-message">{error}</div>}
+      {error && <Error message={error} />}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="label">Name</label>
