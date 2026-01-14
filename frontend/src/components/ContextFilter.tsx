@@ -7,9 +7,6 @@ interface ContextFilterProps {
   onSelectContext: (contextId: string | null) => void;
 }
 
-/**
- * Filter tabs to switch between different mental contexts
- */
 export const ContextFilter = ({
   contexts,
   selectedContext,

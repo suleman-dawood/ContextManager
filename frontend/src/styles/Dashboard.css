@@ -1,23 +1,9 @@
-/* Dashboard - Main overview page */
-
 .dashboard {
-  padding: var(--space-xl) 0;
   min-height: 100vh;
   background: var(--white);
 }
 
-.dashboard-header {
-  margin-bottom: var(--space-xl);
-}
-
-.dashboard-title {
-  font-size: var(--font-size-2xl);
-  color: var(--black);
-  margin-bottom: var(--space-md);
-}
-
-.dashboard-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
+.dashboard .container {
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-xl);
 }

@@ -10,9 +10,6 @@ interface TaskListProps {
   onStatusChange: (taskId: string, status: TaskStatus) => void;
 }
 
-/**
- * List container for displaying multiple task cards
- */
 export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListProps) => {
   if (tasks.length === 0) {
     return (
@@ -22,7 +19,6 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListPr
     );
   }
 
-  // Group tasks by status for better organization
   const todoTasks = tasks.filter(t => t.status === TaskStatus.Todo);
   const inProgressTasks = tasks.filter(t => t.status === TaskStatus.InProgress);
   const completedTasks = tasks.filter(t => t.status === TaskStatus.Completed);

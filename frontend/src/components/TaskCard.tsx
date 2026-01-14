@@ -10,11 +10,7 @@ interface TaskCardProps {
   onStatusChange: (taskId: string, status: TaskStatus) => void;
 }
 
-/**
- * Individual task card component showing task details and actions
- */
 export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardProps) => {
-  // Get priority display
   const getPriorityBadge = () => {
     const badges = {
       [Priority.High]: { text: 'High', class: 'priority-high' },
@@ -25,7 +21,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
     return <span className={`badge badge-base ${badge.class}`}>{badge.text}</span>;
   };
 
-  // Format due date
   const formatDueDate = (date?: string) => {
     if (!date) return null;
     const dueDate = new Date(date);

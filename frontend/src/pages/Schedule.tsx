@@ -5,15 +5,11 @@ import { AppHeader } from '../components/AppHeader';
 import { useEffect } from 'react';
 import '../styles/Schedule.css';
 
-/**
- * Schedule page - AI-powered session planning with drag-and-drop
- */
-export const Schedule = () => {
+export function Schedule() {
   const navigate = useNavigate();
   const user = getCurrentUser();
 
-  // Redirect if not authenticated
-  useEffect(() => {
+  useEffect(function() {
     if (!user) {
       navigate('/login');
     }
@@ -26,5 +22,5 @@ export const Schedule = () => {
       <ScheduleView />
     </div>
   );
-};
+}
 

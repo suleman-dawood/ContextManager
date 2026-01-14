@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { useTaskForm } from '../hooks/useTaskForm';
 import type { Task, UpdateTaskRequest, Context } from '../types';
 import { Priority, TaskStatus } from '../types';
 import '../styles/EditTaskModal.css';
@@ -11,33 +12,15 @@ interface EditTaskModalProps {
   onSubmit: (taskId: string, updates: UpdateTaskRequest) => Promise<void>;
 }
 
-/**
- * Modal for editing an existing task
- */
 export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskModalProps) => {
   const [loading, setLoading] = useState(false);
-  
-  // Convert ISO datetime to YYYY-MM-DD format for date input
-  const formatDateForInput = (isoDate?: string) => {
-    if (!isoDate) return undefined;
-    return isoDate.split('T')[0];
-  };
-  
-  const [formData, setFormData] = useState<UpdateTaskRequest>({
-    contextId: task.contextId,
-    title: task.title,
-    description: task.description,
-    estimatedMinutes: task.estimatedMinutes,
-    priority: task.priority,
-    status: task.status,
-    dueDate: formatDateForInput(task.dueDate)
-  });
+  const { formData, updateTitle, updateDescription, updateEstimatedMinutes, updatePriority, updateDueDate, updateContextId, updateStatus } = useTaskForm(task);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await onSubmit(task.id, formData);
+      await onSubmit(task.id, formData as UpdateTaskRequest);
       onClose();
     } catch (error) {
       console.error('Failed to update task:', error);
@@ -64,7 +47,7 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
               type="text"
               className="input"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) => updateTitle(e.target.value)}
               required
               autoFocus
             />
@@ -76,7 +59,7 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
               className="input"
               rows={3}
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => updateDescription(e.target.value)}
             />
           </div>
 
@@ -84,8 +67,8 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
             <label className="label">Context *</label>
             <select
               className="input"
-              value={formData.contextId}
-              onChange={(e) => setFormData({ ...formData, contextId: e.target.value })}
+              value={'contextId' in formData ? formData.contextId : ''}
+              onChange={(e) => updateContextId(e.target.value)}
               required
             >
               {contexts.map((context) => (
@@ -105,7 +88,7 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
                 min="5"
                 step="5"
                 value={formData.estimatedMinutes}
-                onChange={(e) => setFormData({ ...formData, estimatedMinutes: parseInt(e.target.value) })}
+                onChange={(e) => updateEstimatedMinutes(parseInt(e.target.value))}
               />
             </div>
 
@@ -114,7 +97,7 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
               <select
                 className="input"
                 value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) as Priority })}
+                onChange={(e) => updatePriority(parseInt(e.target.value) as Priority)}
               >
                 <option value={Priority.Low}>Low</option>
                 <option value={Priority.Medium}>Medium</option>
@@ -128,8 +111,8 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
               <label className="label">Status</label>
               <select
                 className="input"
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: parseInt(e.target.value) as TaskStatus })}
+                value={'status' in formData ? formData.status : TaskStatus.Todo}
+                onChange={(e) => updateStatus(parseInt(e.target.value) as TaskStatus)}
               >
                 <option value={TaskStatus.Todo}>To Do</option>
                 <option value={TaskStatus.InProgress}>In Progress</option>
@@ -143,7 +126,7 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
                 type="date"
                 className="input"
                 value={formData.dueDate || ''}
-                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value || undefined })}
+                onChange={(e) => updateDueDate(e.target.value || undefined)}
               />
             </div>
           </div>
@@ -161,4 +144,3 @@ export const EditTaskModal = ({ task, contexts, onClose, onSubmit }: EditTaskMod
     </div>
   );
 };
-

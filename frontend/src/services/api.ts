@@ -85,6 +85,11 @@ export const tasksApi = {
     return response.data;
   },
 
+  getPendingTasksCount: async function(): Promise<number> {
+    const response = await api.get<{ count: number }>('/tasks/count');
+    return response.data.count;
+  },
+
   createTask: async function(data: CreateTaskRequest): Promise<Task> {
     const response = await api.post<Task>('/tasks', data);
     return response.data;

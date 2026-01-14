@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import { suggestionsApi } from '../services/api';
+import { useTaskForm } from '../hooks/useTaskForm';
 import type { CreateTaskRequest, ContextCategorizationResponse } from '../types';
 import { Priority } from '../types';
 import '../styles/CreateTaskModal.css';
@@ -10,23 +11,13 @@ interface CreateTaskModalProps {
   onSubmit: (task: CreateTaskRequest) => Promise<void>;
 }
 
-/**
- * Modal for creating a new task
- */
 export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => {
   const [loading, setLoading] = useState(false);
   const [categorizing, setCategorizing] = useState(false);
   const [categorization, setCategorization] = useState<ContextCategorizationResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<Omit<CreateTaskRequest, 'contextId'>>({
-    title: '',
-    description: '',
-    estimatedMinutes: 30,
-    priority: Priority.Medium,
-    dueDate: undefined
-  });
+  const { formData, updateTitle, updateDescription, updateEstimatedMinutes, updatePriority, updateDueDate } = useTaskForm();
 
-  // Auto-categorize task on submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -39,7 +30,6 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
     setError(null);
     
     try {
-      // First, categorize the task with AI
       setCategorizing(true);
       const result = await suggestionsApi.categorizeTask({
         title: formData.title,
@@ -48,7 +38,6 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
       setCategorization(result);
       setCategorizing(false);
 
-      // Then submit with the AI-selected context
       const taskData: CreateTaskRequest = {
         ...formData,
         contextId: result.contextId
@@ -82,7 +71,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
               type="text"
               className="input"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) => updateTitle(e.target.value)}
               required
               autoFocus
             />
@@ -119,7 +108,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
               className="input"
               rows={3}
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => updateDescription(e.target.value)}
             />
           </div>
 
@@ -132,7 +121,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
                 min="5"
                 step="5"
                 value={formData.estimatedMinutes}
-                onChange={(e) => setFormData({ ...formData, estimatedMinutes: parseInt(e.target.value) })}
+                onChange={(e) => updateEstimatedMinutes(parseInt(e.target.value))}
               />
             </div>
 
@@ -141,7 +130,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
               <select
                 className="input"
                 value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) as Priority })}
+                onChange={(e) => updatePriority(parseInt(e.target.value) as Priority)}
               >
                 <option value={Priority.Low}>Low</option>
                 <option value={Priority.Medium}>Medium</option>
@@ -156,7 +145,7 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
               type="date"
               className="input"
               value={formData.dueDate || ''}
-              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value || undefined })}
+              onChange={(e) => updateDueDate(e.target.value || undefined)}
             />
           </div>
 
@@ -173,4 +162,3 @@ export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => 
     </div>
   );
 };
-

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { TaskList } from '../components/TaskList';
@@ -7,70 +7,47 @@ import { CreateTaskModal } from '../components/CreateTaskModal';
 import { EditTaskModal } from '../components/EditTaskModal';
 import { StatsCards } from '../components/StatsCards';
 import { AppHeader } from '../components/AppHeader';
-import { tasksApi, contextsApi } from '../services/api';
+import { useTasks } from '../hooks/useTasks';
+import { useContexts } from '../hooks/useContexts';
 import { getCurrentUser } from '../services/auth';
-import type { Task, Context, CreateTaskRequest, UpdateTaskRequest } from '../types';
+import type { Task, CreateTaskRequest, UpdateTaskRequest } from '../types';
 import { TaskStatus } from '../types';
 import '../styles/Dashboard.css';
 
-/**
- * Main dashboard page - the heart of the application
- */
-export const Dashboard = () => {
+export function Dashboard() {
   const navigate = useNavigate();
   const user = getCurrentUser();
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [contexts, setContexts] = useState<Context[]>([]);
+  const { tasks, loading, createTask, updateTask, deleteTask } = useTasks();
+  const { contexts } = useContexts();
+
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    loadData();
-  }, [navigate, user]);
+  if (!user) {
+    navigate('/login');
+    return null;
+  }
 
-  const loadData = async () => {
-    try {
-      const [contextsData, tasksData] = await Promise.all([
-        contextsApi.getContexts(),
-        tasksApi.getTasks()
-      ]);
-      setContexts(contextsData);
-      setTasks(tasksData);
-    } catch (error) {
-      // If 401, token might be invalid - clear and redirect
-      if ((error as any).response?.status === 401) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filteredTasks = useMemo(() => {
+    return selectedContext
+      ? tasks.filter(t => t.contextId === selectedContext)
+      : tasks;
+  }, [tasks, selectedContext]);
 
   const handleCreateTask = async (taskData: CreateTaskRequest) => {
-    const newTask = await tasksApi.createTask(taskData);
-    setTasks([...tasks, newTask]);
+    await createTask(taskData);
   };
 
   const handleUpdateTask = async (taskId: string, updates: UpdateTaskRequest) => {
-    const updatedTask = await tasksApi.updateTask(taskId, updates);
-    setTasks(tasks.map(t => t.id === taskId ? updatedTask : t));
+    await updateTask(taskId, updates);
     setEditingTask(null);
   };
 
   const handleDeleteTask = async (taskId: string) => {
     if (confirm('Are you sure you want to delete this task?')) {
-      await tasksApi.deleteTask(taskId);
-      setTasks(tasks.filter(t => t.id !== taskId));
+      await deleteTask(taskId);
     }
   };
 
@@ -90,11 +67,6 @@ export const Dashboard = () => {
 
     await handleUpdateTask(taskId, updates);
   };
-
-  // Filter tasks based on selected context
-  const filteredTasks = selectedContext
-    ? tasks.filter(t => t.contextId === selectedContext)
-    : tasks;
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -147,5 +119,4 @@ export const Dashboard = () => {
       )}
     </div>
   );
-};
-
+}
