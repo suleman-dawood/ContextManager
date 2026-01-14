@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { TaskList } from '../components/TaskList';
 import { ContextFilter } from '../components/ContextFilter';
 import { CreateTaskModal } from '../components/CreateTaskModal';
@@ -9,26 +8,17 @@ import { StatsCards } from '../components/StatsCards';
 import { AppHeader } from '../components/AppHeader';
 import { useTasks } from '../hooks/useTasks';
 import { useContexts } from '../hooks/useContexts';
-import { getCurrentUser } from '../services/auth';
 import type { Task, CreateTaskRequest, UpdateTaskRequest } from '../types';
 import { TaskStatus } from '../types';
 import '../styles/Dashboard.css';
 
 export function Dashboard() {
-  const navigate = useNavigate();
-  const user = getCurrentUser();
-
-  const { tasks, loading, createTask, updateTask, deleteTask } = useTasks();
-  const { contexts } = useContexts();
+  const { tasks, loading, error: tasksError, createTask, updateTask, deleteTask } = useTasks();
+  const { contexts, loading: contextsLoading } = useContexts();
 
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
 
   const filteredTasks = useMemo(() => {
     return selectedContext
@@ -68,8 +58,12 @@ export function Dashboard() {
     await handleUpdateTask(taskId, updates);
   };
 
-  if (loading) {
+  if (loading || contextsLoading) {
     return <div className="loading">Loading...</div>;
+  }
+
+  if (tasksError) {
+    return <div className="error-message">{tasksError}</div>;
   }
 
   return (

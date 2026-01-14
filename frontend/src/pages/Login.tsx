@@ -1,72 +1,21 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Brain } from 'lucide-react';
-import { authApi } from '../services/api';
-import { saveAuth } from '../services/auth';
+import { ClipboardList } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { useAuthForm } from '../hooks/useAuthForm';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
-import type { LoginRequest, RegisterRequest } from '../types';
 import '../styles/Login.css';
 
 export function Login() {
-  const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const [loginData, setLoginData] = useState<LoginRequest>({
-    email: '',
-    password: ''
-  });
-
-  const [registerData, setRegisterData] = useState<RegisterRequest>({
-    email: '',
-    name: '',
-    password: ''
-  });
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const response = await authApi.login(loginData);
-      if (response && response.token) {
-        saveAuth(response);
-        navigate('/dashboard');
-      } else {
-        setError('Invalid response from server');
-      }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Login failed';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleRegister(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const response = await authApi.register(registerData);
-      saveAuth(response);
-      navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { loading, error, login, register } = useAuth();
+  const { isLogin, setIsLogin, loginData, setLoginData, registerData, setRegisterData } = useAuthForm();
 
   return (
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
-          <Brain size={48} color="#FFD700" />
+          <ClipboardList size={48} color="#FFD700" />
           <h1>Context Manager</h1>
-          <p>AI-powered task management for focused work</p>
+          <p>AI-powered task management systemfor more focused work sessions</p>
         </div>
 
         <div className="auth-tabs">
@@ -88,17 +37,17 @@ export function Login() {
           <LoginForm
             loginData={loginData}
             loading={loading}
-            error={error}
+            error={error || ''}
             onChange={setLoginData}
-            onSubmit={handleLogin}
+            onSubmit={() => login(loginData)}
           />
         ) : (
           <RegisterForm
             registerData={registerData}
             loading={loading}
-            error={error}
+            error={error || ''}
             onChange={setRegisterData}
-            onSubmit={handleRegister}
+            onSubmit={() => register(registerData)}
           />
         )}
       </div>

@@ -6,14 +6,19 @@ interface LoginFormProps {
   loading: boolean;
   error: string;
   onChange: (data: LoginRequest) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: () => Promise<void>;
 }
 
 export function LoginForm({ loginData, loading, error, onChange, onSubmit }: LoginFormProps) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSubmit();
+  };
+
   return (
     <>
       {error && <div className="error-message">{error}</div>}
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="label">Email</label>
           <input

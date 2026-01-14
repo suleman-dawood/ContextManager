@@ -48,7 +48,7 @@ export default function ScheduleView() {
       const newIndex = sessionPlan.items.findIndex((item) => item.id === over.id);
 
       const newItems = arrayMove(sessionPlan.items, oldIndex, newIndex);
-      const taskIds = newItems.map((item) => item.task.id);
+        const taskIds = newItems.map((item) => item.task.id);
       
       try {
         await updateOrder(taskIds);
@@ -117,7 +117,7 @@ export default function ScheduleView() {
             items={sessionPlan.items}
             onDragEnd={handleDragEnd}
             onRemove={removeTask}
-          />
+                    />
         </div>
       )}
     </div>

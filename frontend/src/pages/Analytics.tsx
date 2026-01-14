@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { AppHeader } from '../components/AppHeader';
 import '../styles/Analytics.css';
@@ -15,6 +15,10 @@ export function Analytics() {
     ? Math.round(completionRate.reduce((sum, c) => sum + c.rate, 0) / completionRate.length)
     : 0;
 
+  const pieChartCells = contextDistribution.map((entry) => (
+    <Cell key={entry.context} fill={entry.color} />
+  ));
+
   return (
     <div className="analytics-page page-wrapper">
       <AppHeader />
@@ -26,7 +30,7 @@ export function Analytics() {
             <div className="chart-header flex-between">
               <div>
                 <h2 className="heading-tertiary">Tasks by Context</h2>
-                <p className="chart-description text-secondary">Distribution of your tasks across different mental contexts</p>
+                <p className="chart-description text-secondary">Distribution of your tasks across different contexts</p>
               </div>
               <div className="chart-actions">
                 <button 
@@ -49,11 +53,8 @@ export function Analytics() {
                     outerRadius={100}
                     label={({ context, count }) => `${context}: ${count}`}
                   >
-                    {contextDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
+                    {pieChartCells}
                   </Pie>
-                  <Tooltip />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -72,7 +73,7 @@ export function Analytics() {
             </div>
             <div className="summary-card card-base">
               <div className="summary-value">{avgCompletionRate}%</div>
-              <div className="summary-label text-secondary">Avg. Completion Rate</div>
+              <div className="summary-label text-secondary">Average Completion Rate</div>
             </div>
             <div className="summary-card card-base">
               <div className="summary-value">{contextDistribution.length}</div>

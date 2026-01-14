@@ -6,14 +6,19 @@ interface RegisterFormProps {
   loading: boolean;
   error: string;
   onChange: (data: RegisterRequest) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: () => Promise<void>;
 }
 
 export function RegisterForm({ registerData, loading, error, onChange, onSubmit }: RegisterFormProps) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSubmit();
+  };
+
   return (
     <>
       {error && <div className="error-message">{error}</div>}
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="label">Name</label>
           <input
