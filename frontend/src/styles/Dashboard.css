@@ -7,3 +7,15 @@
   padding-top: 40px;
   padding-bottom: var(--space-xl);
 }
+
+.dashboard .main-content {
+  margin-top: var(--space-lg);
+}
+
+.dashboard .tasks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}

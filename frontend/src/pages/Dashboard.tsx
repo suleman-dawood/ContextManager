@@ -75,12 +75,19 @@ export function Dashboard() {
         <StatsCards tasks={tasks} />
 
         <div className="main-content">
-          
+          <div className="tasks-header">
             <ContextFilter
               contexts={contexts}
               selectedContext={selectedContext}
               onSelectContext={setSelectedContext}
             />
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowCreateModal(true)}
+            >
+              Create Task
+            </button>
+          </div>
 
           <TaskList
             tasks={filteredTasks}
