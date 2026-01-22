@@ -59,9 +59,19 @@ builder.Services.AddHttpClient();
 // CORS config
 var allowedOrigins = new List<string> { "http://localhost:3000", "http://localhost:5173" };
 var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL");
-if (!string.IsNullOrEmpty(frontendUrl))
+if (!string.IsNullOrWhiteSpace(frontendUrl))
 {
     allowedOrigins.Add(frontendUrl);
+}
+
+var frontendUrls = Environment.GetEnvironmentVariable("FRONTEND_URLS");
+if (!string.IsNullOrWhiteSpace(frontendUrls))
+{
+    // Allow multiple frontend origins for production deployments.
+    allowedOrigins.AddRange(
+        frontendUrls
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    );
 }
 
 var isProduction = builder.Configuration["ASPNETCORE_ENVIRONMENT"] == "Production";
@@ -70,19 +80,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        if (isProduction)
-        {
-            policy.SetIsOriginAllowed(origin =>
-                origin.Contains("railway.app") || 
-                origin.Contains("localhost") ||
-                origin.Contains("127.0.0.1") ||
-                allowedOrigins.Contains(origin) ||
-                (frontendUrl != null && origin == frontendUrl));
-        }
-        else
-        {
-            policy.WithOrigins(allowedOrigins.ToArray());
-        }
+        // Credentials require explicit origins, so use the allow list in all environments.
+        policy.WithOrigins(allowedOrigins.Distinct().ToArray());
         
         policy.AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     });
