@@ -49,6 +49,57 @@ namespace ContextManager.API.Controllers
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
 
+            var defaultContexts = new List<Context>
+            {
+                new Context
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    Name = "Deep Work",
+                    Description = "Complex problem-solving, coding, writing, research",
+                    Color = "#3B82F6",
+                    Icon = "brain"
+                },
+                new Context
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    Name = "Meetings",
+                    Description = "Collaborative sessions, discussions, video calls",
+                    Color = "#10B981",
+                    Icon = "users"
+                },
+                new Context
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    Name = "Admin",
+                    Description = "Email management, scheduling, documentation, planning",
+                    Color = "#F59E0B",
+                    Icon = "clipboard"
+                },
+                new Context
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    Name = "Creative",
+                    Description = "Brainstorming, design, prototyping, experimentation",
+                    Color = "#8B5CF6",
+                    Icon = "palette"
+                },
+                new Context
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    Name = "Learning",
+                    Description = "Reading, courses, tutorials, skill development",
+                    Color = "#EC4899",
+                    Icon = "book"
+                }
+            };
+            _db.Contexts.AddRange(defaultContexts);
+            await _db.SaveChangesAsync();
+
             var token = _authService.GenerateJwtToken(user);
 
             return Ok(new AuthResponse

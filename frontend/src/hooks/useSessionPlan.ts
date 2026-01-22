@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { sessionPlanApi, tasksApi } from '../services/api';
 import type { SessionPlan, GenerateSessionPlanRequest } from '../types';
+import { formatLocalDate } from '../utils/dateUtils';
 
 export function useSessionPlan(date: Date) {
   const [sessionPlan, setSessionPlan] = useState<SessionPlan | null>(null);
@@ -15,8 +16,10 @@ export function useSessionPlan(date: Date) {
     try {
       const count = await tasksApi.getPendingTasksCount();
       setPendingTasksCount(count);
-    } catch (err) {
+      return count;
+    } catch (err: any) {
       console.error('Failed to load pending tasks count', err);
+      return 0;
     } finally {
       setLoadingCount(false);
     }
@@ -26,7 +29,7 @@ export function useSessionPlan(date: Date) {
     setLoading(true);
     setError(null);
     try {
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(date);
       const plan = await sessionPlanApi.getSessionPlan(dateStr);
       setSessionPlan(plan);
     } catch (err: any) {
@@ -42,9 +45,9 @@ export function useSessionPlan(date: Date) {
   }
 
   async function generatePlan() {
-    await loadPendingTasksCount();
+    const count = await loadPendingTasksCount();
     
-    if (pendingTasksCount === 0) {
+    if (count === 0) {
       setError('No available tasks to create a session plan');
       return;
     }
@@ -52,7 +55,7 @@ export function useSessionPlan(date: Date) {
     setGenerating(true);
     setError(null);
     try {
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(date);
       const request: GenerateSessionPlanRequest = { planDate: dateStr };
       const plan = await sessionPlanApi.generateSessionPlan(request);
       setSessionPlan(plan);

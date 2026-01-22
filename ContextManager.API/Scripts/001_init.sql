@@ -39,12 +39,4 @@ CREATE TABLE IF NOT EXISTS "Tasks" (
 CREATE INDEX IF NOT EXISTS "IX_Tasks_UserId" ON "Tasks" ("UserId");
 CREATE INDEX IF NOT EXISTS "IX_Tasks_ContextId" ON "Tasks" ("ContextId");
 
-INSERT INTO "Contexts" ("Id", "Name", "Description", "Color", "Icon")
-VALUES 
-    ('11111111-1111-1111-1111-111111111111', 'Deep Work', 'Complex problem-solving, coding, writing, research', '#3B82F6', 'brain'),
-    ('22222222-2222-2222-2222-222222222222', 'Meetings', 'Collaborative sessions, discussions, video calls', '#10B981', 'users'),
-    ('33333333-3333-3333-3333-333333333333', 'Admin', 'Email management, scheduling, documentation, planning', '#F59E0B', 'clipboard'),
-    ('44444444-4444-4444-4444-444444444444', 'Creative', 'Brainstorming, design, prototyping, experimentation', '#8B5CF6', 'palette'),
-    ('55555555-5555-5555-5555-555555555555', 'Learning', 'Reading, courses, tutorials, skill development', '#EC4899', 'book')
-ON CONFLICT ("Id") DO NOTHING;
 

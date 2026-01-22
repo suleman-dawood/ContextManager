@@ -3,6 +3,7 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Analytics } from './pages/Analytics';
 import { Schedule } from './pages/Schedule';
+import { Contexts } from './pages/Contexts';
 import { isAuthenticated } from './services/auth';
 import type { ReactNode } from 'react';
 
@@ -41,6 +42,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Schedule />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contexts"
+          element={
+            <ProtectedRoute>
+              <Contexts />
             </ProtectedRoute>
           }
         />

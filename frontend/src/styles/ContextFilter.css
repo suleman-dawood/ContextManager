@@ -7,6 +7,13 @@
   border-bottom: 2px solid var(--black);
 }
 
+.context-filter-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
 .filter-btn {
   padding: var(--space-sm) var(--space-md);
   font-size: var(--font-size-base);

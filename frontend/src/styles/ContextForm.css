@@ -1,0 +1,10 @@
+.context-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.context-form .form-error {
+    color: #b91c1c;
+    font-size: 0.9rem;
+}

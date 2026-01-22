@@ -4,8 +4,8 @@ AI-powered task management application that organizes work by mental context. Us
 
 ## Tech Stack
 
-- **Backend:** .NET 8, PostgreSQL, Claude Anthropic API
-- **Frontend:** React 18 + TypeScript
+- Backend: .NET 8, PostgreSQL, Claude Anthropic API
+- Frontend: React 18 + TypeScript
 
 ## Setup
 
@@ -23,8 +23,8 @@ AI-powered task management application that organizes work by mental context. Us
    cd ContextManager.API
    ```
 
-2. Configure `appsettings.json`:
-   ```json
+2. Configure appsettings.json:
+   
    {
      "ConnectionStrings": {
        "DefaultConnection": "Host=localhost;Database=contextmanager;Username=postgres;Password=yourpassword"
@@ -36,35 +36,35 @@ AI-powered task management application that organizes work by mental context. Us
        "ApiKey": "your-claude-api-key-here"
      }
    }
-   ```
+   
 
 3. Run:
-   ```bash
+   
    dotnet restore
    dotnet run
-   ```
+   
 
-   API runs at `http://localhost:5000` (migrations run automatically)
+   API runs at http://localhost:5000 (migrations run automatically)
 
 ### Frontend
 
 1. Navigate to frontend directory:
-   ```bash
+   
    cd frontend
-   ```
+   
 
-2. Create `.env` file:
-   ```
+2. Create .env file:
+   
    VITE_API_URL=http://localhost:5000/api
-   ```
+   
 
 3. Run:
-   ```bash
+   
    npm install
    npm run dev
-   ```
+   
 
-   App runs at `http://localhost:3000`
+   App runs at http://localhost:3000
 
 ## License
 

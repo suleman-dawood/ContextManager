@@ -5,7 +5,7 @@
   padding: var(--space-sm) var(--space-md);
   margin-bottom: var(--space-sm);
   box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
+  transition: all 0.2s ease-out;
 }
 
 .task-card:hover {
@@ -141,21 +141,4 @@
   background: var(--orange);
   border: 1px solid var(--black);
   font-size: var(--font-size-xs);
-}
-
-@media (max-width: 768px) {
-  .task-footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-xs);
-  }
-  
-  .task-actions {
-    justify-content: space-between;
-    width: 100%;
-  }
-  
-  .task-meta {
-    width: 100%;
-  }
 }

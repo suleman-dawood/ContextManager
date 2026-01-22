@@ -54,7 +54,9 @@ export default function ScheduleView() {
     if (active.id !== over.id) {
       const oldIndex = sessionPlan.items.findIndex((item) => item.id === active.id);
       const newIndex = sessionPlan.items.findIndex((item) => item.id === over.id);
-
+      if (oldIndex < 0 || newIndex < 0) {
+        return;
+      }
       const newItems = arrayMove(sessionPlan.items, oldIndex, newIndex);
         const taskIds = newItems.map((item) => item.task.id);
       

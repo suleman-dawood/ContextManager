@@ -76,15 +76,6 @@ namespace ContextManager.API.Data
                 entity.Property(e => e.PasswordHash).IsRequired();
             });
 
-            modelBuilder.Entity<Context>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Description).IsRequired().HasMaxLength(200);
-                entity.Property(e => e.Color).IsRequired().HasMaxLength(7); // hex color
-                entity.Property(e => e.Icon).IsRequired().HasMaxLength(100);
-            });
-
             modelBuilder.Entity<Models.Task>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -133,49 +124,19 @@ namespace ContextManager.API.Data
                 entity.HasIndex(spi => new { spi.SessionPlanId, spi.Order });
             });
 
-            // 5 pre-defined contexts
-            modelBuilder.Entity<Context>().HasData(
-                new Context
-                {
-                    Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                    Name = "Deep Work",
-                    Description = "Complex problem-solving, coding, writing, research",
-                    Color = "#3B82F6",
-                    Icon = "brain"
-                },
-                new Context
-                {
-                    Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                    Name = "Meetings",
-                    Description = "Collaborative sessions, discussions, video calls",
-                    Color = "#10B981",
-                    Icon = "users"
-                },
-                new Context
-                {
-                    Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                    Name = "Admin",
-                    Description = "Email management, scheduling, documentation, planning",
-                    Color = "#F59E0B",
-                    Icon = "clipboard"
-                },
-                new Context
-                {
-                    Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-                    Name = "Creative",
-                    Description = "Brainstorming, design, prototyping, experimentation",
-                    Color = "#8B5CF6",
-                    Icon = "palette"
-                },
-                new Context
-                {
-                    Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
-                    Name = "Learning",
-                    Description = "Reading, courses, tutorials, skill development",
-                    Color = "#EC4899",
-                    Icon = "book"
-                }
-            );
+            modelBuilder.Entity<Context>(entity =>
+            {
+                entity.HasOne(c => c.User)
+                    .WithMany()
+                    .HasForeignKey(c => c.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasIndex(c => new { c.UserId, c.Name }).IsUnique();
+                entity.Property(c => c.Name).IsRequired().HasMaxLength(100);
+                entity.Property(c => c.Description).IsRequired().HasMaxLength(200);
+                entity.Property(c => c.Color).IsRequired().HasMaxLength(7); // hex color
+                entity.Property(c => c.Icon).IsRequired().HasMaxLength(100);
+                entity.HasKey(e => e.Id);
+            });
         }
     }
 }

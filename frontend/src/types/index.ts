@@ -130,3 +130,25 @@ export interface UpdateSessionPlanOrderRequest {
   taskIds: string[];
 }
 
+export interface CreateContextRequest {
+  name: string;
+  description: string;
+  color: string;
+  icon: string;
+}
+
+export interface UpdateContextRequest {
+  name: string;
+  description: string;
+  color: string;
+  icon: string;
+}
+
+export interface ContextResponse {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  icon: string;
+}
+

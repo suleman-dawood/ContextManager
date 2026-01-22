@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, BarChart3, Calendar, LogOut } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Calendar, Folder, LogOut } from 'lucide-react';
 import '../styles/AppHeader.css';
 
 export const AppHeader = () => {
@@ -39,6 +39,14 @@ export const AppHeader = () => {
           >
             <Calendar size={20} />
             Schedule
+          </button>
+          <button 
+            className="nav-btn" 
+            onClick={() => navigate('/contexts')}
+            title="Contexts"
+          >
+            <Folder size={20} />
+            Contexts
           </button>
           <button 
             className="nav-btn nav-btn-logout" 

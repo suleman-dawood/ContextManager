@@ -82,12 +82,14 @@ export function Dashboard() {
               <Plus size={18} /> New Task
             </button>
           </div>
-
-          <ContextFilter
-            contexts={contexts}
-            selectedContext={selectedContext}
-            onSelectContext={setSelectedContext}
-          />
+          <div className="context-filter-container">
+            <ContextFilter
+              contexts={contexts}
+              selectedContext={selectedContext}
+              onSelectContext={setSelectedContext}
+            />
+            <button className="filter-btn-icon" onClick={() => setShowCreateModal(true)}><Plus size={18} /></button>
+          </div>
 
           <TaskList
             tasks={filteredTasks}

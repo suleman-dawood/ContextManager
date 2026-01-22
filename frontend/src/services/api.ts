@@ -7,6 +7,8 @@ import type {
   CreateTaskRequest,
   UpdateTaskRequest,
   Context,
+  CreateContextRequest,
+  UpdateContextRequest,
   ContextDistribution,
   CompletionRate,
   ContextCategorizationResponse,
@@ -109,6 +111,17 @@ export const contextsApi = {
   getContexts: async function(): Promise<Context[]> {
     const response = await api.get<Context[]>('/contexts');
     return response.data;
+  },
+  createContext: async function(data: CreateContextRequest): Promise<Context> {
+    const response = await api.post<Context>('/contexts', data);
+    return response.data;
+  },
+  updateContext: async function(id: string, data: UpdateContextRequest): Promise<Context> {
+    const response = await api.put<Context>(`/contexts/${id}`, data);
+    return response.data;
+  },
+  deleteContext: async function(id: string): Promise<void> {
+    await api.delete(`/contexts/${id}`);
   }
 };
 

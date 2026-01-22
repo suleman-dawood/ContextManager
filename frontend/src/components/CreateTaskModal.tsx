@@ -12,7 +12,7 @@ interface CreateTaskModalProps {
   onSubmit: (task: CreateTaskRequest) => Promise<void>;
 }
 
-export const CreateTaskModal = ({ onClose, onSubmit }: CreateTaskModalProps) => {
+export function CreateTaskModal({ onClose, onSubmit }: CreateTaskModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { formData, updateTitle, updateDescription, updateEstimatedMinutes, updatePriority, updateDueDate } = useTaskForm();

@@ -52,6 +52,7 @@ builder.Services.AddScoped<ClaudeService>();
 builder.Services.AddScoped<SessionPlanService>();
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<AnalyticsService>();
+builder.Services.AddScoped<ContextService>();
 builder.Services.AddScoped<DatabaseMigrationService>();
 builder.Services.AddHttpClient();
 
