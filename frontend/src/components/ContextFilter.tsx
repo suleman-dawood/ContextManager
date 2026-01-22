@@ -1,7 +1,5 @@
 import type { Context } from '../types';
 import '../styles/ContextFilter.css';
-import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
 
 interface ContextFilterProps {
   contexts: Context[];
@@ -15,7 +13,6 @@ export function ContextFilter({
   onSelectContext
 }: ContextFilterProps) {
 
-  const navigate = useNavigate();
 
   return (
     <div className="context-filter-container">
@@ -36,7 +33,6 @@ export function ContextFilter({
           </button>
         ))}
       </div>
-      <button className="filter-btn-icon" onClick={() => navigate('/contexts')}><Plus size={18} /></button>
     </div>
   );
 }

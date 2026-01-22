@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { Plus } from 'lucide-react';
 import { TaskList } from '../components/TaskList';
 import { ContextFilter } from '../components/ContextFilter';
 import { CreateTaskModal } from '../components/CreateTaskModal';
@@ -76,20 +75,12 @@ export function Dashboard() {
         <StatsCards tasks={tasks} />
 
         <div className="main-content">
-          <div className="flex-between divider-bottom">
-            <h2>Your Tasks</h2>
-            <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
-              <Plus size={18} /> New Task
-            </button>
-          </div>
-          <div className="context-filter-container">
+          
             <ContextFilter
               contexts={contexts}
               selectedContext={selectedContext}
               onSelectContext={setSelectedContext}
             />
-            <button className="filter-btn-icon" onClick={() => setShowCreateModal(true)}><Plus size={18} /></button>
-          </div>
 
           <TaskList
             tasks={filteredTasks}

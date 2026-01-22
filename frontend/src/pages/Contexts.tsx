@@ -35,7 +35,8 @@ export function Contexts() {
     <div className="contexts-page page-wrapper">
       <AppHeader />
 
-      <div className="context-container">
+      {/* Use the shared container class to keep page layout centered like Dashboard. */}
+      <div className="container context-container">
         <h1>Manage Your Contexts</h1>
         <p>Contexts are used to group tasks. You can create, edit, and delete contexts here.</p>
 
@@ -57,8 +58,9 @@ export function Contexts() {
         </div>
 
         {showCreateModal && (
-          <div className="context-modal-backdrop">
-            <div className="context-modal">
+          // Reuse the global modal styles for consistent centering and backdrop.
+          <div className="modal-overlay">
+            <div className="modal">
               <h2>Create Context</h2>
               <ContextForm
                 mode="create"
@@ -71,8 +73,9 @@ export function Contexts() {
         )}
 
         {editingContext && (
-          <div className="context-modal-backdrop">
-            <div className="context-modal">
+          // Reuse the global modal styles for consistent centering and backdrop.
+          <div className="modal-overlay">
+            <div className="modal">
               <h2>Edit Context</h2>
               <ContextForm
                 mode="edit"
