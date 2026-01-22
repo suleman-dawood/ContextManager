@@ -12,11 +12,13 @@ export function Contexts() {
     const { contexts, loading, error, createContext, updateContext, deleteContext } = useContexts();
 
     const [editingContext, setEditingContext] = useState<Context | null>(null);
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const canCreate = contexts.length < 10;
     const canDelete = contexts.length > 3;
   
     async function handleCreateContext(contextData: CreateContextRequest) {
         await createContext(contextData);
+        setShowCreateModal(false);
     }
 
     async function handleUpdateContext(contextData: UpdateContextRequest) {
@@ -35,36 +37,55 @@ export function Contexts() {
 
       <div className="context-container">
         <h1>Manage Your Contexts</h1>
-        <h2>Contexts are used to group tasks. You can create, edit, and delete contexts here.</h2>
+        <p>Contexts are used to group tasks. You can create, edit, and delete contexts here.</p>
 
         {loading && <Loading message="Loading contexts..." />}
         {error && <Error message={error} />}
 
         <div className="contexts-section">
-          <h2>Create Context</h2>
+          <div className="contexts-header">
+            <h2>Create Context</h2>
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowCreateModal(true)}
+              disabled={!canCreate}
+            >
+              New Context
+            </button>
+          </div>
           {!canCreate && <p className="warning-text">Maximum 10 contexts allowed.</p>}
-
-          <ContextForm
-            mode="create"
-            onSubmit={handleCreateContext}
-            disabled={!canCreate}
-          />
         </div>
 
+        {showCreateModal && (
+          <div className="context-modal-backdrop">
+            <div className="context-modal">
+              <h2>Create Context</h2>
+              <ContextForm
+                mode="create"
+                onSubmit={handleCreateContext}
+                disabled={!canCreate}
+                onCancel={() => setShowCreateModal(false)}
+              />
+            </div>
+          </div>
+        )}
+
         {editingContext && (
-          <div className="contexts-section">
-            <h2>Edit Context</h2>
-            <ContextForm
-              mode="edit"
-              initialValues={{
-                name: editingContext.name,
-                description: editingContext.description,
-                color: editingContext.color,
-                icon: editingContext.icon
-              }}
-              onSubmit={handleUpdateContext}
-              onCancel={() => setEditingContext(null)}
-            />
+          <div className="context-modal-backdrop">
+            <div className="context-modal">
+              <h2>Edit Context</h2>
+              <ContextForm
+                mode="edit"
+                initialValues={{
+                  name: editingContext.name,
+                  description: editingContext.description,
+                  color: editingContext.color,
+                  icon: editingContext.icon
+                }}
+                onSubmit={handleUpdateContext}
+                onCancel={() => setEditingContext(null)}
+              />
+            </div>
           </div>
         )}
 

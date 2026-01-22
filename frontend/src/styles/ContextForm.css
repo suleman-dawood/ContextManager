@@ -8,3 +8,24 @@
     color: #b91c1c;
     font-size: 0.9rem;
 }
+
+.context-form .color-input {
+    padding: 4px;
+    height: 40px;
+}
+
+.context-form .icon-select {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.context-form .icon-preview {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
