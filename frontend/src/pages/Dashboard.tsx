@@ -7,7 +7,7 @@ import { TaskFromNaturalLanguageModal } from '../components/TaskFromNaturalLangu
 import { StatsCards } from '../components/StatsCards';
 import { AppHeader } from '../components/AppHeader';
 import { Loading } from '../components/Loading';
-import { Error } from '../components/Error';
+import { Error as ErrorComponent } from '../components/Error';
 import { useTasks } from '../hooks/useTasks';
 import { useContexts } from '../hooks/useContexts';
 import { useSuggestions } from '../hooks/useSuggestions';
@@ -35,16 +35,22 @@ export function Dashboard() {
   }
 
   async function handleTaskFromNaturalLanguage(naturalLanguage: string) {
-    const task = await getTaskFromNaturalLanguage({ naturalLanguage: naturalLanguage });
-    if (!task) return;
-    await createTask({
-      contextId: task.contextId,
-      title: task.title,
-      description: task.description,
-      estimatedMinutes: task.estimatedMinutes,
-      priority: task.priority,
-      dueDate: task.dueDate ?? undefined
-    });
+    try {
+      const task = await getTaskFromNaturalLanguage({ naturalLanguage: naturalLanguage });
+      if (!task) {
+        throw new Error('Failed to generate task. Please try again.');
+      }
+      await createTask({
+        contextId: task.contextId,
+        title: task.title,
+        description: task.description,
+        estimatedMinutes: task.estimatedMinutes,
+        priority: task.priority,
+        dueDate: task.dueDate ?? undefined
+      });
+    } catch (error: any) {
+      throw error;
+    }
   }
 
   async function handleUpdateTask(taskId: string, updates: UpdateTaskRequest) {
@@ -80,7 +86,7 @@ export function Dashboard() {
   }
 
   if (tasksError) {
-    return <Error fullPage message={tasksError} onRetry={() => window.location.reload()} />;
+    return <ErrorComponent fullPage message={tasksError} onRetry={() => window.location.reload()} />;
   }
 
   return (
