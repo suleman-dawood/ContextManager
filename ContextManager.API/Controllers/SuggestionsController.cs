@@ -44,5 +44,33 @@ namespace ContextManager.API.Controllers
                 return StatusCode(500, new { message = "Failed to categorize task", error = ex.Message });
             }
         }
+
+        /// POST /api/suggestions/task-from-natural-language
+        [HttpPost("task-from-natural-language")]
+        public async Task<ActionResult<TaskFromNaturalLanguageResponse>> GetTaskFromNaturalLanguage([FromBody] TaskFromNaturalLanguageRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.NaturalLanguage))
+            {
+                return BadRequest(new { message = "Missing input" });
+            }
+
+            try
+            {
+                var task = await _claudeService.GetTaskFromNaturalLanguageAsync(request.NaturalLanguage);
+                return Ok(task);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(502, new { message = "AI service unavailable", error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to get task from natural language", error = ex.Message });
+            }
+        }
     }
 }

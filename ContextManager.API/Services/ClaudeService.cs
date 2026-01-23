@@ -30,12 +30,8 @@ namespace ContextManager.API.Services
         /// categorizes a task into the appropriate context
         public async Task<ContextCategorizationResponse> CategorizeTaskAsync(string title, string description)
         {
+            // fetch all available contexts from the database
             var contexts = await _db.Contexts.ToListAsync();
-            
-            if (!contexts.Any())
-            {
-                throw new InvalidOperationException("No contexts available in database");
-            }
 
             var prompt = BuildCategorizationPrompt(title, description, contexts);
             var claudeResponse = await CallClaudeApiAsync(prompt);
@@ -98,7 +94,6 @@ namespace ContextManager.API.Services
                     }
                 }
                 
-                // preserving original order from Claude's response for remaining items
                 var trimmedTaskIds = trimmedItems.Select(item => item.Task.Id).ToHashSet();
                 sessionPlan.Items = originalItems
                     .Where(item => trimmedTaskIds.Contains(item.Task.Id))
@@ -108,6 +103,18 @@ namespace ContextManager.API.Services
             }
 
             return sessionPlan;
+        }
+
+        public async Task<TaskFromNaturalLanguageResponse> GetTaskFromNaturalLanguageAsync(string naturalLanguage)
+        {
+            // first, generate task details (title, description, estimatedMinutes, priority, dueDate) without context
+            var prompt = await BuildTaskFromNaturalLanguagePrompt(naturalLanguage);
+            var claudeResponse = await CallClaudeApiAsync(prompt);
+            var taskDetails = ParseTaskFromNaturalLanguageResponse(claudeResponse);
+            var categorization = await CategorizeTaskAsync(taskDetails.Title, taskDetails.Description);
+            taskDetails.ContextId = categorization.ContextId;
+            
+            return taskDetails;
         }
 
         private async Task<string> CallClaudeApiAsync(string prompt)
@@ -142,7 +149,6 @@ namespace ContextManager.API.Services
 
             var responseJson = await response.Content.ReadAsStringAsync();
             
-            // parse Claude's response 
             using var doc = JsonDocument.Parse(responseJson);
             var contentArray = doc.RootElement.GetProperty("content");
             var textContent = contentArray[0].GetProperty("text").GetString();
@@ -342,6 +348,91 @@ Important:
             catch (JsonException ex)
             {
                 throw new InvalidOperationException($"Failed to parse session plan: {ex.Message}");
+            }
+        }
+
+        private Task<string> BuildTaskFromNaturalLanguagePrompt(string naturalLanguage)
+        {
+            var currentHour = DateTime.Now.Hour;
+            var timeOfDay = currentHour < 12 ? "morning" : currentHour < 17 ? "afternoon" : "evening";
+            var dayOfWeek = DateTime.Now.DayOfWeek.ToString();
+            
+            var instructions = $@"
+1. Analyze the natural language description and create a task title and description
+2. Determine the estimated minutes required to complete the task (be realistic)
+3. Determine the priority of the task (High, Medium, or Low)
+4. Determine the due date of the task (format: YYYY-MM-DD, or empty string if no due date)
+";
+
+            var prompt = $@"You are an intelligent task creation assistant. Create a task based on the following natural language description.
+
+Natural Language Description:
+{naturalLanguage}
+
+Current Time: {dayOfWeek} {timeOfDay} ({DateTime.Now:HH:mm})
+
+Instructions:
+{instructions}
+
+Respond ONLY with valid JSON in this exact format:
+{{
+  ""title"": ""Task title"",
+  ""description"": ""Task description"",
+  ""estimatedMinutes"": 30,
+  ""priority"": ""High"",
+  ""dueDate"": ""2026-01-24""
+}}
+
+Important:
+- priority must be one of: High, Medium, Low
+- dueDate format: YYYY-MM-DD or empty string """" if no due date
+- estimatedMinutes should be a reasonable estimate based on the task complexity
+- Keep title concise but descriptive
+- Description can be empty if not needed";
+
+            return System.Threading.Tasks.Task.FromResult(prompt);
+        }
+
+        private TaskFromNaturalLanguageResponse ParseTaskFromNaturalLanguageResponse(string claudeResponse)
+        {
+            try
+            {
+                var jsonStart = claudeResponse.IndexOf('{');
+                var jsonEnd = claudeResponse.LastIndexOf('}') + 1;
+                var jsonString = claudeResponse.Substring(jsonStart, jsonEnd - jsonStart);
+
+                using var doc = JsonDocument.Parse(jsonString);
+                var title = doc.RootElement.GetProperty("title").GetString() ?? "";
+                var description = doc.RootElement.GetProperty("description").GetString() ?? "";
+                var estimatedMinutes = doc.RootElement.GetProperty("estimatedMinutes").GetInt32();
+                var priorityString = doc.RootElement.GetProperty("priority").GetString() ?? "";
+                var dueDateString = doc.RootElement.GetProperty("dueDate").GetString() ?? "";
+
+                Priority priority = Priority.Medium; 
+                if (Enum.TryParse<Priority>(priorityString, ignoreCase: true, out var parsedPriority))
+                {
+                    priority = parsedPriority;
+                }
+
+                DateTime? dueDate = null;
+                if (!string.IsNullOrWhiteSpace(dueDateString) && DateTime.TryParse(dueDateString, out var parsedDate))
+                {
+                    dueDate = parsedDate;
+                }
+
+                return new TaskFromNaturalLanguageResponse
+                {
+                    Title = title,
+                    Description = description,
+                    EstimatedMinutes = estimatedMinutes,
+                    Priority = priority,
+                    DueDate = dueDate,
+                    ContextId = Guid.Empty // will be set by categorization
+                };
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException($"Failed to parse task from natural language response: {ex.Message}");
             }
         }
     }
