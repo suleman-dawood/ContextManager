@@ -13,6 +13,8 @@ import type {
   CompletionRate,
   ContextCategorizationResponse,
   CategorizeTaskRequest,
+  TaskFromNaturalLanguageResponse,
+  TaskFromNaturalLanguageRequest,
   SessionPlan,
   GenerateSessionPlanRequest,
   UpdateSessionPlanOrderRequest
@@ -128,6 +130,11 @@ export const contextsApi = {
 export const suggestionsApi = {
   categorizeTask: async function(data: CategorizeTaskRequest): Promise<ContextCategorizationResponse> {
     const response = await api.post<ContextCategorizationResponse>('/suggestions/categorize', data);
+    return response.data;
+  },
+
+  getTaskFromNaturalLanguage: async function(data: TaskFromNaturalLanguageRequest): Promise<TaskFromNaturalLanguageResponse> {
+    const response = await api.post<TaskFromNaturalLanguageResponse>('/suggestions/task-from-natural-language', data);
     return response.data;
   }
 };

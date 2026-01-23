@@ -102,6 +102,19 @@ export interface CategorizeTaskRequest {
   description: string;
 }
 
+export interface TaskFromNaturalLanguageRequest {
+  naturalLanguage: string;
+}
+
+export interface TaskFromNaturalLanguageResponse {
+  title: string;
+  description: string;
+  estimatedMinutes: number;
+  priority: Priority;
+  dueDate: string | null;
+  contextId: string;
+}
+
 export interface SessionPlanItem {
   id: string;
   task: Task;

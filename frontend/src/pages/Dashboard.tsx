@@ -3,12 +3,14 @@ import { TaskList } from '../components/TaskList';
 import { ContextFilter } from '../components/ContextFilter';
 import { CreateTaskModal } from '../components/CreateTaskModal';
 import { EditTaskModal } from '../components/EditTaskModal';
+import { TaskFromNaturalLanguageModal } from '../components/TaskFromNaturalLanguageModal'
 import { StatsCards } from '../components/StatsCards';
 import { AppHeader } from '../components/AppHeader';
 import { Loading } from '../components/Loading';
 import { Error } from '../components/Error';
 import { useTasks } from '../hooks/useTasks';
 import { useContexts } from '../hooks/useContexts';
+import { useSuggestions } from '../hooks/useSuggestions';
 import type { Task, CreateTaskRequest, UpdateTaskRequest } from '../types';
 import { TaskStatus } from '../types';
 import '../styles/Dashboard.css';
@@ -16,9 +18,10 @@ import '../styles/Dashboard.css';
 export function Dashboard() {
   const { tasks, loading, error: tasksError, createTask, updateTask, deleteTask } = useTasks();
   const { contexts, loading: contextsLoading } = useContexts();
-
+  const { getTaskFromNaturalLanguage } = useSuggestions();
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showTaskFromNaturalLanguageModal, setShowTaskFromNaturalLanguageModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const filteredTasks = useMemo(() => {
@@ -27,22 +30,35 @@ export function Dashboard() {
       : tasks;
   }, [tasks, selectedContext]);
 
-  const handleCreateTask = async (taskData: CreateTaskRequest) => {
+  async function handleCreateTask(taskData: CreateTaskRequest) {
     await createTask(taskData);
-  };
+  }
 
-  const handleUpdateTask = async (taskId: string, updates: UpdateTaskRequest) => {
+  async function handleTaskFromNaturalLanguage(naturalLanguage: string) {
+    const task = await getTaskFromNaturalLanguage({ naturalLanguage: naturalLanguage });
+    if (!task) return;
+    await createTask({
+      contextId: task.contextId,
+      title: task.title,
+      description: task.description,
+      estimatedMinutes: task.estimatedMinutes,
+      priority: task.priority,
+      dueDate: task.dueDate ?? undefined
+    });
+  }
+
+  async function handleUpdateTask(taskId: string, updates: UpdateTaskRequest) {
     await updateTask(taskId, updates);
     setEditingTask(null);
-  };
+  }
 
-  const handleDeleteTask = async (taskId: string) => {
+  async function handleDeleteTask(taskId: string) {
     if (confirm('Are you sure you want to delete this task?')) {
       await deleteTask(taskId);
     }
-  };
+  }
 
-  const handleStatusChange = async (taskId: string, status: TaskStatus) => {
+  async function handleStatusChange(taskId: string, status: TaskStatus) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
@@ -54,7 +70,7 @@ export function Dashboard() {
       priority: task.priority,
       status,
       dueDate: task.dueDate
-    };
+    }
 
     await handleUpdateTask(taskId, updates);
   };
@@ -72,6 +88,9 @@ export function Dashboard() {
       <AppHeader />
 
       <div className="container">
+
+        <button className="quick-button" onClick={() => setShowTaskFromNaturalLanguageModal(true)}></button>
+        
         <StatsCards tasks={tasks} />
 
         <div className="main-content">
@@ -97,6 +116,13 @@ export function Dashboard() {
           />
         </div>
       </div>
+
+      {showTaskFromNaturalLanguageModal && (
+        <TaskFromNaturalLanguageModal
+          onClose={() => setShowTaskFromNaturalLanguageModal(false)}
+          onSubmit={handleTaskFromNaturalLanguage}
+        />
+      )}
 
       {showCreateModal && (
         <CreateTaskModal
