@@ -35,8 +35,17 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
     );
   };
 
+  const isOverdue = () => {
+    if (!task.dueDate || task.status === TaskStatus.Completed) return false;
+    const dueDate = new Date(task.dueDate);
+    const now = new Date();
+    return dueDate < now;
+  };
+
+  const cardClassName = isOverdue() ? 'task-card task-card-overdue' : 'task-card';
+
   return (
-    <div className="task-card" style={{ borderLeft: `4px solid ${task.contextColor}` }}>
+    <div className={cardClassName} style={{ borderLeft: `4px solid ${task.contextColor}` }}>
       <div className="task-header">
         <div className="task-title-row">
           <input

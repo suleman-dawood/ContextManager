@@ -10,15 +10,43 @@
 
 .dashboard .quick-button {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
   background: var(--yellow);
+  border: 2px solid var(--black);
+  border-radius: 0;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  color: var(--black);
+  z-index: 100;
+  transition: all 0.2s ease-out;
 }
 
 .dashboard .quick-button:hover {
   background: var(--orange);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.dashboard .quick-button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard .quick-button .quick-button-text {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .dashboard .quick-button .quick-button-text {
+    display: inline;
+  }
 }
 
 .dashboard .main-content {

@@ -1,0 +1,30 @@
+.status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.status-filter-btn {
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--black);
+  background: var(--white);
+  border: 1px solid var(--black);
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.15s ease-out;
+}
+
+.status-filter-btn:hover {
+  opacity: 1;
+  background: var(--gray-light);
+}
+
+.status-filter-btn.active {
+  background: var(--yellow);
+  border-color: var(--black);
+  opacity: 1;
+}

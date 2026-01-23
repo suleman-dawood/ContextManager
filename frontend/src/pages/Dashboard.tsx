@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
+import { Sparkles } from 'lucide-react';
 import { TaskList } from '../components/TaskList';
 import { ContextFilter } from '../components/ContextFilter';
+import { StatusFilter } from '../components/StatusFilter';
 import { CreateTaskModal } from '../components/CreateTaskModal';
 import { EditTaskModal } from '../components/EditTaskModal';
 import { TaskFromNaturalLanguageModal } from '../components/TaskFromNaturalLanguageModal'
@@ -20,6 +22,7 @@ export function Dashboard() {
   const { contexts, loading: contextsLoading } = useContexts();
   const { getTaskFromNaturalLanguage } = useSuggestions();
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showTaskFromNaturalLanguageModal, setShowTaskFromNaturalLanguageModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -94,8 +97,14 @@ export function Dashboard() {
       <AppHeader />
 
       <div className="container">
-
-        <button className="quick-button" onClick={() => setShowTaskFromNaturalLanguageModal(true)}></button>
+        <button 
+          className="quick-button" 
+          onClick={() => setShowTaskFromNaturalLanguageModal(true)}
+          title="Quick Task (AI)"
+        >
+          <Sparkles size={24} />
+          <span className="quick-button-text">Quick Task</span>
+        </button>
         
         <StatsCards tasks={tasks} />
 
@@ -113,6 +122,11 @@ export function Dashboard() {
               Create Task
             </button>
           </div>
+
+          <StatusFilter
+            selectedStatus={statusFilter}
+            onSelectStatus={setStatusFilter}
+          />
 
           <TaskList
             tasks={filteredTasks}

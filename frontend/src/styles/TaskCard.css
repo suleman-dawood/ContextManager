@@ -142,3 +142,23 @@
   border: 1px solid var(--black);
   font-size: var(--font-size-xs);
 }
+
+.task-card-overdue {
+  border-top: 3px solid var(--orange) !important;
+  background: linear-gradient(to right, rgba(255, 165, 0, 0.1) 0%, var(--white) 5%);
+  animation: pulse-overdue 2s ease-in-out infinite;
+}
+
+@keyframes pulse-overdue {
+  0%, 100% {
+    box-shadow: var(--shadow-sm), 0 0 0 0 rgba(255, 165, 0, 0.4);
+  }
+  50% {
+    box-shadow: var(--shadow-md), 0 0 0 4px rgba(255, 165, 0, 0.1);
+  }
+}
+
+.task-card-overdue .task-title-row h3 {
+  color: var(--orange);
+  font-weight: 700;
+}
