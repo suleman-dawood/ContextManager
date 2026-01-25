@@ -166,6 +166,7 @@
 @media (max-width: 767px) {
   .task-card {
     padding: var(--space-sm);
+    padding-right: 90px;
     margin-bottom: var(--space-sm);
     display: flex;
     flex-direction: column;
@@ -180,7 +181,6 @@
     gap: var(--space-sm);
     margin-bottom: 0;
     width: 100%;
-    padding-right: 80px;
   }
   
   .task-title-row {
@@ -264,10 +264,7 @@
   }
   
   .context-badge {
-    font-size: 10px;
-    padding: 3px 6px;
-    max-width: none;
-    white-space: nowrap;
+    display: none;
   }
   
   .badge {

@@ -434,6 +434,7 @@
   
   .schedule-task-item {
     padding: var(--space-sm);
+    padding-right: 50px;
     margin-bottom: var(--space-sm);
     display: flex;
     flex-direction: column;
@@ -470,7 +471,6 @@
     align-items: center;
     gap: var(--space-sm);
     width: 100%;
-    padding-right: 80px;
   }
   
   .task-title-row {
