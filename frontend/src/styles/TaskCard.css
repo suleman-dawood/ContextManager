@@ -165,40 +165,45 @@
 
 @media (max-width: 767px) {
   .task-card {
-    padding: var(--space-xs) var(--space-sm);
-    margin-bottom: var(--space-xs);
+    padding: var(--space-sm);
+    margin-bottom: var(--space-sm);
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: var(--space-xs);
-    min-height: 56px;
+    min-height: auto;
   }
   
   .task-header {
     display: flex;
-    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-sm);
     margin-bottom: 0;
+    width: 100%;
   }
   
   .task-title-row {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: var(--space-sm);
+    flex: 1;
+    min-width: 0;
   }
   
   .task-title-row input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
   }
   
   .task-title-row h3 {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
     font-weight: 600;
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 120px;
+    flex: 1;
+    min-width: 0;
   }
   
   .task-description {
@@ -206,53 +211,50 @@
   }
   
   .task-footer {
-    flex: 1;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
     gap: var(--space-xs);
     padding: 0;
     border: none;
-    min-width: 0;
   }
   
   .task-meta {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
-    font-size: var(--font-size-xs);
-    flex: 1;
-    min-width: 0;
+    gap: var(--space-sm);
+    font-size: 11px;
+    flex-wrap: wrap;
+    order: 1;
   }
   
   .task-meta span {
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   
   .task-actions {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
     display: flex;
     align-items: center;
     gap: 4px;
-    flex-shrink: 0;
   }
   
   .task-actions button {
-    padding: 6px 8px;
-    font-size: var(--font-size-xs);
-    min-width: auto;
-    min-height: auto;
+    padding: 8px;
+    min-width: 36px;
+    min-height: 36px;
     border: 1px solid var(--black);
+    background: var(--white);
+  }
+  
+  .task-actions button span {
+    display: none;
   }
   
   .task-actions button svg {
-    width: 14px;
-    height: 14px;
-  }
-  
-  .task-actions button:last-child {
-    padding: 6px;
+    width: 16px;
+    height: 16px;
   }
   
   .status-badge {
@@ -260,14 +262,14 @@
   }
   
   .context-badge {
-    font-size: 9px;
-    padding: 2px 4px;
-    max-width: 50px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 10px;
+    padding: 3px 6px;
+    max-width: none;
+    white-space: nowrap;
   }
   
   .badge {
-    display: none;
+    font-size: 9px;
+    padding: 2px 6px;
   }
 }

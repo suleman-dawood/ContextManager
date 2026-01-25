@@ -25,7 +25,7 @@ export function Analytics() {
       <AppHeader />
 
       <div className="container">
-        <h1 className="analytics-title">Productivity Analytics</h1>
+        <h1 className="analytics-page-title">Productivity Analytics</h1>
         <div className="charts-grid">
           <div className="chart-card">
             <div className="chart-header flex-between">

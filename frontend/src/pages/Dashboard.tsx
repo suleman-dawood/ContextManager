@@ -93,23 +93,23 @@ export function Dashboard() {
   }
 
   return (
-    <div className="dashboard page-wrapper">
+    <div className="dashboard-page page-wrapper">
       <AppHeader />
 
       <div className="container">
         <button 
-          className="quick-button" 
+          className="dashboard-quick-button" 
           onClick={() => setShowTaskFromNaturalLanguageModal(true)}
           title="Quick Task (AI)"
         >
           <Sparkles size={24} />
-          <span className="quick-button-text">Quick Task</span>
+          <span className="dashboard-quick-button-text">Quick Task</span>
         </button>
         
         <StatsCards tasks={tasks} />
 
-        <div className="main-content">
-          <div className="tasks-header">
+        <div className="dashboard-main-content">
+          <div className="dashboard-tasks-header">
             <ContextFilter
               contexts={contexts}
               selectedContext={selectedContext}

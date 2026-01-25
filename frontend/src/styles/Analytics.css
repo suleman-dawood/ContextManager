@@ -4,15 +4,15 @@
   background: var(--white);
 }
 
-.analytics-header {
+.analytics-page-header {
   margin-bottom: var(--space-xl);
 }
 
-.analytics-header h1 {
+.analytics-page-header h1 {
   margin: var(--space-md) 0 0 0;
 }
 
-.analytics-title {
+.analytics-page-title {
   font-size: var(--font-size-2xl);
   color: var(--black);
   margin-bottom: var(--space-lg);

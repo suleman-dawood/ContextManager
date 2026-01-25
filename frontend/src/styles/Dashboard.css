@@ -1,14 +1,14 @@
-.dashboard {
+.dashboard-page {
   min-height: 100vh;
   background: var(--white);
 }
 
-.dashboard .container {
+.dashboard-page .container {
   padding-top: 40px;
   padding-bottom: var(--space-xl);
 }
 
-.dashboard .quick-button {
+.dashboard-quick-button {
   position: fixed;
   bottom: 24px;
   right: 24px;
@@ -28,32 +28,32 @@
   transition: all 0.2s ease-out;
 }
 
-.dashboard .quick-button:hover {
+.dashboard-quick-button:hover {
   background: var(--orange);
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
-.dashboard .quick-button:active {
+.dashboard-quick-button:active {
   transform: translateY(0);
   box-shadow: var(--shadow-sm);
 }
 
-.dashboard .quick-button .quick-button-text {
+.dashboard-quick-button-text {
   display: none;
 }
 
 @media (min-width: 768px) {
-  .dashboard .quick-button .quick-button-text {
+  .dashboard-quick-button-text {
     display: inline;
   }
 }
 
-.dashboard .main-content {
+.dashboard-main-content {
   margin-top: var(--space-lg);
 }
 
-.dashboard .tasks-header {
+.dashboard-tasks-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -61,17 +61,17 @@
   margin-bottom: var(--space-lg);
 }
 
-.dashboard .tasks-header .btn {
+.dashboard-tasks-header .btn {
   white-space: nowrap;
 }
 
 @media (max-width: 767px) {
-  .dashboard .container {
+  .dashboard-page .container {
     padding-top: var(--space-lg);
     padding-bottom: 80px;
   }
   
-  .dashboard .quick-button {
+  .dashboard-quick-button {
     bottom: 16px;
     right: 16px;
     padding: var(--space-md);
@@ -79,13 +79,13 @@
     min-height: var(--min-touch-target);
   }
   
-  .dashboard .tasks-header {
+  .dashboard-tasks-header {
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-md);
   }
   
-  .dashboard .tasks-header .btn {
+  .dashboard-tasks-header .btn {
     width: 100%;
   }
 }

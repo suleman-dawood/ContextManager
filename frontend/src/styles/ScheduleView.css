@@ -433,13 +433,14 @@
   }
   
   .schedule-task-item {
-    padding: var(--space-xs) var(--space-sm);
-    margin-bottom: var(--space-xs);
+    padding: var(--space-sm);
+    margin-bottom: var(--space-sm);
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: var(--space-xs);
-    min-height: 56px;
+    min-height: auto;
     overflow: hidden;
+    position: relative;
   }
   
   .drag-handle {
@@ -447,12 +448,9 @@
   }
   
   .task-content {
-    flex: 1;
+    width: 100%;
     min-width: 0;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
   }
   
   .context-header {
@@ -460,7 +458,7 @@
   }
   
   .task-details {
-    flex: 1;
+    width: 100%;
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -470,9 +468,9 @@
   .task-header-row {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
-    flex: 1;
-    min-width: 0;
+    gap: var(--space-sm);
+    width: 100%;
+    padding-right: 80px;
   }
   
   .task-title-row {
@@ -480,17 +478,17 @@
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: var(--space-sm);
   }
   
   .task-title-row input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
   }
   
   .task-details h4 {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
     font-weight: 600;
     margin: 0;
     overflow: hidden;
@@ -507,31 +505,34 @@
   .task-meta {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
-    font-size: var(--font-size-xs);
-    flex-wrap: nowrap;
+    gap: var(--space-sm);
+    font-size: 11px;
+    flex-wrap: wrap;
   }
   
   .task-meta span {
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   
   .btn-remove-task {
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
     flex-shrink: 0;
     padding: 0;
+    background: var(--white);
+    border: 1px solid var(--black);
   }
   
-  .context-badge {
-    font-size: 9px;
-    padding: 2px 4px;
-    max-width: 50px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .context-badge,
+  .context-badge-dynamic {
+    font-size: 10px;
+    padding: 3px 6px;
+    max-width: none;
+    white-space: nowrap;
   }
   
   .task-count-badge,
@@ -544,13 +545,17 @@
   }
   
   .badge {
-    display: none;
+    font-size: 9px;
+    padding: 2px 6px;
   }
   
   .time-estimate,
-  .ai-reasoning,
   .due-date-text {
-    font-size: 9px;
+    font-size: 11px;
+  }
+  
+  .ai-reasoning {
+    display: none;
   }
   
   .drag-instructions {
