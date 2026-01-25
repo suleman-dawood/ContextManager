@@ -192,16 +192,20 @@
   }
   
   .summary-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-md);
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xs);
   }
   
   .summary-card {
-    padding: var(--space-lg);
+    padding: var(--space-sm);
   }
   
   .summary-value {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
+  }
+  
+  .summary-label {
+    font-size: 10px;
   }
 }
 

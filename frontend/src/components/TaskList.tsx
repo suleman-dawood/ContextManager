@@ -8,20 +8,38 @@ interface TaskListProps {
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
   onStatusChange: (taskId: string, status: TaskStatus) => void;
+  statusFilter?: string;
 }
 
-export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange }: TaskListProps) => {
-  if (tasks.length === 0) {
+export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange, statusFilter = 'all' }: TaskListProps) => {
+  const isOverdue = (task: Task) => {
+    if (!task.dueDate || task.status === TaskStatus.Completed) return false;
+    return new Date(task.dueDate) < new Date();
+  };
+
+  let filteredTasks = tasks;
+  
+  if (statusFilter === 'todo') {
+    filteredTasks = tasks.filter(t => t.status === TaskStatus.Todo);
+  } else if (statusFilter === 'inprogress') {
+    filteredTasks = tasks.filter(t => t.status === TaskStatus.InProgress);
+  } else if (statusFilter === 'completed') {
+    filteredTasks = tasks.filter(t => t.status === TaskStatus.Completed);
+  } else if (statusFilter === 'overdue') {
+    filteredTasks = tasks.filter(t => isOverdue(t));
+  }
+
+  if (filteredTasks.length === 0) {
     return (
       <div className="empty-state">
-        <p>No tasks yet. Create your first task to get started!</p>
+        <p>No tasks found. {statusFilter !== 'all' ? 'Try a different filter.' : 'Create your first task to get started!'}</p>
       </div>
     );
   }
 
-  const todoTasks = tasks.filter(t => t.status === TaskStatus.Todo);
-  const inProgressTasks = tasks.filter(t => t.status === TaskStatus.InProgress);
-  const completedTasks = tasks.filter(t => t.status === TaskStatus.Completed);
+  const todoTasks = filteredTasks.filter(t => t.status === TaskStatus.Todo);
+  const inProgressTasks = filteredTasks.filter(t => t.status === TaskStatus.InProgress);
+  const completedTasks = filteredTasks.filter(t => t.status === TaskStatus.Completed);
 
   return (
     <div className="task-list">

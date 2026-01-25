@@ -165,49 +165,80 @@
 
 @media (max-width: 767px) {
   .task-card {
-    padding: var(--space-md);
-    margin-bottom: var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
+    margin-bottom: var(--space-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-height: 56px;
   }
   
-  .task-title-row h3 {
-    font-size: var(--font-size-md);
+  .task-header {
+    display: none;
   }
   
   .task-description {
-    font-size: var(--font-size-base);
+    display: none;
   }
   
   .task-footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-md);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    padding: 0;
+    border: none;
   }
   
   .task-meta {
-    font-size: var(--font-size-base);
-    gap: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--font-size-xs);
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .task-meta span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .task-actions {
-    width: 100%;
-    justify-content: flex-end;
-    gap: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
   }
   
   .task-actions button {
-    min-width: var(--min-touch-target);
-    min-height: var(--min-touch-target);
-    padding: var(--space-sm) var(--space-md);
+    padding: 6px 8px;
+    font-size: var(--font-size-xs);
+    min-width: auto;
+    min-height: auto;
+    border: 1px solid var(--black);
   }
   
-  .task-title-row input[type="checkbox"] {
-    width: 24px;
-    height: 24px;
+  .task-actions button svg {
+    width: 14px;
+    height: 14px;
   }
   
-  .status-badge,
+  .task-actions button:last-child {
+    padding: 6px;
+  }
+  
+  .status-badge {
+    display: none;
+  }
+  
   .context-badge {
-    font-size: var(--font-size-sm);
-    padding: 4px var(--space-sm);
+    font-size: 10px;
+    padding: 2px 6px;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

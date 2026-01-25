@@ -133,6 +133,7 @@ export function Dashboard() {
             onEdit={setEditingTask}
             onDelete={handleDeleteTask}
             onStatusChange={handleStatusChange}
+            statusFilter={statusFilter}
           />
         </div>
       </div>
