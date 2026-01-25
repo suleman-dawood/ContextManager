@@ -171,6 +171,7 @@
     flex-direction: column;
     gap: var(--space-xs);
     min-height: auto;
+    position: relative;
   }
   
   .task-header {
@@ -179,6 +180,7 @@
     gap: var(--space-sm);
     margin-bottom: 0;
     width: 100%;
+    padding-right: 80px;
   }
   
   .task-title-row {
