@@ -173,10 +173,10 @@
 
 .task-dropdown {
   position: relative;
+  display: none;
 }
 
 .task-dropdown-btn {
-  display: none;
   padding: 4px;
   background: none;
   border: none;
@@ -245,6 +245,10 @@
   
   .task-footer {
     display: none;
+  }
+  
+  .task-dropdown {
+    display: block;
   }
   
   .task-card-row-1 {
