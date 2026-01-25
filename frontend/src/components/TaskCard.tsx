@@ -48,6 +48,49 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
 
   return (
     <div className={cardClassName} style={{ borderLeft: `4px solid ${task.contextColor}` }}>
+      <div className="task-header">
+        <div className="task-title-row">
+          <input
+            type="checkbox"
+            checked={task.status === TaskStatus.Completed}
+            onChange={(e) => 
+              onStatusChange(task.id, e.target.checked ? TaskStatus.Completed : TaskStatus.Todo)
+            }
+          />
+          <h3 className={task.status === TaskStatus.Completed ? 'completed' : ''}>
+            {task.title}
+          </h3>
+        </div>
+      </div>
+
+      {task.description && (
+        <p className="task-description">{task.description}</p>
+      )}
+
+      <div className="task-footer">
+        <div className="task-meta">
+          <span className="context-badge" style={{ backgroundColor: task.contextColor, color: '#000000' }}>
+            {task.contextName}
+          </span>
+          {formatDueDate(task.dueDate)}
+          <span>
+            <Clock size={14} /> {task.estimatedMinutes}min
+          </span>
+          {getPriorityBadge()}
+          <span className={`status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
+            {TaskStatus[task.status]}
+          </span>
+        </div>
+        <div className="task-actions">
+          <button className="btn btn-icon" onClick={() => onEdit(task)} title="Edit Task">
+            <Edit2 size={16} />
+          </button>
+          <button className="btn btn-icon btn-danger" onClick={() => onDelete(task.id)} title="Delete Task">
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </div>
+
       <div className="task-card-row-1">
         <input
           type="checkbox"
@@ -93,10 +136,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           )}
         </div>
       </div>
-
-      {task.description && (
-        <p className="task-description">{task.description}</p>
-      )}
 
       <div className="task-card-row-2">
         <span className="context-badge" style={{ backgroundColor: task.contextColor, color: '#000000' }}>
