@@ -122,12 +122,15 @@ export function SortableTaskItem({ item, isFirstInGroup, contextName, contextCol
           )}
           
           <div className="task-meta">
-            {getPriorityBadge()}
+            <span className="context-badge context-badge-dynamic" style={{ backgroundColor: contextColor, color: '#000000' }}>
+              {contextName}
+            </span>
+            {formatDueDate(item.task.dueDate)}
             <span className="time-estimate">
               <Clock1 size={14} />
               {item.task.estimatedMinutes} min
             </span>
-            {formatDueDate(item.task.dueDate)}
+            {getPriorityBadge()}
             {item.reasoning && (
               <span className="ai-reasoning">
                 <Zap size={14} />

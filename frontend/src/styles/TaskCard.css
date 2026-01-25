@@ -242,7 +242,7 @@
     gap: 4px;
   }
   
-  .task-actions button {
+  .task-actions .task-action-btn {
     padding: 8px;
     min-width: 36px;
     min-height: 36px;
@@ -250,11 +250,11 @@
     background: var(--white);
   }
   
-  .task-actions button span {
+  .task-actions .task-action-btn span {
     display: none;
   }
   
-  .task-actions button svg {
+  .task-actions .task-action-btn svg {
     width: 16px;
     height: 16px;
   }

@@ -1,67 +1,43 @@
 .status-filter {
   display: flex;
-  gap: var(--space-sm);
   flex-wrap: wrap;
-  margin-bottom: var(--space-lg);
-  padding-bottom: var(--space-md);
-  border-bottom: 2px solid var(--black);
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
 }
 
 .status-filter-btn {
-  padding: var(--space-sm) var(--space-md);
-  font-size: var(--font-size-base);
-  font-weight: 600;
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
   color: var(--black);
   background: var(--white);
-  border: 2px solid var(--black);
-  border-radius: 0;
+  border: 1px solid var(--black);
+  border-radius: 999px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
+  opacity: 0.8;
+  transition: all 0.15s ease-out;
 }
 
 .status-filter-btn:hover {
+  opacity: 1;
   background: var(--gray-light);
 }
 
 .status-filter-btn.active {
   background: var(--yellow);
   border-color: var(--black);
-  position: relative;
-}
-
-.status-filter-btn.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--black);
-}
-
-.status-filter-btn.active:hover {
-  background: var(--black);
-  color: var(--yellow);
-  border-color: var(--yellow);
-}
-
-.status-filter-btn.active:hover::after {
-  background: var(--yellow);
+  opacity: 1;
 }
 
 @media (max-width: 767px) {
   .status-filter {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: var(--space-md);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
   }
   
   .status-filter-btn {
-    min-height: var(--min-touch-target);
-    padding: var(--space-md) var(--space-lg);
-    font-size: var(--font-size-md);
-    white-space: nowrap;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-base);
+    min-height: 36px;
   }
 }

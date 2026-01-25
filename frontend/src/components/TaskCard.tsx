@@ -1,4 +1,4 @@
-import { Clock, Calendar, Trash2 } from 'lucide-react';
+import { Clock, Calendar, Trash2, Edit2 } from 'lucide-react';
 import type { Task } from '../types';
 import { Priority, TaskStatus } from '../types';
 import '../styles/TaskCard.css';
@@ -58,7 +58,6 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           <h3 className={task.status === TaskStatus.Completed ? 'completed' : ''}>
             {task.title}
           </h3>
-          {getPriorityBadge()}
         </div>
       </div>
 
@@ -71,20 +70,23 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           <span className="context-badge" style={{ backgroundColor: task.contextColor, color: '#000000' }}>
             {task.contextName}
           </span>
+          {formatDueDate(task.dueDate)}
           <span>
             <Clock size={12} /> {task.estimatedMinutes}min
           </span>
-          {formatDueDate(task.dueDate)}
+          {getPriorityBadge()}
           <span className={`status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
             {TaskStatus[task.status]}
           </span>
         </div>
         <div className="task-actions">
-          <button className="btn btn-secondary btn-small" onClick={() => onEdit(task)}>
-            Edit
+          <button className="btn btn-secondary btn-small task-action-btn" onClick={() => onEdit(task)} title="Edit task">
+            <Edit2 size={16} />
+            <span>Edit</span>
           </button>
-          <button className="btn btn-secondary btn-small" onClick={() => onDelete(task.id)} title="Delete task">
-            <Trash2 size={16} /> Delete
+          <button className="btn btn-secondary btn-small task-action-btn" onClick={() => onDelete(task.id)} title="Delete task">
+            <Trash2 size={16} />
+            <span>Delete</span>
           </button>
         </div>
       </div>

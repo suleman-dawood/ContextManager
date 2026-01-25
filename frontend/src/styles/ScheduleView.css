@@ -514,11 +514,6 @@
     white-space: nowrap;
   }
   
-  .task-meta .context-badge,
-  .task-meta .context-badge-dynamic {
-    order: -1;
-  }
-  
   .btn-remove-task {
     position: absolute;
     top: var(--space-sm);
