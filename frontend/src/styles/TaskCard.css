@@ -163,10 +163,74 @@
   font-weight: 700;
 }
 
+.task-card-row-1 {
+  display: none;
+}
+
+.task-card-row-2 {
+  display: none;
+}
+
+.task-dropdown {
+  position: relative;
+}
+
+.task-dropdown-btn {
+  display: none;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--black);
+  border-radius: 0;
+}
+
+.task-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: var(--white);
+  border: 2px solid var(--black);
+  border-radius: 0;
+  box-shadow: var(--shadow-lg);
+  min-width: 120px;
+  z-index: 10;
+}
+
+.task-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--black);
+  text-align: left;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--black);
+  transition: background 0.2s ease;
+}
+
+.task-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.task-dropdown-item:hover {
+  background: var(--gray-light);
+}
+
+.task-dropdown-item-danger:hover {
+  background: var(--orange);
+  color: var(--white);
+}
+
 @media (max-width: 767px) {
   .task-card {
     padding: var(--space-sm);
-    padding-right: 90px;
     margin-bottom: var(--space-sm);
     display: flex;
     flex-direction: column;
@@ -176,28 +240,27 @@
   }
   
   .task-header {
+    display: none;
+  }
+  
+  .task-footer {
+    display: none;
+  }
+  
+  .task-card-row-1 {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    margin-bottom: 0;
-    width: 100%;
+    margin-bottom: var(--space-xs);
   }
   
-  .task-title-row {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    flex: 1;
-    min-width: 0;
-  }
-  
-  .task-title-row input[type="checkbox"] {
+  .task-card-row-1 input[type="checkbox"] {
     width: 20px;
     height: 20px;
     flex-shrink: 0;
   }
   
-  .task-title-row h3 {
+  .task-card-row-1 h3 {
     font-size: var(--font-size-sm);
     font-weight: 600;
     margin: 0;
@@ -208,55 +271,28 @@
     min-width: 0;
   }
   
+  .task-dropdown-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+  }
+  
   .task-description {
     display: none;
   }
   
-  .task-footer {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-    padding: 0;
-    border: none;
-  }
-  
-  .task-meta {
+  .task-card-row-2 {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
     font-size: 11px;
     flex-wrap: wrap;
-    order: 1;
   }
   
-  .task-meta span {
+  .task-card-row-2 span {
     white-space: nowrap;
-  }
-  
-  .task-actions {
-    position: absolute;
-    top: var(--space-sm);
-    right: var(--space-sm);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  
-  .task-actions .task-action-btn {
-    padding: 8px;
-    min-width: 36px;
-    min-height: 36px;
-    border: 1px solid var(--black);
-    background: var(--white);
-  }
-  
-  .task-actions .task-action-btn span {
-    display: none;
-  }
-  
-  .task-actions .task-action-btn svg {
-    width: 16px;
-    height: 16px;
   }
   
   .status-badge {
@@ -264,7 +300,10 @@
   }
   
   .context-badge {
-    display: none;
+    font-size: 10px;
+    padding: 3px 6px;
+    max-width: none;
+    white-space: nowrap;
   }
   
   .badge {

@@ -1,4 +1,5 @@
-import { Clock, Calendar, Trash2, Edit2 } from 'lucide-react';
+import { Clock, Calendar, Trash2, Edit2, MoreVertical } from 'lucide-react';
+import { useState } from 'react';
 import type { Task } from '../types';
 import { Priority, TaskStatus } from '../types';
 import '../styles/TaskCard.css';
@@ -11,6 +12,7 @@ interface TaskCardProps {
 }
 
 export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardProps) => {
+  const [showDropdown, setShowDropdown] = useState(false);
   const getPriorityBadge = () => {
     const badges = {
       [Priority.High]: { text: 'High', class: 'priority-high' },
@@ -46,18 +48,49 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
 
   return (
     <div className={cardClassName} style={{ borderLeft: `4px solid ${task.contextColor}` }}>
-      <div className="task-header">
-        <div className="task-title-row">
-          <input
-            type="checkbox"
-            checked={task.status === TaskStatus.Completed}
-            onChange={(e) => 
-              onStatusChange(task.id, e.target.checked ? TaskStatus.Completed : TaskStatus.Todo)
-            }
-          />
-          <h3 className={task.status === TaskStatus.Completed ? 'completed' : ''}>
-            {task.title}
-          </h3>
+      <div className="task-card-row-1">
+        <input
+          type="checkbox"
+          checked={task.status === TaskStatus.Completed}
+          onChange={(e) => 
+            onStatusChange(task.id, e.target.checked ? TaskStatus.Completed : TaskStatus.Todo)
+          }
+        />
+        <h3 className={task.status === TaskStatus.Completed ? 'completed' : ''}>
+          {task.title}
+        </h3>
+        <div className="task-dropdown">
+          <button 
+            className="task-dropdown-btn" 
+            onClick={() => setShowDropdown(!showDropdown)}
+            title="Actions"
+          >
+            <MoreVertical size={20} />
+          </button>
+          {showDropdown && (
+            <div className="task-dropdown-menu">
+              <button 
+                className="task-dropdown-item" 
+                onClick={() => {
+                  onEdit(task);
+                  setShowDropdown(false);
+                }}
+              >
+                <Edit2 size={16} />
+                Edit
+              </button>
+              <button 
+                className="task-dropdown-item task-dropdown-item-danger" 
+                onClick={() => {
+                  onDelete(task.id);
+                  setShowDropdown(false);
+                }}
+              >
+                <Trash2 size={16} />
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -65,30 +98,18 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
         <p className="task-description">{task.description}</p>
       )}
 
-      <div className="task-footer">
-        <div className="task-meta">
-          <span className="context-badge" style={{ backgroundColor: task.contextColor, color: '#000000' }}>
-            {task.contextName}
-          </span>
-          {formatDueDate(task.dueDate)}
-          <span>
-            <Clock size={12} /> {task.estimatedMinutes}min
-          </span>
-          {getPriorityBadge()}
-          <span className={`status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
-            {TaskStatus[task.status]}
-          </span>
-        </div>
-        <div className="task-actions">
-          <button className="btn btn-secondary btn-small task-action-btn" onClick={() => onEdit(task)} title="Edit task">
-            <Edit2 size={16} />
-            <span>Edit</span>
-          </button>
-          <button className="btn btn-secondary btn-small task-action-btn" onClick={() => onDelete(task.id)} title="Delete task">
-            <Trash2 size={16} />
-            <span>Delete</span>
-          </button>
-        </div>
+      <div className="task-card-row-2">
+        <span className="context-badge" style={{ backgroundColor: task.contextColor, color: '#000000' }}>
+          {task.contextName}
+        </span>
+        {formatDueDate(task.dueDate)}
+        <span>
+          <Clock size={12} /> {task.estimatedMinutes}min
+        </span>
+        {getPriorityBadge()}
+        <span className={`status-badge status-${TaskStatus[task.status].toLowerCase()}`}>
+          {TaskStatus[task.status]}
+        </span>
       </div>
     </div>
   );
