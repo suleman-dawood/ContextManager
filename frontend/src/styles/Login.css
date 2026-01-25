@@ -86,3 +86,34 @@
   margin-top: 24px;
 }
 
+@media (max-width: 767px) {
+  .login-page {
+    padding: var(--space-md);
+  }
+  
+  .login-container {
+    padding: var(--space-lg);
+    max-width: 100%;
+    border-width: 2px;
+  }
+  
+  .login-header h1 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .login-header p {
+    font-size: var(--font-size-base);
+  }
+  
+  .auth-tabs button {
+    padding: var(--space-md);
+    font-size: var(--font-size-md);
+    min-height: var(--min-touch-target);
+  }
+  
+  .login-page .error-message {
+    font-size: var(--font-size-base);
+    padding: var(--space-md);
+  }
+}
+

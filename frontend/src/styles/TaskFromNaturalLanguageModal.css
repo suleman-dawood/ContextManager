@@ -15,3 +15,16 @@
   font-size: 16px;
   resize: vertical;
 }
+
+@media (max-width: 767px) {
+  .task-from-natural-language-modal {
+    max-width: 100%;
+  }
+  
+  .natural-language-input {
+    height: 120px;
+    padding: var(--space-md);
+    font-size: var(--font-size-md);
+    min-height: 120px;
+  }
+}

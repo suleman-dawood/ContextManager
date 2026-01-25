@@ -139,3 +139,69 @@
   opacity: 0.8;
 }
 
+@media (max-width: 767px) {
+  .analytics-page {
+    padding: var(--space-md) 0;
+  }
+  
+  .analytics-title {
+    font-size: var(--font-size-xl);
+  }
+  
+  .chart-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .chart-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  
+  .chart-toggle-btn {
+    flex: 1;
+    padding: var(--space-md);
+    font-size: var(--font-size-base);
+    min-height: var(--min-touch-target);
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+  
+  .chart-card {
+    padding: var(--space-md);
+  }
+  
+  .chart-card h2 {
+    font-size: var(--font-size-lg);
+  }
+  
+  .chart-description {
+    font-size: var(--font-size-base);
+  }
+  
+  .empty-chart {
+    height: 250px;
+    font-size: var(--font-size-base);
+  }
+  
+  .summary-section h2 {
+    font-size: var(--font-size-lg);
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+  
+  .summary-card {
+    padding: var(--space-lg);
+  }
+  
+  .summary-value {
+    font-size: var(--font-size-2xl);
+  }
+}
+

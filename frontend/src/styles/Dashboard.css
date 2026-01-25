@@ -64,3 +64,28 @@
 .dashboard .tasks-header .btn {
   white-space: nowrap;
 }
+
+@media (max-width: 767px) {
+  .dashboard .container {
+    padding-top: var(--space-lg);
+    padding-bottom: 80px;
+  }
+  
+  .dashboard .quick-button {
+    bottom: 16px;
+    right: 16px;
+    padding: var(--space-md);
+    min-width: var(--min-touch-target);
+    min-height: var(--min-touch-target);
+  }
+  
+  .dashboard .tasks-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+  }
+  
+  .dashboard .tasks-header .btn {
+    width: 100%;
+  }
+}

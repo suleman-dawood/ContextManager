@@ -36,3 +36,24 @@
   display: inline-block;
   vertical-align: middle;
 }
+
+@media (max-width: 767px) {
+  .create-task-modal .modal-header h2 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .ai-categorization-alert {
+    padding: var(--space-lg);
+    font-size: var(--font-size-base);
+  }
+  
+  .ai-categorization-reasoning,
+  .ai-categorization-confidence {
+    font-size: var(--font-size-base);
+  }
+  
+  .ai-categorizing {
+    padding: var(--space-lg);
+    font-size: var(--font-size-base);
+  }
+}

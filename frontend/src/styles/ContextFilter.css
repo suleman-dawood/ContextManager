@@ -85,3 +85,25 @@
   box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
 }
 
+@media (max-width: 767px) {
+  .context-filter {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--space-md);
+  }
+  
+  .context-filter-select {
+    max-width: 100%;
+    font-size: var(--font-size-md);
+    min-height: var(--min-touch-target);
+  }
+  
+  .filter-btn {
+    min-height: var(--min-touch-target);
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--font-size-md);
+    white-space: nowrap;
+  }
+}
+

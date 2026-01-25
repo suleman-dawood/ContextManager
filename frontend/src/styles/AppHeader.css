@@ -63,3 +63,60 @@
   border-color: var(--orange);
 }
 
+/* Hamburger menu button only for phone*/
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-sm);
+  color: var(--black);
+}
+
+@media (max-width: 767px) {
+  .header-content {
+    padding: var(--space-md);
+    flex-wrap: wrap;
+  }
+  
+  .app-title {
+    font-size: var(--font-size-lg);
+  }
+  
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--min-touch-target);
+    min-height: var(--min-touch-target);
+  }
+  
+  .header-nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+    border-top: 2px solid var(--black);
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+  }
+  
+  .header-nav.mobile-menu-open {
+    display: flex;
+  }
+  
+  .nav-btn {
+    width: 100%;
+    padding: var(--space-md);
+    justify-content: flex-start;
+    min-height: var(--min-touch-target);
+    font-size: var(--font-size-md);
+    border: none;
+    border-bottom: 2px solid var(--black);
+  }
+  
+  .nav-btn:last-child {
+    border-bottom: none;
+  }
+}
+

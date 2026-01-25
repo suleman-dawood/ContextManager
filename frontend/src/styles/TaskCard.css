@@ -162,3 +162,52 @@
   color: var(--orange);
   font-weight: 700;
 }
+
+@media (max-width: 767px) {
+  .task-card {
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+  
+  .task-title-row h3 {
+    font-size: var(--font-size-md);
+  }
+  
+  .task-description {
+    font-size: var(--font-size-base);
+  }
+  
+  .task-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+  }
+  
+  .task-meta {
+    font-size: var(--font-size-base);
+    gap: var(--space-md);
+  }
+  
+  .task-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+  }
+  
+  .task-actions button {
+    min-width: var(--min-touch-target);
+    min-height: var(--min-touch-target);
+    padding: var(--space-sm) var(--space-md);
+  }
+  
+  .task-title-row input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .status-badge,
+  .context-badge {
+    font-size: var(--font-size-sm);
+    padding: 4px var(--space-sm);
+  }
+}

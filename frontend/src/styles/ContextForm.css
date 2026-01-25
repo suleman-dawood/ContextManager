@@ -29,3 +29,23 @@
     align-items: center;
     justify-content: center;
 }
+
+@media (max-width: 767px) {
+  .context-form .form-error {
+    font-size: var(--font-size-base);
+  }
+  
+  .context-form .color-input {
+    height: var(--min-touch-target);
+    padding: var(--space-sm);
+  }
+  
+  .context-form .icon-select {
+    gap: var(--space-md);
+  }
+  
+  .context-form .icon-preview {
+    width: var(--min-touch-target);
+    height: var(--min-touch-target);
+  }
+}

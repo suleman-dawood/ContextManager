@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, BarChart3, Calendar, Folder, LogOut } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Calendar, Folder, LogOut, Menu, X } from 'lucide-react';
 import '../styles/AppHeader.css';
 
 export const AppHeader = () => {
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   function handleLogout() {
     localStorage.removeItem('token');
@@ -11,14 +13,33 @@ export const AppHeader = () => {
     navigate('/login');
   }
 
+  function handleNavigate(path: string) {
+    navigate(path);
+    setMobileMenuOpen(false);
+  }
+
+  function toggleMobileMenu() {
+    setMobileMenuOpen(!mobileMenuOpen);
+  }
+
   return (
     <header className="app-header">
       <div className="header-content">
         <h1 className="app-title">Context Manager</h1>
-        <nav className="header-nav">
+        
+        <button 
+          className="hamburger-btn"
+          onClick={toggleMobileMenu}
+          aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+        
+        <nav className={`header-nav ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
           <button 
             className="nav-btn" 
-            onClick={() => navigate('/dashboard')}
+            onClick={() => handleNavigate('/dashboard')}
             title="Dashboard"
           >
             <LayoutDashboard size={20} />
@@ -26,7 +47,7 @@ export const AppHeader = () => {
           </button>
           <button 
             className="nav-btn" 
-            onClick={() => navigate('/analytics')}
+            onClick={() => handleNavigate('/analytics')}
             title="Analytics"
           >
             <BarChart3 size={20} />
@@ -34,7 +55,7 @@ export const AppHeader = () => {
           </button>
           <button 
             className="nav-btn" 
-            onClick={() => navigate('/schedule')}
+            onClick={() => handleNavigate('/schedule')}
             title="Schedule"
           >
             <Calendar size={20} />
@@ -42,7 +63,7 @@ export const AppHeader = () => {
           </button>
           <button 
             className="nav-btn" 
-            onClick={() => navigate('/contexts')}
+            onClick={() => handleNavigate('/contexts')}
             title="Contexts"
           >
             <Folder size={20} />
@@ -50,7 +71,10 @@ export const AppHeader = () => {
           </button>
           <button 
             className="nav-btn nav-btn-logout" 
-            onClick={handleLogout}
+            onClick={() => {
+              handleLogout();
+              setMobileMenuOpen(false);
+            }}
             title="Logout"
           >
             <LogOut size={20} />

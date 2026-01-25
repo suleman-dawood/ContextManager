@@ -13,3 +13,13 @@
   justify-content: flex-end;
   gap: var(--space-md);
 }
+
+@media (max-width: 767px) {
+  .edit-task-modal .modal-header h2 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .edit-task-modal .form-group {
+    margin-bottom: var(--space-xl);
+  }
+}
