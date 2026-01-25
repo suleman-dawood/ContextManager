@@ -197,15 +197,28 @@
   }
   
   .summary-card {
-    padding: var(--space-sm);
+    padding: var(--space-xs);
+    text-align: center;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
   
   .summary-value {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-base);
+    margin-bottom: 4px;
+    line-height: 1;
   }
   
   .summary-label {
-    font-size: 10px;
+    font-size: 9px;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
   }
 }
 
