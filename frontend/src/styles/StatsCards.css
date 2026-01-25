@@ -62,8 +62,9 @@
 }
 
 @media (max-width: 767px) {
+  .stats-cards.grid-auto-fit,
   .stats-cards {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr) !important;
     gap: var(--space-xs);
     margin-bottom: var(--space-sm);
   }

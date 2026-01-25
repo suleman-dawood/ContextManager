@@ -191,8 +191,9 @@
     font-size: var(--font-size-lg);
   }
   
+  .summary-grid.grid-auto-fit,
   .summary-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr) !important;
     gap: var(--space-xs);
   }
   

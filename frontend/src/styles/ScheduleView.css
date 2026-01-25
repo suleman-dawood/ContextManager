@@ -434,7 +434,11 @@
   
   .schedule-task-item {
     padding: var(--space-xs) var(--space-sm);
+    margin-bottom: var(--space-xs);
+    display: flex;
+    align-items: center;
     gap: var(--space-xs);
+    min-height: 56px;
     overflow: hidden;
   }
   
@@ -443,16 +447,32 @@
   }
   
   .task-content {
-    width: 100%;
+    flex: 1;
     min-width: 0;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+  
+  .context-header {
+    display: none;
+  }
+  
+  .task-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
   }
   
   .task-header-row {
-    flex-direction: row;
+    display: flex;
     align-items: center;
     gap: var(--space-xs);
-    flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
   }
   
   .task-title-row {
@@ -463,51 +483,74 @@
     gap: var(--space-xs);
   }
   
+  .task-title-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  
   .task-details h4 {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    flex: 1;
+    min-width: 0;
   }
   
   .task-description {
-    font-size: var(--font-size-sm);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: none;
   }
   
   .task-meta {
-    font-size: 10px;
-    gap: 4px;
-    flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--font-size-xs);
+    flex-wrap: nowrap;
+  }
+  
+  .task-meta span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .btn-remove-task {
-    width: 32px;
-    height: 32px;
-    font-size: 18px;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
     flex-shrink: 0;
-  }
-  
-  .task-title-row input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
+    padding: 0;
   }
   
   .context-badge {
     font-size: 9px;
     padding: 2px 4px;
-    max-width: 60px;
+    max-width: 50px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   
   .task-count-badge,
   .completed-badge {
-    font-size: 10px;
-    padding: 2px 4px;
+    display: none;
+  }
+  
+  .task-time-range {
+    display: none;
+  }
+  
+  .badge {
+    display: none;
+  }
+  
+  .time-estimate,
+  .ai-reasoning,
+  .due-date-text {
+    font-size: 9px;
   }
   
   .drag-instructions {

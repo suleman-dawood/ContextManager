@@ -174,7 +174,31 @@
   }
   
   .task-header {
-    display: none;
+    display: flex;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+  
+  .task-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+  
+  .task-title-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  
+  .task-title-row h3 {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
   }
   
   .task-description {
@@ -189,6 +213,7 @@
     gap: var(--space-xs);
     padding: 0;
     border: none;
+    min-width: 0;
   }
   
   .task-meta {
@@ -235,10 +260,14 @@
   }
   
   .context-badge {
-    font-size: 10px;
-    padding: 2px 6px;
-    max-width: 60px;
+    font-size: 9px;
+    padding: 2px 4px;
+    max-width: 50px;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  
+  .badge {
+    display: none;
   }
 }
