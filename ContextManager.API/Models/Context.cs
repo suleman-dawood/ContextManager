@@ -2,7 +2,6 @@ using System;
 
 namespace ContextManager.API.Models
 {
-    /// represents a  context or mode of work (e.g Creative, Meetings) and are read-only
     public class Context
     {
         public Guid Id { get; set; }

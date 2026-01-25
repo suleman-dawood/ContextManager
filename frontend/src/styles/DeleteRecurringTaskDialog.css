@@ -1,0 +1,42 @@
+.delete-recurring-dialog {
+  max-width: 500px;
+}
+
+.delete-recurring-content {
+  padding: var(--space-lg);
+}
+
+.delete-recurring-message {
+  font-size: var(--font-size-base);
+  color: var(--black);
+  margin-bottom: var(--space-sm);
+}
+
+.delete-recurring-question {
+  font-size: var(--font-size-base);
+  color: var(--black);
+  margin-bottom: var(--space-lg);
+  font-weight: 500;
+}
+
+.delete-recurring-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.delete-recurring-actions .btn {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .delete-recurring-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .delete-recurring-actions .btn {
+    width: auto;
+    min-width: 150px;
+  }
+}

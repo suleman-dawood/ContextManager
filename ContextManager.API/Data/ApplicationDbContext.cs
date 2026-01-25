@@ -16,6 +16,7 @@ namespace ContextManager.API.Data
         public DbSet<Models.Task> Tasks { get; set; } = null!;
         public DbSet<SessionPlan> SessionPlans { get; set; } = null!;
         public DbSet<SessionPlanItem> SessionPlanItems { get; set; } = null!;
+        public DbSet<RecurrantTask> RecurrantTasks { get; set; } = null!;
 
         /// overrriding SaveChanges to ensure all DateTime values are UTC
         public override int SaveChanges()
@@ -66,6 +67,7 @@ namespace ContextManager.API.Data
             modelBuilder.Entity<Models.Task>().ToTable("Tasks");
             modelBuilder.Entity<SessionPlan>().ToTable("SessionPlans");
             modelBuilder.Entity<SessionPlanItem>().ToTable("SessionPlanItems");
+            modelBuilder.Entity<RecurrantTask>().ToTable("RecurringTasks");
 
             modelBuilder.Entity<User>(entity =>
             {
@@ -91,6 +93,33 @@ namespace ContextManager.API.Data
                     .WithMany()
                     .HasForeignKey(t => t.ContextId)
                     .OnDelete(DeleteBehavior.Restrict); // don't allow context deletion if tasks exist
+                
+                entity.HasOne(t => t.RecurringTaskTemplate)
+                    .WithMany(rt => rt.Tasks)
+                    .HasForeignKey(t => t.RecurringTaskTemplateId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasIndex(t => t.RecurringTaskTemplateId);
+            });
+
+            modelBuilder.Entity<RecurrantTask>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Description).HasMaxLength(2000);
+                
+                entity.HasOne(rt => rt.User)
+                    .WithMany()
+                    .HasForeignKey(rt => rt.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasOne(rt => rt.Context)
+                    .WithMany()
+                    .HasForeignKey(rt => rt.ContextId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
+                entity.HasIndex(rt => rt.UserId);
+                entity.HasIndex(rt => rt.IsActive);
             });
 
             modelBuilder.Entity<SessionPlan>(entity =>

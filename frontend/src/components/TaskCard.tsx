@@ -1,7 +1,8 @@
-import { Clock, Calendar, Trash2, Edit2, MoreVertical } from 'lucide-react';
+import { Clock, Calendar, Trash2, Edit2, MoreVertical, Repeat } from 'lucide-react';
 import { useState } from 'react';
 import type { Task } from '../types';
 import { Priority, TaskStatus } from '../types';
+import { DeleteRecurringTaskDialog } from './DeleteRecurringTaskDialog';
 import '../styles/TaskCard.css';
 
 interface TaskCardProps {
@@ -9,10 +10,12 @@ interface TaskCardProps {
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
   onStatusChange: (taskId: string, status: TaskStatus) => void;
+  onDeleteComplete?: () => void;
 }
 
-export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardProps) => {
+export const TaskCard = ({ task, onEdit, onDelete, onStatusChange, onDeleteComplete }: TaskCardProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const getPriorityBadge = () => {
     const badges = {
       [Priority.High]: { text: 'High', class: 'priority-high' },
@@ -45,23 +48,49 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
   };
 
   const cardClassName = isOverdue() ? 'task-card task-card-overdue' : 'task-card';
+  const isRecurring = task.isRecurringInstance || task.recurringTaskTemplateId != null;
+
+  function handleDeleteClick() {
+    if (isRecurring) {
+      setShowDeleteDialog(true);
+    } else {
+      if (confirm('Are you sure you want to delete this task?')) {
+        onDelete(task.id);
+      }
+    }
+  }
+
+  function handleDeleteComplete() {
+    if (onDeleteComplete) {
+      onDeleteComplete();
+    } else {
+      onDelete(task.id);
+    }
+  }
 
   return (
-    <div className={cardClassName} style={{ borderLeft: `4px solid ${task.contextColor}` }}>
-      <div className="task-header">
-        <div className="task-title-row">
-          <input
-            type="checkbox"
-            checked={task.status === TaskStatus.Completed}
-            onChange={(e) => 
-              onStatusChange(task.id, e.target.checked ? TaskStatus.Completed : TaskStatus.Todo)
-            }
-          />
-          <h3 className={task.status === TaskStatus.Completed ? 'completed' : ''}>
-            {task.title}
-          </h3>
+    <>
+      <div className={cardClassName} style={{ borderLeft: `4px solid ${task.contextColor}` }}>
+        <div className="task-header">
+          <div className="task-title-row">
+            <input
+              type="checkbox"
+              checked={task.status === TaskStatus.Completed}
+              onChange={(e) => 
+                onStatusChange(task.id, e.target.checked ? TaskStatus.Completed : TaskStatus.Todo)
+              }
+            />
+            <h3 className={task.status === TaskStatus.Completed ? 'completed' : ''}>
+              {task.title}
+            </h3>
+            {isRecurring && (
+              <span className="recurring-indicator" title="Recurring task">
+                <Repeat size={14} />
+                <span className="recurring-badge">Recurring</span>
+              </span>
+            )}
+          </div>
         </div>
-      </div>
 
       {task.description && (
         <p className="task-description">{task.description}</p>
@@ -85,7 +114,7 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
           <button className="btn btn-icon" onClick={() => onEdit(task)} title="Edit Task">
             <Edit2 size={16} />
           </button>
-          <button className="btn btn-icon btn-danger" onClick={() => onDelete(task.id)} title="Delete Task">
+          <button className="btn btn-icon btn-danger" onClick={handleDeleteClick} title="Delete Task">
             <Trash2 size={16} />
           </button>
         </div>
@@ -102,6 +131,12 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
         <h3 className={task.status === TaskStatus.Completed ? 'completed' : ''}>
           {task.title}
         </h3>
+        {isRecurring && (
+          <span className="recurring-indicator" title="Recurring task">
+            <Repeat size={14} />
+            <span className="recurring-badge">Recurring</span>
+          </span>
+        )}
         <div className="task-dropdown">
           <button 
             className="task-dropdown-btn" 
@@ -125,8 +160,8 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
               <button 
                 className="task-dropdown-item task-dropdown-item-danger" 
                 onClick={() => {
-                  onDelete(task.id);
                   setShowDropdown(false);
+                  handleDeleteClick();
                 }}
               >
                 <Trash2 size={16} />
@@ -151,6 +186,16 @@ export const TaskCard = ({ task, onEdit, onDelete, onStatusChange }: TaskCardPro
         </span>
       </div>
     </div>
+
+    {showDeleteDialog && (
+      <DeleteRecurringTaskDialog
+        taskId={task.id}
+        taskTitle={task.title}
+        onClose={() => setShowDeleteDialog(false)}
+        onDeleteComplete={handleDeleteComplete}
+      />
+    )}
+    </>
   );
 };
 

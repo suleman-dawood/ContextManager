@@ -12,11 +12,13 @@ namespace ContextManager.API.Controllers
     {
         private readonly TaskService _taskService;
         private readonly AuthService _authService;
+        private readonly RecurrantTaskService _recurrantTaskService;
 
-        public TasksController(TaskService taskService, AuthService authService)
+        public TasksController(TaskService taskService, AuthService authService, RecurrantTaskService recurrantTaskService)
         {
             _taskService = taskService;
             _authService = authService;
+            _recurrantTaskService = recurrantTaskService;
         }
 
         [HttpGet("count")]
@@ -95,7 +97,77 @@ namespace ContextManager.API.Controllers
             try
             {
                 var userId = _authService.GetUserIdFromClaims(User);
+                var task = await _taskService.GetTaskEntityAsync(userId, id);
+
+                if (task == null)
+                {
+                    return NotFound(new { message = "Task not found" });
+                }
+
+                if (task.IsRecurringInstance || task.RecurringTaskTemplateId != null)
+                {
+                    return Ok(new
+                    {
+                        isRecurring = true,
+                        templateId = task.RecurringTaskTemplateId,
+                        message = "This is a recurring task. Delete just this instance or all instances?"
+                    });
+                }
+
                 await _taskService.DeleteTaskAsync(userId, id);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to delete task", error = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}/single")]
+        public async Task<IActionResult> DeleteTaskInstance(Guid id)
+        {
+            try
+            {
+                var userId = _authService.GetUserIdFromClaims(User);
+                await _taskService.DeleteTaskAsync(userId, id);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to delete task instance", error = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}/all")]
+        public async Task<IActionResult> DeleteTaskAndAllInstances(Guid id)
+        {
+            try
+            {
+                var userId = _authService.GetUserIdFromClaims(User);
+                var task = await _taskService.GetTaskEntityAsync(userId, id);
+
+                if (task == null)
+                {
+                    return NotFound(new { message = "Task not found" });
+                }
+
+                if (task.IsRecurringInstance && task.RecurringTaskTemplateId.HasValue)
+                {
+                    await _recurrantTaskService.DeleteRecurrantTaskAsync(userId, task.RecurringTaskTemplateId.Value);
+                }
+                else
+                {
+                    await _taskService.DeleteTaskAsync(userId, id);
+                }
+
                 return NoContent();
             }
             catch (InvalidOperationException ex)

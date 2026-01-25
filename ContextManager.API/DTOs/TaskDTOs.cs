@@ -10,6 +10,7 @@ namespace ContextManager.API.DTOs
         public int EstimatedMinutes { get; set; }
         public Priority Priority { get; set; }
         public DateTime? DueDate { get; set; }
+        public Guid? RecurringTaskTemplateId { get; set; }
     }
 
     public class UpdateTaskRequest
@@ -38,6 +39,8 @@ namespace ContextManager.API.DTOs
         public DateTime? DueDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
+        public Guid? RecurringTaskTemplateId { get; set; }
+        public bool IsRecurringInstance { get; set; }
     }
 }
 

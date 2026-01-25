@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { tasksApi } from '../services/api';
-import type { Task, CreateTaskRequest, UpdateTaskRequest } from '../types';
+import type { Task, CreateTaskRequest, UpdateTaskRequest, DeleteTaskResult } from '../types';
 
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -49,13 +49,40 @@ export function useTasks() {
     }
   }
 
-  async function deleteTask(taskId: string) {
+  async function deleteTask(taskId: string): Promise<DeleteTaskResult> {
     try {
       setError(null);
-      await tasksApi.deleteTask(taskId);
-      setTasks(tasks.filter(t => t.id !== taskId));
+      const result = await tasksApi.deleteTask(taskId);
+      if ('deleted' in result && result.deleted) {
+        setTasks(tasks.filter(t => t.id !== taskId));
+      }
+      return result;
     } catch (err: any) {
         const errorMessage = err.response?.data?.message || 'Failed to delete task';
+        setError(errorMessage);
+        throw err;
+    }
+  }
+
+  async function deleteTaskInstance(taskId: string) {
+    try {
+      setError(null);
+      await tasksApi.deleteTaskInstance(taskId);
+      setTasks(tasks.filter(t => t.id !== taskId));
+    } catch (err: any) {
+        const errorMessage = err.response?.data?.message || 'Failed to delete task instance';
+        setError(errorMessage);
+        throw err;
+    }
+  }
+
+  async function deleteTaskAndAllInstances(taskId: string) {
+    try {
+      setError(null);
+      await tasksApi.deleteTaskAndAllInstances(taskId);
+      setTasks(tasks.filter(t => t.id !== taskId));
+    } catch (err: any) {
+        const errorMessage = err.response?.data?.message || 'Failed to delete task and all instances';
         setError(errorMessage);
         throw err;
     }
@@ -72,7 +99,9 @@ export function useTasks() {
     loadTasks,
     createTask,
     updateTask,
-    deleteTask
+    deleteTask,
+    deleteTaskInstance,
+    deleteTaskAndAllInstances
   };
 }
 

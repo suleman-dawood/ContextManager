@@ -38,6 +38,37 @@ export interface Task {
   dueDate?: string;
   createdAt: string;
   completedAt?: string;
+  recurringTaskTemplateId?: string;
+  isRecurringInstance?: boolean;
+}
+
+export interface RecurringTask {
+  id: string;
+  userId: string;
+  contextId: string;
+  contextName: string;
+  contextColor: string;
+  title: string;
+  description: string | null;
+  estimatedMinutes: number;
+  priority: Priority;
+  recurrenceType: RecurrenceType;
+  recurrenceDays: string[] | null;
+  recurrenceStartDate: string;
+  recurrenceEndDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  instanceCount: number;
+  recurrencePattern: string;
+}
+
+export enum RecurrenceType {
+  Daily = 0,
+  Weekly = 1,
+  Biweekly = 2,
+  Monthly = 3,
+  Custom = 4
 }
 
 export interface ContextDistribution {
@@ -78,6 +109,7 @@ export interface CreateTaskRequest {
   estimatedMinutes: number;
   priority: Priority;
   dueDate?: string;
+  recurringTaskTemplateId?: string;
 }
 
 export interface UpdateTaskRequest {
@@ -88,6 +120,7 @@ export interface UpdateTaskRequest {
   priority: Priority;
   status: TaskStatus;
   dueDate?: string;
+  recurringTaskTemplateId?: string;
 }
 
 export interface ContextCategorizationResponse {
@@ -165,3 +198,51 @@ export interface ContextResponse {
   icon: string;
 }
 
+export interface CreateRecurringTaskRequest {
+  contextId: string;
+  title: string;
+  description?: string | null;
+  estimatedMinutes: number;
+  priority: Priority;
+  recurrenceType: RecurrenceType;
+  recurrenceDays?: string[] | null;
+  recurrenceStartDate: string;
+  recurrenceEndDate?: string | null;
+}
+
+export interface UpdateRecurringTaskRequest {
+  contextId: string;
+  title: string;
+  description?: string | null;
+  estimatedMinutes: number;
+  priority: Priority;
+  recurrenceType: RecurrenceType;
+  recurrenceDays?: string[] | null;
+  recurrenceStartDate: string;
+  recurrenceEndDate?: string | null;
+}
+
+export interface RecurringTaskResponse {
+  id: string;
+  userId: string;
+  contextId: string;
+  contextName: string;
+  contextColor: string;
+  title: string;
+  description: string | null;
+  estimatedMinutes: number;
+  priority: Priority;
+  recurrenceType: RecurrenceType;
+  recurrenceDays: string[] | null;
+  recurrenceStartDate: string;
+  recurrenceEndDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  instanceCount: number;
+  recurrencePattern: string;
+}
+
+export type DeleteTaskResult =
+  | { deleted: true }
+  | { isRecurring: true; templateId: string; message: string };

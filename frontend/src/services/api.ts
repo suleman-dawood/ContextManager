@@ -6,6 +6,10 @@ import type {
   Task,
   CreateTaskRequest,
   UpdateTaskRequest,
+  DeleteTaskResult,
+  RecurringTask,
+  CreateRecurringTaskRequest,
+  UpdateRecurringTaskRequest,
   Context,
   CreateContextRequest,
   UpdateContextRequest,
@@ -104,8 +108,56 @@ export const tasksApi = {
     return response.data;
   },
 
-  deleteTask: async function(id: string): Promise<void> {
-    await api.delete(`/tasks/${id}`);
+  deleteTask: async function(id: string): Promise<DeleteTaskResult> {
+    const response = await api.request<{ isRecurring?: boolean; templateId?: string; message?: string }>({
+      method: 'DELETE',
+      url: `/tasks/${id}`
+    });
+    if (response.status === 204) {
+      return { deleted: true };
+    }
+    if (response.status === 200 && response.data?.isRecurring && response.data?.templateId != null) {
+      return {
+        isRecurring: true,
+        templateId: String(response.data.templateId),
+        message: response.data.message ?? 'This is a recurring task. Delete just this instance or all instances?'
+      };
+    }
+    throw new Error('Unexpected response from delete task');
+  },
+
+  deleteTaskInstance: async function(id: string): Promise<void> {
+    await api.delete(`/tasks/${id}/single`);
+  },
+
+  deleteTaskAndAllInstances: async function(id: string): Promise<void> {
+    await api.delete(`/tasks/${id}/all`);
+  }
+};
+
+export const recurringTasksApi = {
+  getRecurringTasks: async function(): Promise<RecurringTask[]> {
+    const response = await api.get<RecurringTask[]>('/recurring-tasks');
+    return response.data;
+  },
+
+  getRecurringTask: async function(id: string): Promise<RecurringTask> {
+    const response = await api.get<RecurringTask>(`/recurring-tasks/${id}`);
+    return response.data;
+  },
+
+  createRecurringTask: async function(data: CreateRecurringTaskRequest): Promise<RecurringTask> {
+    const response = await api.post<RecurringTask>('/recurring-tasks', data);
+    return response.data;
+  },
+
+  updateRecurringTask: async function(id: string, data: UpdateRecurringTaskRequest): Promise<RecurringTask> {
+    const response = await api.put<RecurringTask>(`/recurring-tasks/${id}`, data);
+    return response.data;
+  },
+
+  deleteRecurringTask: async function(id: string): Promise<void> {
+    await api.delete(`/recurring-tasks/${id}`);
   }
 };
 

@@ -5,7 +5,9 @@ import { ContextFilter } from '../components/ContextFilter';
 import { StatusFilter } from '../components/StatusFilter';
 import { CreateTaskModal } from '../components/CreateTaskModal';
 import { EditTaskModal } from '../components/EditTaskModal';
-import { TaskFromNaturalLanguageModal } from '../components/TaskFromNaturalLanguageModal'
+import { TaskFromNaturalLanguageModal } from '../components/TaskFromNaturalLanguageModal';
+import { TaskTypeSelectionModal } from '../components/TaskTypeSelectionModal';
+import { RecurrantTaskForm } from '../components/RecurrantTaskForm';
 import { StatsCards } from '../components/StatsCards';
 import { AppHeader } from '../components/AppHeader';
 import { Loading } from '../components/Loading';
@@ -13,17 +15,22 @@ import { Error as ErrorComponent } from '../components/Error';
 import { useTasks } from '../hooks/useTasks';
 import { useContexts } from '../hooks/useContexts';
 import { useSuggestions } from '../hooks/useSuggestions';
-import type { Task, CreateTaskRequest, UpdateTaskRequest } from '../types';
+import { useRecurringTasks } from '../hooks/useRecurringTask';
+import type { Task, CreateTaskRequest, UpdateTaskRequest, CreateRecurringTaskRequest, RecurringTask } from '../types';
 import { TaskStatus } from '../types';
 import '../styles/Dashboard.css';
 
 export function Dashboard() {
-  const { tasks, loading, error: tasksError, createTask, updateTask, deleteTask } = useTasks();
+  const { tasks, loading, error: tasksError, createTask, updateTask, deleteTask, loadTasks } = useTasks();
   const { contexts, loading: contextsLoading } = useContexts();
   const { getTaskFromNaturalLanguage } = useSuggestions();
+  const { createRecurringTask, updateRecurringTask } = useRecurringTasks();
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showRecurringTaskForm, setShowRecurringTaskForm] = useState(false);
+  const [editingRecurringTask, setEditingRecurringTask] = useState<RecurringTask | null>(null);
   const [showTaskFromNaturalLanguageModal, setShowTaskFromNaturalLanguageModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
@@ -62,9 +69,28 @@ export function Dashboard() {
   }
 
   async function handleDeleteTask(taskId: string) {
-    if (confirm('Are you sure you want to delete this task?')) {
-      await deleteTask(taskId);
+    try {
+      const result = await deleteTask(taskId);
+      if ('isRecurring' in result && result.isRecurring) {
+        return;
+      }
+      await loadTasks();
+    } catch (err: any) {
+      console.error('Failed to delete task:', err);
     }
+  }
+
+  async function handleCreateRecurringTask(data: CreateRecurringTaskRequest) {
+    await createRecurringTask(data);
+    await loadTasks();
+    setShowRecurringTaskForm(false);
+  }
+
+  async function handleUpdateRecurringTask(data: CreateRecurringTaskRequest) {
+    if (!editingRecurringTask) return;
+    await updateRecurringTask(editingRecurringTask.id, data);
+    await loadTasks();
+    setEditingRecurringTask(null);
   }
 
   async function handleStatusChange(taskId: string, status: TaskStatus) {
@@ -117,7 +143,7 @@ export function Dashboard() {
             />
             <button
               className="btn btn-primary"
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => setShowTaskTypeModal(true)}
             >
               Create Task
             </button>
@@ -134,6 +160,7 @@ export function Dashboard() {
             onDelete={handleDeleteTask}
             onStatusChange={handleStatusChange}
             statusFilter={statusFilter}
+            onDeleteComplete={loadTasks}
           />
         </div>
       </div>
@@ -145,10 +172,43 @@ export function Dashboard() {
         />
       )}
 
+      {showTaskTypeModal && (
+        <TaskTypeSelectionModal
+          onSelectSingle={() => {
+            setShowTaskTypeModal(false);
+            setShowCreateModal(true);
+          }}
+          onSelectRecurring={() => {
+            setShowTaskTypeModal(false);
+            setShowRecurringTaskForm(true);
+          }}
+          onClose={() => setShowTaskTypeModal(false)}
+        />
+      )}
+
       {showCreateModal && (
         <CreateTaskModal
           onClose={() => setShowCreateModal(false)}
           onSubmit={handleCreateTask}
+        />
+      )}
+
+      {showRecurringTaskForm && (
+        <RecurrantTaskForm
+          mode="create"
+          contexts={contexts}
+          onSave={handleCreateRecurringTask}
+          onCancel={() => setShowRecurringTaskForm(false)}
+        />
+      )}
+
+      {editingRecurringTask && (
+        <RecurrantTaskForm
+          mode="edit"
+          template={editingRecurringTask}
+          contexts={contexts}
+          onSave={handleUpdateRecurringTask}
+          onCancel={() => setEditingRecurringTask(null)}
         />
       )}
 

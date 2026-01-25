@@ -152,6 +152,12 @@ namespace ContextManager.API.Services
             return MapToDTO(updatedTask);
         }
 
+        public async Task<TaskModel?> GetTaskEntityAsync(Guid userId, Guid taskId)
+        {
+            return await _db.Tasks
+                .FirstOrDefaultAsync(t => t.Id == taskId && t.UserId == userId);
+        }
+
         public async Task DeleteTaskAsync(Guid userId, Guid taskId)
         {
             var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId && t.UserId == userId);
@@ -181,7 +187,9 @@ namespace ContextManager.API.Services
                 Status = task.Status,
                 DueDate = task.DueDate,
                 CreatedAt = task.CreatedAt,
-                CompletedAt = task.CompletedAt
+                CompletedAt = task.CompletedAt,
+                RecurringTaskTemplateId = task.RecurringTaskTemplateId,
+                IsRecurringInstance = task.IsRecurringInstance
             };
         }
     }

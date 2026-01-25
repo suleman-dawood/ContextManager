@@ -1,0 +1,61 @@
+.recurring-task-form-modal .modal-header h2 {
+  font-size: var(--font-size-xl);
+  color: var(--black);
+  margin: 0;
+}
+
+.recurring-task-form-modal .form-group {
+  margin-bottom: var(--space-md);
+}
+
+.recurrence-days-group .label {
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+.recurrence-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.recurrence-day-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+.recurrence-day-checkbox input {
+  margin: 0;
+}
+
+.recurrence-preview {
+  padding: var(--space-md);
+  background: var(--gray-100, #f3f4f6);
+  border-radius: 4px;
+  margin-bottom: var(--space-md);
+}
+
+.recurrence-preview-text {
+  font-size: var(--font-size-sm);
+  color: var(--black);
+}
+
+.recurring-task-form-modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+@media (max-width: 767px) {
+  .recurring-task-form-modal .modal-header h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .recurrence-days {
+    gap: var(--space-xs);
+  }
+}

@@ -9,9 +9,10 @@ interface TaskListProps {
   onDelete: (taskId: string) => void;
   onStatusChange: (taskId: string, status: TaskStatus) => void;
   statusFilter?: string;
+  onDeleteComplete?: () => void;
 }
 
-export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange, statusFilter = 'all' }: TaskListProps) => {
+export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange, statusFilter = 'all', onDeleteComplete }: TaskListProps) => {
   const isOverdue = (task: Task) => {
     if (!task.dueDate || task.status === TaskStatus.Completed) return false;
     return new Date(task.dueDate) < new Date();
@@ -53,6 +54,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange, statusFilter
               onEdit={onEdit}
               onDelete={onDelete}
               onStatusChange={onStatusChange}
+              onDeleteComplete={onDeleteComplete}
             />
           ))}
         </div>
@@ -68,6 +70,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange, statusFilter
               onEdit={onEdit}
               onDelete={onDelete}
               onStatusChange={onStatusChange}
+              onDeleteComplete={onDeleteComplete}
             />
           ))}
         </div>
@@ -83,6 +86,7 @@ export const TaskList = ({ tasks, onEdit, onDelete, onStatusChange, statusFilter
               onEdit={onEdit}
               onDelete={onDelete}
               onStatusChange={onStatusChange}
+              onDeleteComplete={onDeleteComplete}
             />
           ))}
         </div>
