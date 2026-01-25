@@ -152,15 +152,33 @@ export function RecurrantTaskForm({
       setValidationError('Select at least one day for custom recurrence');
       return;
     }
+    if (form.recurrenceEndDate) {
+      const startDate = new Date(form.recurrenceStartDate);
+      const endDate = new Date(form.recurrenceEndDate);
+      if (endDate < startDate) {
+        setValidationError('End date must be after start date');
+        return;
+      }
+    }
 
     setLoading(true);
     try {
+      // Convert date strings (YYYY-MM-DD) to ISO strings for the API
+      const startDateISO = form.recurrenceStartDate 
+        ? new Date(form.recurrenceStartDate + 'T00:00:00').toISOString()
+        : new Date().toISOString();
+      
+      const endDateISO = form.recurrenceEndDate?.trim()
+        ? new Date(form.recurrenceEndDate + 'T00:00:00').toISOString()
+        : null;
+
       const payload: FormData = {
         ...form,
         title: form.title.trim(),
         description: form.description?.trim() || null,
         recurrenceDays: form.recurrenceType === RecurrenceType.Custom ? (form.recurrenceDays ?? []) : null,
-        recurrenceEndDate: form.recurrenceEndDate?.trim() || null
+        recurrenceStartDate: startDateISO,
+        recurrenceEndDate: endDateISO
       };
       await onSave(payload);
       onCancel();

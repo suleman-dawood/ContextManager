@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, CheckSquare, Repeat } from 'lucide-react';
 import '../styles/TaskTypeSelectionModal.css';
 
 interface TaskTypeSelectionModalProps {
@@ -30,24 +30,34 @@ export function TaskTypeSelectionModal({
           <div className="task-type-options">
             <button
               type="button"
-              className="btn btn-primary task-type-button"
+              className="task-type-card task-type-card-single"
               onClick={onSelectSingle}
             >
-              <span className="task-type-button-title">Single Task</span>
-              <span className="task-type-button-description">
-                A one-time task that you complete once
-              </span>
+              <div className="task-type-card-icon">
+                <CheckSquare size={32} />
+              </div>
+              <div className="task-type-card-content">
+                <span className="task-type-card-title">Single Task</span>
+                <span className="task-type-card-description">
+                  A one-time task that you complete once
+                </span>
+              </div>
             </button>
 
             <button
               type="button"
-              className="btn btn-secondary task-type-button"
+              className="task-type-card task-type-card-recurring"
               onClick={onSelectRecurring}
             >
-              <span className="task-type-button-title">Recurring Task</span>
-              <span className="task-type-button-description">
-                A task that repeats automatically on a schedule (daily, weekly, monthly, etc.)
-              </span>
+              <div className="task-type-card-icon">
+                <Repeat size={32} />
+              </div>
+              <div className="task-type-card-content">
+                <span className="task-type-card-title">Recurring Task</span>
+                <span className="task-type-card-description">
+                  A task that repeats automatically on a schedule (daily, weekly, monthly, etc.)
+                </span>
+              </div>
             </button>
           </div>
 
