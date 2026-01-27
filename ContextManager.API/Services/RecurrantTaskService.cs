@@ -7,6 +7,7 @@ using ContextManager.API.Data;
 using ContextManager.API.DTOs;
 using ContextManager.API.Models;
 using TaskModel = ContextManager.API.Models.Task;
+using Task = System.Threading.Tasks.Task;
 
 namespace ContextManager.API.Services
 {
@@ -211,10 +212,13 @@ namespace ContextManager.API.Services
                     .Select(d => d.Trim())
                     .ToList();
 
-            var existingDates = await _db.Tasks
+            // Get existing task instances for this recurring task to avoid duplicates
+            var existingTaskDates = await _db.Tasks
                 .Where(t => t.RecurringTaskTemplateId == recurringTaskId && t.DueDate.HasValue)
                 .Select(t => t.DueDate!.Value.Date)
                 .ToListAsync();
+            
+            var existingDates = new HashSet<DateTime>(existingTaskDates);
 
             var tasksToAdd = new List<TaskModel>();
             var recurrenceType = recurringTask.RecurrenceType;
@@ -327,11 +331,89 @@ namespace ContextManager.API.Services
             {
                 _db.Tasks.AddRange(tasksToAdd);
                 await _db.SaveChangesAsync();
+                
+                // Automatically add recurring task instances to session plans for their due dates
+                await AddRecurringInstancesToSessionPlansAsync(userId, tasksToAdd);
             }
+        }
+        
+        /// Automatically adds recurring task instances to session plans for their due dates
+        private async Task AddRecurringInstancesToSessionPlansAsync(Guid userId, List<TaskModel> recurringInstances)
+        {
+            // Group instances by their due date
+            var instancesByDate = recurringInstances
+                .Where(t => t.DueDate.HasValue)
+                .GroupBy(t => t.DueDate!.Value.Date)
+                .ToList();
+            
+            foreach (var dateGroup in instancesByDate)
+            {
+                var planDate = DateTime.SpecifyKind(dateGroup.Key, DateTimeKind.Utc);
+                var instances = dateGroup.ToList();
+                
+                // Get or create session plan for this date
+                var sessionPlan = await _db.SessionPlans
+                    .Include(sp => sp.Items)
+                    .FirstOrDefaultAsync(sp => sp.UserId == userId && sp.PlanDate.Date == planDate.Date);
+                
+                if (sessionPlan == null)
+                {
+                    // Create a new session plan for this date
+                    sessionPlan = new SessionPlan
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = userId,
+                        PlanDate = planDate,
+                        CreatedAt = DateTime.UtcNow,
+                        IsCustomized = false,
+                        Items = new List<SessionPlanItem>()
+                    };
+                    _db.SessionPlans.Add(sessionPlan);
+                }
+                
+                // Get existing task IDs in the plan to avoid duplicates
+                var existingTaskIds = sessionPlan.Items.Select(spi => spi.TaskId).ToHashSet();
+                
+                // Add recurring instances to the session plan
+                // Group by context to maintain context grouping
+                var instancesByContext = instances
+                    .Where(t => !existingTaskIds.Contains(t.Id))
+                    .GroupBy(t => t.ContextId)
+                    .ToList();
+                
+                int currentOrder = sessionPlan.Items.Any() 
+                    ? sessionPlan.Items.Max(spi => spi.Order) + 1 
+                    : 0;
+                int currentGroupNumber = sessionPlan.Items.Any()
+                    ? sessionPlan.Items.Max(spi => spi.GroupNumber) + 1
+                    : 0;
+                
+                foreach (var contextGroup in instancesByContext)
+                {
+                    foreach (var instance in contextGroup.OrderBy(t => t.Priority).ThenBy(t => t.CreatedAt))
+                    {
+                        var planItem = new SessionPlanItem
+                        {
+                            Id = Guid.NewGuid(),
+                            SessionPlanId = sessionPlan.Id,
+                            TaskId = instance.Id,
+                            Order = currentOrder++,
+                            GroupNumber = currentGroupNumber,
+                            Reasoning = "Recurring task instance"
+                        };
+                        sessionPlan.Items.Add(planItem);
+                    }
+                    currentGroupNumber++;
+                }
+            }
+            
+            await _db.SaveChangesAsync();
         }
 
         private TaskModel CreateTaskInstance(RecurrantTask template, Guid userId, DateTime dueDate)
         {
+            var dueDateUtc = DateTime.SpecifyKind(dueDate.Date, DateTimeKind.Utc);
+            
             return new TaskModel
             {
                 Id = Guid.NewGuid(),
@@ -342,7 +424,7 @@ namespace ContextManager.API.Services
                 EstimatedMinutes = template.EstimatedMinutes,
                 Priority = template.Priority,
                 Status = Models.TaskStatus.Todo,
-                DueDate = dueDate,
+                DueDate = dueDateUtc,
                 RecurringTaskTemplateId = template.Id,
                 IsRecurringInstance = true,
                 CreatedAt = DateTime.UtcNow

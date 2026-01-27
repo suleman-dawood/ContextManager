@@ -37,7 +37,7 @@ namespace ContextManager.API.Services
                 await _context.SaveChangesAsync();
             }
             
-            var aiPlan = await _claudeService.GetSessionPlanAsync(userId);
+            var aiPlan = await _claudeService.GetSessionPlanAsync(userId, planDate);
             
             if (aiPlan.Items == null || !aiPlan.Items.Any())
             {

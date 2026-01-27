@@ -41,25 +41,33 @@ namespace ContextManager.API.Services
 
         /// intelligently orders tasks for the day with context grouping
         /// returns a structured plan with tasks and reasoning
-        public async Task<SessionPlanResponse> GetSessionPlanAsync(Guid userId)
+        public async Task<SessionPlanResponse> GetSessionPlanAsync(Guid userId, DateTime? planDate = null)
         {
             var now = DateTime.UtcNow;
+            var targetDate = planDate?.Date ?? now.Date;
             
-            // tasks that are already assigned to any session plan
+            // tasks that are already assigned to any session plan for the target date
             var assignedTaskIds = await _db.SessionPlanItems
-                .Where(spi => spi.SessionPlan.UserId == userId)
+                .Where(spi => spi.SessionPlan.UserId == userId && spi.SessionPlan.PlanDate.Date == targetDate)
                 .Select(spi => spi.TaskId)
                 .Distinct()
                 .ToListAsync();
             
-            // available tasks
+            // available tasks: include tasks with no due date, tasks due on or before the target date,
+            // and tasks due up to 7 days in the future (for planning flexibility)
+            // Note: Recurring task instances are automatically added to session plans when created
+            var targetDateEnd = DateTime.SpecifyKind(targetDate, DateTimeKind.Utc).AddDays(1).AddTicks(-1);
+            var maxFutureDate = targetDateEnd.AddDays(7);
             var tasks = await _db.Tasks
                 .Include(t => t.Context)
                 .Where(t => t.UserId == userId 
                     && t.Status != Models.TaskStatus.Completed
-                    && (t.DueDate == null || t.DueDate >= now)
+                    && !t.IsRecurringInstance  // Exclude recurring instances as they're auto-added
+                    && (t.DueDate == null 
+                        || (t.DueDate.Value.Date <= targetDate)
+                        || (t.DueDate.Value.Date > targetDate && t.DueDate.Value.Date <= maxFutureDate))
                     && !assignedTaskIds.Contains(t.Id))
-                .OrderBy(t => t.DueDate)
+                .OrderBy(t => t.DueDate ?? DateTime.MaxValue)
                 .ThenByDescending(t => t.Priority)
                 .ToListAsync();
 
