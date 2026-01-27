@@ -44,7 +44,7 @@ namespace ContextManager.API.Services
         {
             var query = _db.Tasks
                 .Include(t => t.Context)
-                .Where(t => t.UserId == userId);
+                .Where(t => t.UserId == userId && !t.IsRecurringInstance); // Exclude recurring instances from dashboard
 
             if (contextId.HasValue)
             {
@@ -191,6 +191,31 @@ namespace ContextManager.API.Services
                 RecurringTaskTemplateId = task.RecurringTaskTemplateId,
                 IsRecurringInstance = task.IsRecurringInstance
             };
+        }
+
+        public async Task<TaskResponse> CancelRecurringInstanceAsync(Guid userId, Guid taskId)
+        {
+            var task = await _db.Tasks
+                .Include(t => t.Context)
+                .FirstOrDefaultAsync(t => t.Id == taskId && t.UserId == userId);
+
+            if (task == null)
+            {
+                throw new InvalidOperationException("Task not found");
+            }
+
+            if (!task.IsRecurringInstance)
+            {
+                throw new ArgumentException("This task is not a recurring instance");
+            }
+
+            // Convert recurring instance to a normal task by removing the recurring link
+            task.IsRecurringInstance = false;
+            task.RecurringTaskTemplateId = null;
+
+            await _db.SaveChangesAsync();
+
+            return MapToDTO(task);
         }
     }
 }

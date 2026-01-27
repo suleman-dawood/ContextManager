@@ -72,6 +72,13 @@ export function useSessionPlan(date: Date) {
     if (!sessionPlan) return;
     
     try {
+      const taskItem = sessionPlan.items.find(item => item.task.id === taskId);
+      
+      // If it's a recurring instance, convert it to a normal task first
+      if (taskItem?.task.isRecurringInstance) {
+        await tasksApi.cancelRecurringInstance(taskId);
+      }
+      
       const updatedItems = sessionPlan.items.filter(item => item.task.id !== taskId);
       
       if (updatedItems.length === 0) {

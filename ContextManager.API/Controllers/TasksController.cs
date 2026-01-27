@@ -179,5 +179,28 @@ namespace ContextManager.API.Controllers
                 return StatusCode(500, new { message = "Failed to delete task", error = ex.Message });
             }
         }
+
+        [HttpPost("{id}/cancel-recurrence")]
+        public async Task<ActionResult<TaskResponse>> CancelRecurringInstance(Guid id)
+        {
+            try
+            {
+                var userId = _authService.GetUserIdFromClaims(User);
+                var task = await _taskService.CancelRecurringInstanceAsync(userId, id);
+                return Ok(task);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to cancel recurring instance", error = ex.Message });
+            }
+        }
     }
 }

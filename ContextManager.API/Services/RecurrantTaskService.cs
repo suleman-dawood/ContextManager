@@ -14,22 +14,28 @@ namespace ContextManager.API.Services
     public class RecurrantTaskService 
     {
         private readonly ApplicationDbContext _db;
+        private readonly ClaudeService _claudeService;
 
-        public RecurrantTaskService(ApplicationDbContext db)
+        public RecurrantTaskService(ApplicationDbContext db, ClaudeService claudeService)
         {
             _db = db;
+            _claudeService = claudeService;
         }
 
         public async Task<RecurrantTaskResponse> CreateRecurrantTaskAsync(Guid userId, CreateRecurrantTaskRequest request)
         {
-            if (request.ContextId == Guid.Empty)
-            {
-                throw new ArgumentException("ContextId is required");
-            }
-
             if (string.IsNullOrWhiteSpace(request.Title))
             {
                 throw new ArgumentException("Title is required");
+            }
+
+            // Use AI to determine context if not provided
+            if (request.ContextId == Guid.Empty)
+            {
+                var categorization = await _claudeService.CategorizeTaskAsync(
+                    request.Title, 
+                    request.Description ?? string.Empty);
+                request.ContextId = categorization.ContextId;
             }
 
             var context = await _db.Contexts.FindAsync(request.ContextId);
@@ -332,7 +338,6 @@ namespace ContextManager.API.Services
                 _db.Tasks.AddRange(tasksToAdd);
                 await _db.SaveChangesAsync();
                 
-                // Automatically add recurring task instances to session plans for their due dates
                 await AddRecurringInstancesToSessionPlansAsync(userId, tasksToAdd);
             }
         }
@@ -340,7 +345,6 @@ namespace ContextManager.API.Services
         /// Automatically adds recurring task instances to session plans for their due dates
         private async Task AddRecurringInstancesToSessionPlansAsync(Guid userId, List<TaskModel> recurringInstances)
         {
-            // Group instances by their due date
             var instancesByDate = recurringInstances
                 .Where(t => t.DueDate.HasValue)
                 .GroupBy(t => t.DueDate!.Value.Date)
@@ -351,14 +355,12 @@ namespace ContextManager.API.Services
                 var planDate = DateTime.SpecifyKind(dateGroup.Key, DateTimeKind.Utc);
                 var instances = dateGroup.ToList();
                 
-                // Get or create session plan for this date
                 var sessionPlan = await _db.SessionPlans
                     .Include(sp => sp.Items)
                     .FirstOrDefaultAsync(sp => sp.UserId == userId && sp.PlanDate.Date == planDate.Date);
                 
                 if (sessionPlan == null)
                 {
-                    // Create a new session plan for this date
                     sessionPlan = new SessionPlan
                     {
                         Id = Guid.NewGuid(),
@@ -371,11 +373,8 @@ namespace ContextManager.API.Services
                     _db.SessionPlans.Add(sessionPlan);
                 }
                 
-                // Get existing task IDs in the plan to avoid duplicates
                 var existingTaskIds = sessionPlan.Items.Select(spi => spi.TaskId).ToHashSet();
                 
-                // Add recurring instances to the session plan
-                // Group by context to maintain context grouping
                 var instancesByContext = instances
                     .Where(t => !existingTaskIds.Contains(t.Id))
                     .GroupBy(t => t.ContextId)

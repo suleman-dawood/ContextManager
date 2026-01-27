@@ -108,6 +108,7 @@ export default function ScheduleView() {
         onNextDay={handleNextDay}
         onToday={handleToday}
         onGeneratePlan={generatePlan}
+        onTasksUpdated={loadSessionPlan}
       />
 
       {error && <Error message={error} />}

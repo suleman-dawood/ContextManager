@@ -29,7 +29,14 @@ namespace ContextManager.API.Services
             
             var existingPlan = await _context.SessionPlans
                 .Include(sp => sp.Items)
+                    .ThenInclude(spi => spi.Task)
                 .FirstOrDefaultAsync(sp => sp.UserId == userId && sp.PlanDate == planDate);
+            
+            // Preserve recurring task instances when regenerating
+            var recurringInstances = existingPlan?.Items
+                .Where(spi => spi.Task.IsRecurringInstance)
+                .Select(spi => spi.Task)
+                .ToList() ?? new List<Models.Task>();
             
             if (existingPlan != null)
             {
@@ -53,9 +60,40 @@ namespace ContextManager.API.Services
                 IsCustomized = false
             };
             
+            // Add recurring instances first (they have priority)
+            int order = 0;
             int groupNumber = 0;
             Guid? lastContextId = null;
             
+            var recurringByContext = recurringInstances
+                .GroupBy(t => t.ContextId)
+                .OrderBy(g => g.Key)
+                .ToList();
+            
+            foreach (var contextGroup in recurringByContext)
+            {
+                if (lastContextId.HasValue && lastContextId.Value != contextGroup.Key)
+                {
+                    groupNumber++;
+                }
+                lastContextId = contextGroup.Key;
+                
+                foreach (var task in contextGroup.OrderByDescending(t => t.Priority))
+                {
+                    var planItem = new SessionPlanItem
+                    {
+                        Id = Guid.NewGuid(),
+                        SessionPlanId = sessionPlan.Id,
+                        TaskId = task.Id,
+                        Order = order++,
+                        GroupNumber = groupNumber,
+                        Reasoning = "Recurring task - must not be missed"
+                    };
+                    sessionPlan.Items.Add(planItem);
+                }
+            }
+            
+            // Add AI-planned tasks after recurring ones, maintaining context grouping
             for (int i = 0; i < aiPlan.Items.Count; i++)
             {
                 var item = aiPlan.Items[i];
@@ -71,7 +109,7 @@ namespace ContextManager.API.Services
                     Id = Guid.NewGuid(),
                     SessionPlanId = sessionPlan.Id,
                     TaskId = item.Task.Id,
-                    Order = i,
+                    Order = order++,
                     GroupNumber = groupNumber,
                     Reasoning = item.Reasoning
                 };

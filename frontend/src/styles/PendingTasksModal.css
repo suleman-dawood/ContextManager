@@ -1,0 +1,196 @@
+.pending-tasks-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.pending-tasks-modal-content {
+  background: var(--card-bg);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.pending-tasks-loading,
+.pending-tasks-error,
+.pending-tasks-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.pending-tasks-error {
+  color: var(--error);
+}
+
+.pending-tasks-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pending-task-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  transition: all 0.2s;
+}
+
+.pending-task-item:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.pending-task-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pending-task-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pending-task-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.pending-task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.pending-task-context,
+.pending-task-priority,
+.pending-task-status,
+.pending-task-due {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  font-weight: 500;
+}
+
+.pending-task-priority.priority-2 {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.pending-task-priority.priority-1 {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.pending-task-priority.priority-0 {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.pending-task-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pending-task-delete:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.pending-task-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .pending-tasks-modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .pending-tasks-modal-content {
+    max-height: 95vh;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .modal-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .pending-tasks-list {
+    padding: 0.75rem;
+  }
+
+  .pending-task-item {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .pending-task-title {
+    font-size: 0.9rem;
+  }
+
+  .pending-task-description {
+    font-size: 0.8rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .pending-task-meta {
+    font-size: 0.7rem;
+    gap: 0.35rem;
+  }
+
+  .pending-task-context,
+  .pending-task-priority,
+  .pending-task-status,
+  .pending-task-due {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.65rem;
+  }
+
+  .pending-task-delete {
+    padding: 0.4rem;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .modal-footer {
+    padding: 0.75rem 1rem;
+  }
+}

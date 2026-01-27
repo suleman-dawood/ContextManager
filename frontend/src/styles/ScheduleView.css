@@ -52,6 +52,9 @@
 }
 
 .task-count-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
   padding: var(--space-md) var(--space-lg);
   background: var(--yellow);
   border: 2px solid var(--black);
@@ -61,6 +64,30 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-radius: 0;
+}
+
+.task-count-icon {
+  flex-shrink: 0;
+}
+
+.task-count-text {
+  white-space: nowrap;
+}
+
+.task-count-button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.task-count-button:hover:not(:disabled) {
+  background: var(--orange);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.task-count-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Session Summary */
@@ -535,7 +562,6 @@
     white-space: nowrap;
   }
   
-  .task-count-badge,
   .completed-badge {
     display: none;
   }

@@ -1,4 +1,6 @@
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, ListTodo } from 'lucide-react';
+import { useState } from 'react';
+import { PendingTasksModal } from './PendingTasksModal';
 import '../styles/ScheduleView.css';
 
 interface ScheduleHeaderProps {
@@ -11,6 +13,7 @@ interface ScheduleHeaderProps {
   onNextDay: () => void;
   onToday: () => void;
   onGeneratePlan: () => void;
+  onTasksUpdated: () => void;
 }
 
 export function ScheduleHeader({
@@ -22,8 +25,11 @@ export function ScheduleHeader({
   onPreviousDay,
   onNextDay,
   onToday,
-  onGeneratePlan
+  onGeneratePlan,
+  onTasksUpdated
 }: ScheduleHeaderProps) {
+  const [showPendingTasksModal, setShowPendingTasksModal] = useState(false);
+
   function formatDateForInput(date: Date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -34,6 +40,10 @@ export function ScheduleHeader({
   function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newDate = new Date(e.target.value + 'T00:00:00');
     onDateChange(newDate);
+  }
+
+  function handleTaskDeleted() {
+    onTasksUpdated();
   }
 
   return (
@@ -57,15 +67,21 @@ export function ScheduleHeader({
       </div>
 
       <div className="header-actions">
-        <div className="task-count-badge">
+        <button 
+          className="task-count-badge task-count-button"
+          onClick={() => setShowPendingTasksModal(true)}
+          disabled={loadingCount}
+          title={`${pendingTasksCount} ${pendingTasksCount === 1 ? 'task' : 'tasks'} remaining`}
+        >
+          <ListTodo size={20} className="task-count-icon" />
           {loadingCount ? (
-            <span>Loading...</span>
+            <span className="task-count-text">Loading...</span>
           ) : (
-            <span>
+            <span className="task-count-text">
               {pendingTasksCount} {pendingTasksCount === 1 ? 'task' : 'tasks'} remaining
             </span>
           )}
-        </div>
+        </button>
         <button
           className="btn btn-primary"
           onClick={onGeneratePlan}
@@ -76,6 +92,13 @@ export function ScheduleHeader({
           {generating ? 'Generating...' : 'Generate Plan'}
         </button>
       </div>
+
+      {showPendingTasksModal && (
+        <PendingTasksModal
+          onClose={() => setShowPendingTasksModal(false)}
+          onTaskDeleted={handleTaskDeleted}
+        />
+      )}
     </div>
   );
 }

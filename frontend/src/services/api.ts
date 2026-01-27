@@ -132,6 +132,11 @@ export const tasksApi = {
 
   deleteTaskAndAllInstances: async function(id: string): Promise<void> {
     await api.delete(`/tasks/${id}/all`);
+  },
+
+  cancelRecurringInstance: async function(id: string): Promise<Task> {
+    const response = await api.post<Task>(`/tasks/${id}/cancel-recurrence`);
+    return response.data;
   }
 };
 
