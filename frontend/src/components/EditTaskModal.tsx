@@ -19,7 +19,6 @@ export function EditTaskModal({ task, contexts, onClose, onSubmit }: EditTaskMod
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     
-    // Check if due date changed to an earlier date
     const oldDueDate = task.dueDate ? new Date(task.dueDate) : null;
     const newDueDate = formData.dueDate ? new Date(formData.dueDate) : null;
     
@@ -139,6 +138,7 @@ export function EditTaskModal({ task, contexts, onClose, onSubmit }: EditTaskMod
               <input
                 type="date"
                 className="input"
+                min={new Date().toISOString().split('T')[0]}
                 value={formData.dueDate || ''}
                 onChange={(e) => updateDueDate(e.target.value || undefined)}
               />

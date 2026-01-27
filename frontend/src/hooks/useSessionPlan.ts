@@ -76,22 +76,28 @@ export function useSessionPlan(date: Date) {
       
       // If it's a recurring instance, convert it to a normal task first
       if (taskItem?.task.isRecurringInstance) {
+        console.log('Converting recurring instance to normal task:', taskId);
         await tasksApi.cancelRecurringInstance(taskId);
       }
       
       const updatedItems = sessionPlan.items.filter(item => item.task.id !== taskId);
       
       if (updatedItems.length === 0) {
+        console.log('All tasks removed, deleting session plan');
         setSessionPlan(null);
         await loadPendingTasksCount();
         return;
       }
       
       const taskIds = updatedItems.map(item => item.task.id);
+      console.log('Updating session plan order, removing task:', taskId);
+      console.log('Remaining task IDs:', taskIds);
       await sessionPlanApi.updateSessionPlanOrder(sessionPlan.id, { taskIds });
       await loadSessionPlan();
       await loadPendingTasksCount();
+      console.log('Task removed successfully');
     } catch (err: any) {
+        console.error('Error removing task:', err);
         setError(err.response?.data?.message || 'Failed to remove task from plan');
     }
   }

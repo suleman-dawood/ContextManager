@@ -315,6 +315,7 @@ export function RecurrantTaskForm({
               <input
                 type="date"
                 className="input"
+                min={new Date().toISOString().split('T')[0]}
                 value={form.recurrenceStartDate}
                 onChange={(e) => update('recurrenceStartDate', e.target.value)}
                 required
@@ -325,6 +326,7 @@ export function RecurrantTaskForm({
               <input
                 type="date"
                 className="input"
+                min={form.recurrenceStartDate || new Date().toISOString().split('T')[0]}
                 value={form.recurrenceEndDate ?? ''}
                 onChange={(e) => update('recurrenceEndDate', e.target.value || null)}
               />

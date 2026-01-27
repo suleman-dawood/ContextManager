@@ -143,6 +143,7 @@ export function CreateTaskModal({ onClose, onSubmit }: CreateTaskModalProps) {
             <input
               type="date"
               className="input"
+              min={new Date().toISOString().split('T')[0]}
               value={formData.dueDate || ''}
               onChange={(e) => updateDueDate(e.target.value || undefined)}
             />
