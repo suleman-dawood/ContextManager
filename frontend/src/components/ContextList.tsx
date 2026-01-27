@@ -12,6 +12,7 @@ import {
     type LucideIcon
 } from 'lucide-react';
 import type { Context } from '../types';
+import '../styles/Contexts.css';
 
 interface ContextListProps {
     contexts: Context[];

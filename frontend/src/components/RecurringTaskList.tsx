@@ -146,11 +146,6 @@ export function RecurringTaskList({ recurringTasks, onEdit, onDelete }: Recurrin
             </div>
           </div>
 
-          {task.description && (
-            <div className="task-card-description">
-              <p className="task-description">{task.description}</p>
-            </div>
-          )}
 
           <div className="task-card-row-2">
             <span 

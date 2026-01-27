@@ -46,6 +46,11 @@ export function ScheduleHeader({
     onTasksUpdated();
   }
 
+  function handleModalClose() {
+    setShowPendingTasksModal(false);
+    onTasksUpdated();
+  }
+
   return (
     <div className="schedule-header">
       <div className="date-navigation">
@@ -90,7 +95,8 @@ export function ScheduleHeader({
 
       {showPendingTasksModal && (
         <PendingTasksModal
-          onClose={() => setShowPendingTasksModal(false)}
+          key={Date.now()}
+          onClose={handleModalClose}
           onTaskDeleted={handleTaskDeleted}
         />
       )}
