@@ -8,6 +8,8 @@ import { EditTaskModal } from '../components/EditTaskModal';
 import { TaskFromNaturalLanguageModal } from '../components/TaskFromNaturalLanguageModal';
 import { TaskTypeSelectionModal } from '../components/TaskTypeSelectionModal';
 import { RecurrantTaskForm } from '../components/RecurrantTaskForm';
+import { EditRecurringTaskModal } from '../components/EditRecurringTaskModal';
+import { RecurringTaskList } from '../components/RecurringTaskList';
 import { StatsCards } from '../components/StatsCards';
 import { AppHeader } from '../components/AppHeader';
 import { Loading } from '../components/Loading';
@@ -16,7 +18,7 @@ import { useTasks } from '../hooks/useTasks';
 import { useContexts } from '../hooks/useContexts';
 import { useSuggestions } from '../hooks/useSuggestions';
 import { useRecurringTasks } from '../hooks/useRecurringTask';
-import type { Task, CreateTaskRequest, UpdateTaskRequest, CreateRecurringTaskRequest, RecurringTask } from '../types';
+import type { Task, CreateTaskRequest, UpdateTaskRequest, CreateRecurringTaskRequest, UpdateRecurringTaskRequest, RecurringTask } from '../types';
 import { TaskStatus } from '../types';
 import '../styles/Dashboard.css';
 
@@ -24,7 +26,15 @@ export function Dashboard() {
   const { tasks, loading, error: tasksError, createTask, updateTask, deleteTask, loadTasks } = useTasks();
   const { contexts, loading: contextsLoading } = useContexts();
   const { getTaskFromNaturalLanguage } = useSuggestions();
-  const { createRecurringTask, updateRecurringTask } = useRecurringTasks();
+  const { 
+    recurringTasks, 
+    loading: recurringLoading, 
+    createRecurringTask, 
+    updateRecurringTask, 
+    deleteRecurringTask,
+    loadRecurringTasks 
+  } = useRecurringTasks();
+  const [viewMode, setViewMode] = useState<'tasks' | 'recurring'>('tasks');
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
@@ -83,14 +93,26 @@ export function Dashboard() {
   async function handleCreateRecurringTask(data: CreateRecurringTaskRequest) {
     await createRecurringTask(data);
     await loadTasks();
+    await loadRecurringTasks();
     setShowRecurringTaskForm(false);
   }
 
-  async function handleUpdateRecurringTask(data: CreateRecurringTaskRequest) {
-    if (!editingRecurringTask) return;
-    await updateRecurringTask(editingRecurringTask.id, data);
+  async function handleUpdateRecurringTask(id: string, data: UpdateRecurringTaskRequest) {
+    await updateRecurringTask(id, data);
     await loadTasks();
+    await loadRecurringTasks();
     setEditingRecurringTask(null);
+  }
+
+  async function handleDeleteRecurringTask(id: string) {
+    try {
+      await deleteRecurringTask(id);
+      await loadTasks();
+      await loadRecurringTasks();
+    } catch (err: any) {
+      console.error('Failed to delete recurring task:', err);
+      throw err;
+    }
   }
 
   async function handleStatusChange(taskId: string, status: TaskStatus) {
@@ -135,33 +157,94 @@ export function Dashboard() {
         <StatsCards tasks={tasks} />
 
         <div className="dashboard-main-content">
-          <div className="dashboard-tasks-header">
-            <ContextFilter
-              contexts={contexts}
-              selectedContext={selectedContext}
-              onSelectContext={setSelectedContext}
-            />
+          <div className="dashboard-view-toggle" style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', borderBottom: '2px solid #e0e0e0' }}>
             <button
-              className="btn btn-primary"
-              onClick={() => setShowTaskTypeModal(true)}
+              className={viewMode === 'tasks' ? 'view-tab-active' : 'view-tab'}
+              onClick={() => setViewMode('tasks')}
+              style={{
+                padding: '0.75rem 1.5rem',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                fontWeight: viewMode === 'tasks' ? 'bold' : 'normal',
+                borderBottom: viewMode === 'tasks' ? '3px solid #4f46e5' : 'none',
+                marginBottom: '-2px',
+                color: viewMode === 'tasks' ? '#4f46e5' : '#666'
+              }}
             >
-              Create Task
+              Tasks
+            </button>
+            <button
+              className={viewMode === 'recurring' ? 'view-tab-active' : 'view-tab'}
+              onClick={() => setViewMode('recurring')}
+              style={{
+                padding: '0.75rem 1.5rem',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                fontWeight: viewMode === 'recurring' ? 'bold' : 'normal',
+                borderBottom: viewMode === 'recurring' ? '3px solid #4f46e5' : 'none',
+                marginBottom: '-2px',
+                color: viewMode === 'recurring' ? '#4f46e5' : '#666'
+              }}
+            >
+              Recurring Tasks
             </button>
           </div>
 
-          <StatusFilter
-            selectedStatus={statusFilter}
-            onSelectStatus={setStatusFilter}
-          />
+          {viewMode === 'tasks' ? (
+            <>
+              <div className="dashboard-tasks-header">
+                <ContextFilter
+                  contexts={contexts}
+                  selectedContext={selectedContext}
+                  onSelectContext={setSelectedContext}
+                />
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowTaskTypeModal(true)}
+                >
+                  Create Task
+                </button>
+              </div>
 
-          <TaskList
-            tasks={filteredTasks}
-            onEdit={setEditingTask}
-            onDelete={handleDeleteTask}
-            onStatusChange={handleStatusChange}
-            statusFilter={statusFilter}
-            onDeleteComplete={loadTasks}
-          />
+              <StatusFilter
+                selectedStatus={statusFilter}
+                onSelectStatus={setStatusFilter}
+              />
+
+              <TaskList
+                tasks={filteredTasks}
+                onEdit={setEditingTask}
+                onDelete={handleDeleteTask}
+                onStatusChange={handleStatusChange}
+                statusFilter={statusFilter}
+                onDeleteComplete={loadTasks}
+              />
+            </>
+          ) : (
+            <>
+              <div className="dashboard-tasks-header">
+                <div></div>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowRecurringTaskForm(true)}
+                >
+                  Create Recurring Task
+                </button>
+              </div>
+
+              {recurringLoading ? (
+                <Loading message="Loading recurring tasks..." />
+              ) : (
+                <RecurringTaskList
+                  recurringTasks={recurringTasks}
+                  onEdit={setEditingRecurringTask}
+                  onDelete={handleDeleteRecurringTask}
+                />
+              )}
+            </>
+          )}
         </div>
       </div>
 
@@ -203,9 +286,8 @@ export function Dashboard() {
       )}
 
       {editingRecurringTask && (
-        <RecurrantTaskForm
-          mode="edit"
-          template={editingRecurringTask}
+        <EditRecurringTaskModal
+          recurringTask={editingRecurringTask}
           contexts={contexts}
           onSave={handleUpdateRecurringTask}
           onCancel={() => setEditingRecurringTask(null)}

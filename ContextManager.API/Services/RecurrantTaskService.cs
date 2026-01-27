@@ -29,7 +29,6 @@ namespace ContextManager.API.Services
                 throw new ArgumentException("Title is required");
             }
 
-            // Use AI to determine context if not provided
             if (request.ContextId == Guid.Empty)
             {
                 var categorization = await _claudeService.CategorizeTaskAsync(
@@ -218,7 +217,6 @@ namespace ContextManager.API.Services
                     .Select(d => d.Trim())
                     .ToList();
 
-            // Get existing task instances for this recurring task to avoid duplicates
             var existingTaskDates = await _db.Tasks
                 .Where(t => t.RecurringTaskTemplateId == recurringTaskId && t.DueDate.HasValue)
                 .Select(t => t.DueDate!.Value.Date)
@@ -342,7 +340,6 @@ namespace ContextManager.API.Services
             }
         }
         
-        /// Automatically adds recurring task instances to session plans for their due dates
         private async Task AddRecurringInstancesToSessionPlansAsync(Guid userId, List<TaskModel> recurringInstances)
         {
             var instancesByDate = recurringInstances

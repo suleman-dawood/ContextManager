@@ -32,7 +32,6 @@ namespace ContextManager.API.Services
                     .ThenInclude(spi => spi.Task)
                 .FirstOrDefaultAsync(sp => sp.UserId == userId && sp.PlanDate == planDate);
             
-            // Preserve recurring task instances when regenerating
             var recurringInstances = existingPlan?.Items
                 .Where(spi => spi.Task.IsRecurringInstance)
                 .Select(spi => spi.Task)
@@ -60,7 +59,7 @@ namespace ContextManager.API.Services
                 IsCustomized = false
             };
             
-            // Add recurring instances first (they have priority)
+            // recurring instances first
             int order = 0;
             int groupNumber = 0;
             Guid? lastContextId = null;
@@ -93,7 +92,6 @@ namespace ContextManager.API.Services
                 }
             }
             
-            // Add AI-planned tasks after recurring ones, maintaining context grouping
             for (int i = 0; i < aiPlan.Items.Count; i++)
             {
                 var item = aiPlan.Items[i];

@@ -1,22 +1,20 @@
 import { useState, useEffect, useMemo } from 'react';
 import { X } from 'lucide-react';
 import { Error } from './Error';
-import type { Context, RecurringTask, CreateRecurringTaskRequest } from '../types';
+import type { Context, RecurringTask, UpdateRecurringTaskRequest } from '../types';
 import { Priority, RecurrenceType } from '../types';
 import '../styles/RecurrantTaskForm.css';
 
 const DAY_OPTIONS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
-type FormData = CreateRecurringTaskRequest;
-
-interface RecurrantTaskFormProps {
-  mode: 'create' | 'edit';
-  template?: RecurringTask;
+interface EditRecurringTaskModalProps {
+  recurringTask: RecurringTask;
   contexts: Context[];
-  onSave: (data: FormData) => Promise<void>;
+  onSave: (id: string, data: UpdateRecurringTaskRequest) => Promise<void>;
   onCancel: () => void;
 }
 
+// Helper function to convert ISO date string to date input value (YYYY-MM-DD)
 function toDateInputValue(isoOrDate: string | null): string {
   if (!isoOrDate) return '';
   const d = new Date(isoOrDate);
@@ -24,7 +22,8 @@ function toDateInputValue(isoOrDate: string | null): string {
   return d.toISOString().slice(0, 10);
 }
 
-function buildPreview(form: FormData): string {
+// Generates a preview text showing the recurrence pattern
+function buildPreview(form: UpdateRecurringTaskRequest): string {
   if (!form.recurrenceStartDate) return 'Please select a start date';
 
   const start = new Date(form.recurrenceStartDate).toLocaleDateString(undefined, {
@@ -80,52 +79,49 @@ function buildPreview(form: FormData): string {
   return text;
 }
 
-const defaultFormData: FormData = {
-  contextId: '00000000-0000-0000-0000-000000000000', // AI will determine context
-  title: '',
-  description: null,
-  estimatedMinutes: 30,
-  priority: Priority.Medium,
-  recurrenceType: RecurrenceType.Daily,
-  recurrenceDays: null,
-  recurrenceStartDate: toDateInputValue(new Date().toISOString()),
-  recurrenceEndDate: null
-};
-
-export function RecurrantTaskForm({
-  mode,
-  template,
+export function EditRecurringTaskModal({
+  recurringTask,
   contexts,
   onSave,
   onCancel
-}: RecurrantTaskFormProps) {
-  const [form, setForm] = useState<FormData>(defaultFormData);
+}: EditRecurringTaskModalProps) {
+  const [form, setForm] = useState<UpdateRecurringTaskRequest>({
+    contextId: recurringTask.contextId,
+    title: recurringTask.title,
+    description: recurringTask.description ?? null,
+    estimatedMinutes: recurringTask.estimatedMinutes,
+    priority: recurringTask.priority,
+    recurrenceType: recurringTask.recurrenceType,
+    recurrenceDays: recurringTask.recurrenceDays ?? null,
+    recurrenceStartDate: toDateInputValue(recurringTask.recurrenceStartDate),
+    recurrenceEndDate: recurringTask.recurrenceEndDate ? toDateInputValue(recurringTask.recurrenceEndDate) : null
+  });
+  
   const [loading, setLoading] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  // Update form when recurringTask changes
   useEffect(() => {
-    if (mode === 'edit' && template) {
-      setForm({
-        contextId: template.contextId,
-        title: template.title,
-        description: template.description ?? null,
-        estimatedMinutes: template.estimatedMinutes,
-        priority: template.priority,
-        recurrenceType: template.recurrenceType,
-        recurrenceDays: template.recurrenceDays ?? null,
-        recurrenceStartDate: toDateInputValue(template.recurrenceStartDate),
-        recurrenceEndDate: template.recurrenceEndDate ? toDateInputValue(template.recurrenceEndDate) : null
-      });
-    } else {
-      setForm({ ...defaultFormData, recurrenceStartDate: toDateInputValue(new Date().toISOString()) });
-    }
-  }, [mode, template]);
+    setForm({
+      contextId: recurringTask.contextId,
+      title: recurringTask.title,
+      description: recurringTask.description ?? null,
+      estimatedMinutes: recurringTask.estimatedMinutes,
+      priority: recurringTask.priority,
+      recurrenceType: recurringTask.recurrenceType,
+      recurrenceDays: recurringTask.recurrenceDays ?? null,
+      recurrenceStartDate: toDateInputValue(recurringTask.recurrenceStartDate),
+      recurrenceEndDate: recurringTask.recurrenceEndDate ? toDateInputValue(recurringTask.recurrenceEndDate) : null
+    });
+  }, [recurringTask]);
 
-  const update = <K extends keyof FormData>(field: K, value: FormData[K]) => {
+  // Generic update function for form fields
+  const update = <K extends keyof UpdateRecurringTaskRequest>(field: K, value: UpdateRecurringTaskRequest[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setValidationError(null);
   };
 
+  // Toggle a specific day in the custom recurrence days
   const toggleRecurrenceDay = (day: string) => {
     const current = form.recurrenceDays ?? [];
     const next = current.includes(day)
@@ -134,14 +130,20 @@ export function RecurrantTaskForm({
     update('recurrenceDays', next.length ? next : null);
   };
 
+  // Preview text showing the recurrence pattern
   const preview = useMemo(() => buildPreview(form), [form]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setValidationError(null);
 
+    // Validate required fields
     if (!form.title.trim()) {
       setValidationError('Title is required');
+      return;
+    }
+    if (!form.contextId) {
+      setValidationError('Context is required');
       return;
     }
     if (form.recurrenceType === RecurrenceType.Custom && (!form.recurrenceDays || form.recurrenceDays.length === 0)) {
@@ -168,7 +170,7 @@ export function RecurrantTaskForm({
         ? new Date(form.recurrenceEndDate + 'T00:00:00').toISOString()
         : null;
 
-      const payload: FormData = {
+      const payload: UpdateRecurringTaskRequest = {
         ...form,
         title: form.title.trim(),
         description: form.description?.trim() || null,
@@ -176,7 +178,8 @@ export function RecurrantTaskForm({
         recurrenceStartDate: startDateISO,
         recurrenceEndDate: endDateISO
       };
-      await onSave(payload);
+      
+      await onSave(recurringTask.id, payload);
       onCancel();
     } catch (err: unknown) {
       const msg = err && typeof err === 'object' && 'response' in err
@@ -194,7 +197,7 @@ export function RecurrantTaskForm({
     <div className="modal-overlay recurring-task-form-overlay" onClick={onCancel}>
       <div className="modal recurring-task-form-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header flex-between divider-bottom">
-          <h2>{mode === 'create' ? 'Create Recurring Task' : 'Edit Recurring Task'}</h2>
+          <h2>Edit Recurring Task</h2>
           <button type="button" className="btn-icon" onClick={onCancel} aria-label="Close">
             <X size={24} />
           </button>
@@ -223,32 +226,22 @@ export function RecurrantTaskForm({
             />
           </div>
 
-          {mode === 'edit' && (
-            <div className="form-group">
-              <label className="label">Context *</label>
-              <select
-                className="input"
-                value={form.contextId}
-                onChange={(e) => update('contextId', e.target.value)}
-                required
-              >
-                <option value="">Select context</option>
-                {contexts.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {mode === 'create' && (
-            <div className="form-group">
-              <p style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>
-                Context will be automatically determined by AI based on task title and description
-              </p>
-            </div>
-          )}
+          <div className="form-group">
+            <label className="label">Context *</label>
+            <select
+              className="input"
+              value={form.contextId}
+              onChange={(e) => update('contextId', e.target.value)}
+              required
+            >
+              <option value="">Select context</option>
+              {contexts.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <div className="form-row">
             <div className="form-group">
@@ -342,7 +335,7 @@ export function RecurrantTaskForm({
               Cancel
             </button>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? (mode === 'create' ? 'Creating...' : 'Saving...') : mode === 'create' ? 'Create' : 'Save'}
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>

@@ -23,7 +23,6 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
     try {
       setLoading(true);
       const allTasks = await tasksApi.getTasks();
-      // Filter for pending tasks (not completed) and not already in any session plan
       const pending = allTasks.filter(t => t.status !== 2); // 2 = Completed
       setTasks(pending);
       setError(null);
@@ -35,19 +34,45 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
   }
 
   async function handleDelete(taskId: string) {
-    if (!confirm('Are you sure you want to delete this task?')) {
-      return;
-    }
+    const taskToDelete = tasks.find(t => t.id === taskId);
+    
+    // Check if this is a recurring task instance
+    if (taskToDelete?.isRecurringInstance) {
+      const choice = confirm(
+        'This is a recurring task instance. Click OK to delete only this instance, or Cancel to keep it.'
+      );
+      
+      if (!choice) {
+        return;
+      }
+      
+      try {
+        setDeletingId(taskId);
+        // Delete only this instance, not the template
+        await tasksApi.deleteTaskInstance(taskId);
+        setTasks(tasks.filter(t => t.id !== taskId));
+        onTaskDeleted();
+      } catch (err: any) {
+        alert(err.response?.data?.message || 'Failed to delete task instance');
+      } finally {
+        setDeletingId(null);
+      }
+    } else {
+      // Regular task deletion
+      if (!confirm('Are you sure you want to delete this task?')) {
+        return;
+      }
 
-    try {
-      setDeletingId(taskId);
-      await tasksApi.deleteTask(taskId);
-      setTasks(tasks.filter(t => t.id !== taskId));
-      onTaskDeleted();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to delete task');
-    } finally {
-      setDeletingId(null);
+      try {
+        setDeletingId(taskId);
+        await tasksApi.deleteTask(taskId);
+        setTasks(tasks.filter(t => t.id !== taskId));
+        onTaskDeleted();
+      } catch (err: any) {
+        alert(err.response?.data?.message || 'Failed to delete task');
+      } finally {
+        setDeletingId(null);
+      }
     }
   }
 
