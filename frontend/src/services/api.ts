@@ -13,8 +13,6 @@ import type {
   Context,
   CreateContextRequest,
   UpdateContextRequest,
-  ContextDistribution,
-  CompletionRate,
   ContextCategorizationResponse,
   CategorizeTaskRequest,
   TaskFromNaturalLanguageResponse,
@@ -213,18 +211,6 @@ export const sessionPlanApi = {
 
   updateSessionPlanOrder: async function(sessionPlanId: string, data: UpdateSessionPlanOrderRequest): Promise<SessionPlan> {
     const response = await api.put<SessionPlan>(`/sessionplan/${sessionPlanId}/order`, data);
-    return response.data;
-  }
-};
-
-export const analyticsApi = {
-  getContextDistribution: async function(activeOnly: boolean = false): Promise<ContextDistribution[]> {
-    const response = await api.get<ContextDistribution[]>(`/analytics/context-distribution?activeOnly=${activeOnly}`);
-    return response.data;
-  },
-
-  getCompletionRate: async function(): Promise<CompletionRate[]> {
-    const response = await api.get<CompletionRate[]>('/analytics/completion-rate');
     return response.data;
   }
 };

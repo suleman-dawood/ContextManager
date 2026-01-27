@@ -347,6 +347,8 @@ namespace ContextManager.API.Services
                 .GroupBy(t => t.DueDate!.Value.Date)
                 .ToList();
             
+            bool hasChanges = false;
+            
             foreach (var dateGroup in instancesByDate)
             {
                 var planDate = DateTime.SpecifyKind(dateGroup.Key, DateTimeKind.Utc);
@@ -368,6 +370,10 @@ namespace ContextManager.API.Services
                         Items = new List<SessionPlanItem>()
                     };
                     _db.SessionPlans.Add(sessionPlan);
+                    await _db.SaveChangesAsync();
+                    sessionPlan = await _db.SessionPlans
+                        .Include(sp => sp.Items)
+                        .FirstAsync(sp => sp.Id == sessionPlan.Id);
                 }
                 
                 var existingTaskIds = sessionPlan.Items.Select(spi => spi.TaskId).ToHashSet();
@@ -376,6 +382,11 @@ namespace ContextManager.API.Services
                     .Where(t => !existingTaskIds.Contains(t.Id))
                     .GroupBy(t => t.ContextId)
                     .ToList();
+                
+                if (!instancesByContext.Any())
+                {
+                    continue; // No new instances to add for this date
+                }
                 
                 int currentOrder = sessionPlan.Items.Any() 
                     ? sessionPlan.Items.Max(spi => spi.Order) + 1 
@@ -397,13 +408,18 @@ namespace ContextManager.API.Services
                             GroupNumber = currentGroupNumber,
                             Reasoning = "Recurring task instance"
                         };
-                        sessionPlan.Items.Add(planItem);
+                        _db.SessionPlanItems.Add(planItem);
+                        hasChanges = true;
                     }
                     currentGroupNumber++;
                 }
             }
             
-            await _db.SaveChangesAsync();
+            // Only save if we actually added new items
+            if (hasChanges)
+            {
+                await _db.SaveChangesAsync();
+            }
         }
 
         private TaskModel CreateTaskInstance(RecurrantTask template, Guid userId, DateTime dueDate)

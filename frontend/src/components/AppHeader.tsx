@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, BarChart3, Calendar, Folder, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Calendar, Folder, LogOut, Menu, X } from 'lucide-react';
 import '../styles/AppHeader.css';
 
 export const AppHeader = () => {
@@ -44,14 +44,6 @@ export const AppHeader = () => {
           >
             <LayoutDashboard size={20} />
             Dashboard
-          </button>
-          <button 
-            className="nav-btn" 
-            onClick={() => handleNavigate('/analytics')}
-            title="Analytics"
-          >
-            <BarChart3 size={20} />
-            Analytics
           </button>
           <button 
             className="nav-btn" 

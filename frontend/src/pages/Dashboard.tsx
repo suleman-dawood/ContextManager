@@ -10,6 +10,7 @@ import { TaskTypeSelectionModal } from '../components/TaskTypeSelectionModal';
 import { RecurrantTaskForm } from '../components/RecurrantTaskForm';
 import { EditRecurringTaskModal } from '../components/EditRecurringTaskModal';
 import { RecurringTaskList } from '../components/RecurringTaskList';
+import { ViewToggle } from '../components/ViewToggle';
 import { StatsCards } from '../components/StatsCards';
 import { AppHeader } from '../components/AppHeader';
 import { Loading } from '../components/Loading';
@@ -157,40 +158,14 @@ export function Dashboard() {
         <StatsCards tasks={tasks} />
 
         <div className="dashboard-main-content">
-          <div className="dashboard-view-toggle" style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', borderBottom: '2px solid #e0e0e0' }}>
-            <button
-              className={viewMode === 'tasks' ? 'view-tab-active' : 'view-tab'}
-              onClick={() => setViewMode('tasks')}
-              style={{
-                padding: '0.75rem 1.5rem',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                fontWeight: viewMode === 'tasks' ? 'bold' : 'normal',
-                borderBottom: viewMode === 'tasks' ? '3px solid #4f46e5' : 'none',
-                marginBottom: '-2px',
-                color: viewMode === 'tasks' ? '#4f46e5' : '#666'
-              }}
-            >
-              Tasks
-            </button>
-            <button
-              className={viewMode === 'recurring' ? 'view-tab-active' : 'view-tab'}
-              onClick={() => setViewMode('recurring')}
-              style={{
-                padding: '0.75rem 1.5rem',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                fontWeight: viewMode === 'recurring' ? 'bold' : 'normal',
-                borderBottom: viewMode === 'recurring' ? '3px solid #4f46e5' : 'none',
-                marginBottom: '-2px',
-                color: viewMode === 'recurring' ? '#4f46e5' : '#666'
-              }}
-            >
-              Recurring Tasks
-            </button>
-          </div>
+          <ViewToggle
+            activeView={viewMode}
+            views={[
+              { id: 'tasks', label: 'Tasks' },
+              { id: 'recurring', label: 'Recurring Tasks' }
+            ]}
+            onViewChange={(view) => setViewMode(view as 'tasks' | 'recurring')}
+          />
 
           {viewMode === 'tasks' ? (
             <>

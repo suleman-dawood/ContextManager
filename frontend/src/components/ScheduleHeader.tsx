@@ -68,28 +68,23 @@ export function ScheduleHeader({
 
       <div className="header-actions">
         <button 
-          className="task-count-badge task-count-button"
+          className="btn-icon-badge"
           onClick={() => setShowPendingTasksModal(true)}
           disabled={loadingCount}
           title={`${pendingTasksCount} ${pendingTasksCount === 1 ? 'task' : 'tasks'} remaining`}
         >
-          <ListTodo size={20} className="task-count-icon" />
-          {loadingCount ? (
-            <span className="task-count-text">Loading...</span>
-          ) : (
-            <span className="task-count-text">
-              {pendingTasksCount} {pendingTasksCount === 1 ? 'task' : 'tasks'} remaining
-            </span>
+          <ListTodo size={24} />
+          {!loadingCount && pendingTasksCount > 0 && (
+            <span className="icon-badge-count">{pendingTasksCount}</span>
           )}
         </button>
         <button
-          className="btn btn-primary"
+          className="btn-icon-primary"
           onClick={onGeneratePlan}
           disabled={generating || pendingTasksCount === 0}
+          title={generating ? 'Generating...' : 'Generate Plan'}
         >
-          
-          <RefreshCw size={18} className={generating ? 'spinning' : ''} />
-          {generating ? 'Generating...' : 'Generate Plan'}
+          <RefreshCw size={24} className={generating ? 'spinning' : ''} />
         </button>
       </div>
 

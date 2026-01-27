@@ -71,19 +71,6 @@ export enum RecurrenceType {
   Custom = 4
 }
 
-export interface ContextDistribution {
-  context: string;
-  color: string;
-  count: number;
-}
-
-export interface CompletionRate {
-  date: string;
-  rate: number;
-  completed: number;
-  total: number;
-}
-
 export interface LoginRequest {
   email: string;
   password: string;

@@ -48,46 +48,79 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
 }
 
-.task-count-badge {
+.btn-icon-badge {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
   background: var(--yellow);
   border: 2px solid var(--black);
   color: var(--black);
-  font-weight: 700;
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
   border-radius: 0;
 }
 
-.task-count-icon {
-  flex-shrink: 0;
-}
-
-.task-count-text {
-  white-space: nowrap;
-}
-
-.task-count-button {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.task-count-button:hover:not(:disabled) {
+.btn-icon-badge:hover:not(:disabled) {
   background: var(--orange);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.task-count-button:disabled {
+.btn-icon-badge:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.btn-icon-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  background: var(--black);
+  border: 2px solid var(--black);
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0;
+}
+
+.btn-icon-primary:hover:not(:disabled) {
+  background: var(--yellow);
+  color: var(--black);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-icon-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon-badge-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--black);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 12px;
+  border: 2px solid var(--black);
+  border-radius: 0;
 }
 
 /* Session Summary */

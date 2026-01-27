@@ -1,8 +1,11 @@
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, Clock, Calendar } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { tasksApi } from '../services/api';
+import { tasksApi, sessionPlanApi } from '../services/api';
+import { formatLocalDate } from '../utils/dateUtils';
 import type { Task } from '../types';
-import '../styles/PendingTasksModal.css';
+import { Loading } from './Loading';
+import { Error } from './Error';
+import '../styles/CreateTaskModal.css';
 
 interface PendingTasksModalProps {
   onClose: () => void;
@@ -23,7 +26,28 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
     try {
       setLoading(true);
       const allTasks = await tasksApi.getTasks();
-      const pending = allTasks.filter(t => t.status !== 2); // 2 = Completed
+      
+      // Get all task IDs that are already in session plans
+      const today = new Date();
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(today.getDate() - 7);
+      const sevenDaysFromNow = new Date(today);
+      sevenDaysFromNow.setDate(today.getDate() + 7);
+      
+      const sessionPlans = await sessionPlanApi.getSessionPlansInRange(
+        formatLocalDate(sevenDaysAgo),
+        formatLocalDate(sevenDaysFromNow)
+      );
+      
+      const assignedTaskIds = new Set(
+        sessionPlans.flatMap(plan => plan.items.map(item => item.task.id))
+      );
+      
+      // Filter out completed tasks and tasks already in session plans
+      const pending = allTasks.filter(
+        t => t.status !== 2 && !assignedTaskIds.has(t.id)
+      );
+      
       setTasks(pending);
       setError(null);
     } catch (err: any) {
@@ -36,7 +60,6 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
   async function handleDelete(taskId: string) {
     const taskToDelete = tasks.find(t => t.id === taskId);
     
-    // Check if this is a recurring task instance
     if (taskToDelete?.isRecurringInstance) {
       const choice = confirm(
         'This is a recurring task instance. Click OK to delete only this instance, or Cancel to keep it.'
@@ -48,7 +71,6 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
       
       try {
         setDeletingId(taskId);
-        // Delete only this instance, not the template
         await tasksApi.deleteTaskInstance(taskId);
         setTasks(tasks.filter(t => t.id !== taskId));
         onTaskDeleted();
@@ -95,71 +117,92 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
   }
 
   return (
-    <div className="modal-overlay pending-tasks-modal-overlay" onClick={onClose}>
-      <div className="modal-content pending-tasks-modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Pending Tasks</h2>
-          <button className="close-button" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px', maxHeight: '80vh' }}>
+        <div className="modal-header flex-between divider-bottom">
+          <h2>Remaining Tasks</h2>
+          <button className="btn-icon" onClick={onClose} aria-label="Close">
             <X size={24} />
           </button>
         </div>
 
-        {loading && (
-          <div className="pending-tasks-loading">
-            <p>Loading tasks...</p>
-          </div>
-        )}
+        <div style={{ maxHeight: '60vh', overflowY: 'auto', padding: '1.5rem' }}>
+          {loading && <Loading message="Loading tasks..." />}
 
-        {error && (
-          <div className="pending-tasks-error">
-            <p>{error}</p>
-          </div>
-        )}
+          {error && <Error message={error} />}
 
-        {!loading && !error && tasks.length === 0 && (
-          <div className="pending-tasks-empty">
-            <p>No pending tasks found</p>
-          </div>
-        )}
+          {!loading && !error && tasks.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+              <p>No remaining tasks. All tasks are either completed or already in a session plan.</p>
+            </div>
+          )}
 
-        {!loading && !error && tasks.length > 0 && (
-          <div className="pending-tasks-list">
-            {tasks.map(task => (
-              <div key={task.id} className="pending-task-item">
-                <div className="pending-task-info">
-                  <div className="pending-task-title">{task.title}</div>
-                  {task.description && (
-                    <div className="pending-task-description">{task.description}</div>
-                  )}
-                  <div className="pending-task-meta">
-                    <span className="pending-task-context" style={{ color: task.contextColor }}>
-                      {task.contextName}
-                    </span>
-                    <span className={`pending-task-priority priority-${task.priority}`}>
-                      {getPriorityLabel(task.priority)}
-                    </span>
-                    <span className="pending-task-status">{getStatusLabel(task.status)}</span>
-                    {task.dueDate && (
-                      <span className="pending-task-due">
-                        Due: {new Date(task.dueDate).toLocaleDateString()}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  className="pending-task-delete"
-                  onClick={() => handleDelete(task.id)}
-                  disabled={deletingId === task.id}
-                  title="Delete task"
+          {!loading && !error && tasks.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {tasks.map(task => (
+                <div 
+                  key={task.id} 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '1rem',
+                    padding: '1rem',
+                    border: '2px solid #000',
+                    borderLeft: `4px solid ${task.contextColor}`,
+                    background: '#fff'
+                  }}
                 >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: '600' }}>
+                      {task.title}
+                    </h3>
+                    {task.description && (
+                      <p style={{ margin: '0 0 0.75rem 0', color: '#666', fontSize: '0.9rem' }}>
+                        {task.description}
+                      </p>
+                    )}
+                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', fontSize: '0.85rem' }}>
+                      <span style={{ 
+                        padding: '0.25rem 0.5rem',
+                        background: task.contextColor,
+                        color: '#000',
+                        fontWeight: '600',
+                        border: '1px solid #000'
+                      }}>
+                        {task.contextName}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        <Clock size={14} /> {task.estimatedMinutes}min
+                      </span>
+                      <span className={`badge priority-${['low', 'medium', 'high'][task.priority]}`}>
+                        {getPriorityLabel(task.priority)}
+                      </span>
+                      <span className={`badge status-${['todo', 'inprogress', 'completed'][task.status]}`}>
+                        {getStatusLabel(task.status)}
+                      </span>
+                      {task.dueDate && (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <Calendar size={14} /> {new Date(task.dueDate).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    className="btn btn-icon btn-danger"
+                    onClick={() => handleDelete(task.id)}
+                    disabled={deletingId === task.id}
+                    title="Delete task"
+                    style={{ flexShrink: 0 }}
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-        <div className="modal-footer">
+        <div className="modal-actions flex-center">
           <button className="btn btn-secondary" onClick={onClose}>
             Close
           </button>
