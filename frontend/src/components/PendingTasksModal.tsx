@@ -26,6 +26,7 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
     try {
       setLoading(true);
       const allTasks = await tasksApi.getTasks();
+      console.log('📥 Loaded all tasks:', allTasks.length, 'tasks');
       
       // Get all task IDs that are already in ANY session plan (to match backend logic)
       // Use a large date range to effectively capture all session plans
@@ -38,10 +39,12 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
         formatLocalDate(oneYearAgo),
         formatLocalDate(oneYearFromNow)
       );
+      console.log('📅 Loaded session plans:', sessionPlans.length);
       
       const assignedTaskIds = new Set(
         sessionPlans.flatMap(plan => plan.items.map(item => item.task.id))
       );
+      console.log('🔒 Tasks assigned to session plans:', assignedTaskIds.size);
       
       // Filter out completed tasks and tasks already in session plans
       // Also filter out tasks with past due dates (to match backend logic)
@@ -53,9 +56,13 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
         return !isCompleted && !isAssigned && !isOverdue;
       });
       
+      console.log('✅ Pending tasks after filtering:', pending.length);
+      console.log('📋 Pending tasks:', pending.map(t => ({ id: t.id, title: t.title, isRecurringInstance: t.isRecurringInstance })));
+      
       setTasks(pending);
       setError(null);
     } catch (err: any) {
+      console.error('❌ Error loading pending tasks:', err);
       setError(err.response?.data?.message || 'Failed to load tasks');
     } finally {
       setLoading(false);

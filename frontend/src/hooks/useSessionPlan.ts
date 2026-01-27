@@ -76,19 +76,29 @@ export function useSessionPlan(date: Date) {
       
       // If it's a recurring instance, convert it to a normal task first
       if (taskItem?.task.isRecurringInstance) {
-        console.log('Converting recurring instance to normal task:', taskId);
-        await tasksApi.cancelRecurringInstance(taskId);
+        console.log('🔄 Converting recurring instance to normal task:', {
+          id: taskId,
+          title: taskItem.task.title,
+          isRecurringInstance: taskItem.task.isRecurringInstance
+        });
+        const convertedTask = await tasksApi.cancelRecurringInstance(taskId);
+        console.log('✅ Recurring instance converted:', {
+          id: convertedTask.id,
+          title: convertedTask.title,
+          isRecurringInstance: convertedTask.isRecurringInstance,
+          recurringTaskTemplateId: convertedTask.recurringTaskTemplateId
+        });
       }
       
       const updatedItems = sessionPlan.items.filter(item => item.task.id !== taskId);
       const taskIds = updatedItems.map(item => item.task.id);
       
-      console.log('Updating session plan order, removing task:', taskId);
-      console.log('Remaining task IDs:', taskIds);
+      console.log('📝 Updating session plan order, removing task:', taskId);
+      console.log('📋 Remaining task IDs:', taskIds);
       const response = await sessionPlanApi.updateSessionPlanOrder(sessionPlan.id, { taskIds });
     
       if (response && 'message' in response) {
-        console.log('Session plan deleted - all tasks removed');
+        console.log('🗑️ Session plan deleted - all tasks removed');
         setSessionPlan(null);
       } else {
         // Reload the session plan to get the updated state
@@ -96,9 +106,9 @@ export function useSessionPlan(date: Date) {
       }
       
       await loadPendingTasksCount();
-      console.log('Task removed successfully');
+      console.log('✅ Task removed successfully, pending tasks reloaded');
     } catch (err: any) {
-        console.error('Error removing task:', err);
+        console.error('❌ Error removing task:', err);
         setError(err.response?.data?.message || 'Failed to remove task from plan');
     }
   }
