@@ -85,12 +85,8 @@ export function useSessionPlan(date: Date) {
       
       console.log('Updating session plan order, removing task:', taskId);
       console.log('Remaining task IDs:', taskIds);
-      
-      // Call the API to update the session plan
-      // If taskIds is empty, the backend will delete the entire session plan
       const response = await sessionPlanApi.updateSessionPlanOrder(sessionPlan.id, { taskIds });
-      
-      // Check if the session plan was deleted (response will have a message instead of plan data)
+    
       if (response && 'message' in response) {
         console.log('Session plan deleted - all tasks removed');
         setSessionPlan(null);

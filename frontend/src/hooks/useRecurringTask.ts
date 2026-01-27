@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { recurringTasksApi } from '../services/api';
+import { recurringTasksApi, tasksApi } from '../services/api';
 import type { CreateRecurringTaskRequest, UpdateRecurringTaskRequest, RecurringTask } from '../types';
 
 export function useRecurringTasks() {
@@ -57,6 +57,27 @@ export function useRecurringTasks() {
       throw err;
     }
   }
+  
+  async function deleteTaskInstance(id: string) {
+    try {
+      setError(null);
+      await tasksApi.deleteTaskInstance(id);
+      setRecurringTasks(recurringTasks.filter(t => t.id !== id));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to delete task instance');
+      throw err;
+    }
+  }
+  async function deleteTaskAndAllInstances(id: string) {
+    try {
+      setError(null);
+      await tasksApi.deleteTaskAndAllInstances(id);
+      setRecurringTasks(recurringTasks.filter(t => t.id !== id));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to delete task and all instances');
+      throw err;
+    }
+  }
 
   useEffect(() => {
     loadRecurringTasks();
@@ -69,6 +90,8 @@ export function useRecurringTasks() {
     loadRecurringTasks,
     createRecurringTask,
     updateRecurringTask,
-    deleteRecurringTask
+    deleteRecurringTask,
+    deleteTaskInstance,
+    deleteTaskAndAllInstances
   };
 }

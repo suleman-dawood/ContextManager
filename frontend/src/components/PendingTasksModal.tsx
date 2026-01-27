@@ -27,16 +27,16 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
       setLoading(true);
       const allTasks = await tasksApi.getTasks();
       
-      // Get all task IDs that are already in session plans
-      const today = new Date();
-      const sevenDaysAgo = new Date(today);
-      sevenDaysAgo.setDate(today.getDate() - 7);
-      const sevenDaysFromNow = new Date(today);
-      sevenDaysFromNow.setDate(today.getDate() + 7);
+      // Get all task IDs that are already in ANY session plan (to match backend logic)
+      // Use a large date range to effectively capture all session plans
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const oneYearFromNow = new Date();
+      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
       
       const sessionPlans = await sessionPlanApi.getSessionPlansInRange(
-        formatLocalDate(sevenDaysAgo),
-        formatLocalDate(sevenDaysFromNow)
+        formatLocalDate(oneYearAgo),
+        formatLocalDate(oneYearFromNow)
       );
       
       const assignedTaskIds = new Set(
@@ -44,9 +44,14 @@ export function PendingTasksModal({ onClose, onTaskDeleted }: PendingTasksModalP
       );
       
       // Filter out completed tasks and tasks already in session plans
-      const pending = allTasks.filter(
-        t => t.status !== 2 && !assignedTaskIds.has(t.id)
-      );
+      // Also filter out tasks with past due dates (to match backend logic)
+      const now = new Date();
+      const pending = allTasks.filter(t => {
+        const isCompleted = t.status === 2;
+        const isAssigned = assignedTaskIds.has(t.id);
+        const isOverdue = t.dueDate && new Date(t.dueDate) < now;
+        return !isCompleted && !isAssigned && !isOverdue;
+      });
       
       setTasks(pending);
       setError(null);

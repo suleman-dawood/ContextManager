@@ -23,15 +23,22 @@ namespace ContextManager.API.Services
         {
             var now = DateTime.UtcNow;
             
+            // Get all task IDs that are assigned to any session plan
             var assignedTaskIds = await _db.SessionPlanItems
                 .Where(spi => spi.SessionPlan.UserId == userId)
                 .Select(spi => spi.TaskId)
                 .Distinct()
                 .ToListAsync();
             
+            // Count tasks that are:
+            // - Not completed
+            // - Not recurring instances (only regular tasks and converted instances)
+            // - Have no due date or due date in the future
+            // - Not already assigned to a session plan
             return await _db.Tasks
                 .Where(t => t.UserId == userId 
                     && t.Status != Models.TaskStatus.Completed
+                    && !t.IsRecurringInstance
                     && (t.DueDate == null || t.DueDate >= now)
                     && !assignedTaskIds.Contains(t.Id))
                 .CountAsync();
