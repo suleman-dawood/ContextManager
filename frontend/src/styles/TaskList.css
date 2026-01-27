@@ -4,6 +4,13 @@
   gap: var(--space-sm);
 }
 
+.task-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
 .divider-bottom {
   border-bottom: 1px solid var(--black);
   margin-bottom: var(--space-sm);

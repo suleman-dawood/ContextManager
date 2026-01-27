@@ -58,12 +58,14 @@ export function ContextList({ contexts, onEdit, onDelete, disableDelete }: Conte
         <div className="context-list">
             {contexts.map(context => (
                 <div key={context.id} className="context-row">
-                    <div className="context-name">{context.name}</div>
-                    <div className="context-description">{context.description}</div>
-                    <div className="context-meta">
-                        <div className="context-color" style={{ backgroundColor: context.color }}></div>
-                        <div className="context-icon">{renderIcon(context.icon)}</div>
+                    <div className="context-list-header">
+                        <div className="context-name">{context.name}</div>
+                        <div className="context-meta">
+                            <div className="context-color" style={{ backgroundColor: context.color }}></div>
+                            <div className="context-icon">{renderIcon(context.icon)}</div>
+                        </div>
                     </div>
+                    <div className="context-description">{context.description}</div>
                     <div className="context-actions">
                         <button className="btn btn-secondary btn-small" onClick={() => onEdit(context)}>Edit</button>
                         <button className="btn btn-secondary btn-small" onClick={() => handleDelete(context.id)} disabled={disableDelete}>Delete</button>

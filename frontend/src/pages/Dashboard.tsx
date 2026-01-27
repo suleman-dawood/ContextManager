@@ -37,6 +37,7 @@ export function Dashboard() {
   } = useRecurringTasks();
   const [viewMode, setViewMode] = useState<'tasks' | 'recurring'>('tasks');
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
+  const [selectedRecurringContext, setSelectedRecurringContext] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -50,6 +51,12 @@ export function Dashboard() {
       ? tasks.filter(t => t.contextId === selectedContext)
       : tasks;
   }, [tasks, selectedContext]);
+
+  const filteredRecurringTasks = useMemo(() => {
+    return selectedRecurringContext
+      ? recurringTasks.filter(t => t.contextId === selectedRecurringContext)
+      : recurringTasks;
+  }, [recurringTasks, selectedRecurringContext]);
 
   async function handleCreateTask(taskData: CreateTaskRequest) {
     await createTask(taskData);
@@ -200,7 +207,11 @@ export function Dashboard() {
           ) : (
             <>
               <div className="dashboard-tasks-header">
-                <div></div>
+                <ContextFilter
+                  contexts={contexts}
+                  selectedContext={selectedRecurringContext}
+                  onSelectContext={setSelectedRecurringContext}
+                />
                 <button
                   className="btn btn-primary"
                   onClick={() => setShowRecurringTaskForm(true)}
@@ -213,7 +224,7 @@ export function Dashboard() {
                 <Loading message="Loading recurring tasks..." />
               ) : (
                 <RecurringTaskList
-                  recurringTasks={recurringTasks}
+                  recurringTasks={filteredRecurringTasks}
                   onEdit={setEditingRecurringTask}
                   onDelete={handleDeleteRecurringTask}
                 />

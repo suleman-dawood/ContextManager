@@ -43,6 +43,12 @@
     border-bottom: none;
   }
 
+  .context-list-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
   .context-name {
     font-weight: 600;
     min-width: 150px;
@@ -122,6 +128,13 @@
     gap: var(--space-xs);
     overflow: hidden;
   }
+
+  .context-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
   
   .context-name {
     min-width: auto;
@@ -129,6 +142,7 @@
     font-weight: 700;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
   }
   
   .context-description {
@@ -141,9 +155,11 @@
   }
   
   .context-meta {
-    gap: var(--space-sm);
+    flex-direction: column;
+    gap: var(--space-xs);
     justify-content: flex-start;
     align-items: center;
+    flex-shrink: 0;
   }
   
   .context-color {

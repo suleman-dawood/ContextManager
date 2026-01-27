@@ -450,7 +450,7 @@
   }
   
   .header-actions {
-    flex-direction: column;
+    flex-direction: row;
     width: 100%;
     gap: var(--space-xs);
   }

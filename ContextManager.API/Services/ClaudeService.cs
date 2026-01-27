@@ -46,9 +46,10 @@ namespace ContextManager.API.Services
             var now = DateTime.UtcNow;
             var targetDate = planDate?.Date ?? now.Date;
             
-            // tasks that are already assigned to any session plan for the target date
+            // Exclude tasks that are already assigned to ANY session plan (not just target date)
+            // This ensures tasks aren't duplicated across multiple session plans
             var assignedTaskIds = await _db.SessionPlanItems
-                .Where(spi => spi.SessionPlan.UserId == userId && spi.SessionPlan.PlanDate.Date == targetDate)
+                .Where(spi => spi.SessionPlan.UserId == userId)
                 .Select(spi => spi.TaskId)
                 .Distinct()
                 .ToListAsync();

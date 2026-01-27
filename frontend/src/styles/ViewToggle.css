@@ -26,12 +26,12 @@
 }
 
 .view-toggle-btn:hover:not(.view-toggle-btn-active) {
-  background: var(--yellow);
+  background: var(--orange);
 }
 
 .view-toggle-btn-active {
-  background: var(--black);
-  color: var(--white);
+  background: var(--yellow);
+  color: var(--black);
   font-weight: 700;
 }
 

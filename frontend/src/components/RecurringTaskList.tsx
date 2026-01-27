@@ -3,7 +3,6 @@ import { Edit2, Trash2, Calendar, Clock, Repeat, MoreVertical } from 'lucide-rea
 import type { RecurringTask } from '../types';
 import { Priority } from '../types';
 import '../styles/TaskCard.css';
-import '../styles/RecurringTaskList.css';
 
 interface RecurringTaskListProps {
   recurringTasks: RecurringTask[];
@@ -51,128 +50,125 @@ export function RecurringTaskList({ recurringTasks, onEdit, onDelete }: Recurrin
   }
 
   return (
-    <div className="recurring-task-list">
+    <div className="task-list">
       {recurringTasks.map((task) => (
         <div 
           key={task.id} 
-          className="recurring-task-card"
+          className="task-card"
           style={{ borderLeft: `4px solid ${task.contextColor}` }}
         >
-          {/* Desktop view */}
-          <div className="recurring-task-desktop">
-            <div className="task-header">
-              <div className="task-title-row">
-                <Repeat size={18} style={{ color: task.contextColor }} />
-                <h3>{task.title}</h3>
-              </div>
-            </div>
-
-            {task.description && (
-              <p className="task-description">{task.description}</p>
-            )}
-
-            <div className="task-footer">
-              <div className="task-meta">
-                <span 
-                  className="context-badge" 
-                  style={{ backgroundColor: task.contextColor, color: '#000000' }}
-                >
-                  {task.contextName}
-                </span>
-                <span>
-                  <Calendar size={14} /> {task.recurrencePattern}
-                </span>
-                <span>
-                  <Clock size={14} /> {task.estimatedMinutes}min
-                </span>
-                {getPriorityBadge(task.priority)}
-                <span className="badge" style={{ backgroundColor: '#e3f2fd', color: '#1976d2' }}>
-                  {task.instanceCount} instances
-                </span>
-              </div>
-              <div className="task-actions">
-                <button 
-                  className="btn btn-icon" 
-                  onClick={() => onEdit(task)} 
-                  title="Edit Recurring Task"
-                >
-                  <Edit2 size={16} />
-                </button>
-                <button 
-                  className="btn btn-icon btn-danger" 
-                  onClick={() => handleDelete(task.id, task.title)}
-                  disabled={deletingId === task.id}
-                  title="Delete Recurring Task"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+          <div className="task-header">
+            <div className="task-title-row">
+              <Repeat size={18} style={{ color: task.contextColor }} />
+              <h3>{task.title}</h3>
             </div>
           </div>
 
-          {/* Mobile view */}
-          <div className="recurring-task-mobile">
-            <div className="recurring-task-mobile-header">
-              <Repeat size={16} style={{ color: task.contextColor }} />
-              <h3>{task.title}</h3>
-              <div className="task-dropdown">
-                <button 
-                  className="task-dropdown-btn" 
-                  onClick={() => setOpenDropdown(openDropdown === task.id ? null : task.id)}
-                  title="Actions"
-                >
-                  <MoreVertical size={20} />
-                </button>
-                {openDropdown === task.id && (
-                  <div className="task-dropdown-menu">
-                    <button 
-                      className="task-dropdown-item" 
-                      onClick={() => {
-                        onEdit(task);
-                        setOpenDropdown(null);
-                      }}
-                    >
-                      <Edit2 size={16} />
-                      Edit
-                    </button>
-                    <button 
-                      className="task-dropdown-item task-dropdown-item-danger" 
-                      onClick={() => {
-                        setOpenDropdown(null);
-                        handleDelete(task.id, task.title);
-                      }}
-                      disabled={deletingId === task.id}
-                    >
-                      <Trash2 size={16} />
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+          {task.description && (
+            <p className="task-description">{task.description}</p>
+          )}
 
-            {task.description && (
-              <p className="task-description">{task.description}</p>
-            )}
-
-            <div className="recurring-task-mobile-meta">
+          <div className="task-footer">
+            <div className="task-meta">
               <span 
                 className="context-badge" 
                 style={{ backgroundColor: task.contextColor, color: '#000000' }}
               >
                 {task.contextName}
               </span>
-              <span style={{ fontSize: '0.85rem' }}>
-                <Calendar size={12} /> {task.recurrencePattern}
+              <span>
+                <Calendar size={14} /> {task.recurrencePattern}
               </span>
-              <span style={{ fontSize: '0.85rem' }}>
-                <Clock size={12} /> {task.estimatedMinutes}min
+              <span>
+                <Clock size={14} /> {task.estimatedMinutes}min
               </span>
               {getPriorityBadge(task.priority)}
-              <span className="badge" style={{ backgroundColor: '#e3f2fd', color: '#1976d2', fontSize: '0.75rem' }}>
-                {task.instanceCount}
+              <span className="badge" style={{ backgroundColor: '#e3f2fd', color: '#1976d2' }}>
+                {task.instanceCount} instances
               </span>
             </div>
+            <div className="task-actions">
+              <button 
+                className="btn btn-icon" 
+                onClick={() => onEdit(task)} 
+                title="Edit Recurring Task"
+              >
+                <Edit2 size={16} />
+              </button>
+              <button 
+                className="btn btn-icon btn-danger" 
+                onClick={() => handleDelete(task.id, task.title)}
+                disabled={deletingId === task.id}
+                title="Delete Recurring Task"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile view */}
+          <div className="task-card-row-1">
+            <Repeat size={18} style={{ color: task.contextColor }} />
+            <h3>{task.title}</h3>
+            <div className="task-dropdown">
+              <button 
+                className="task-dropdown-btn" 
+                onClick={() => setOpenDropdown(openDropdown === task.id ? null : task.id)}
+                title="Actions"
+              >
+                <MoreVertical size={20} />
+              </button>
+              {openDropdown === task.id && (
+                <div className="task-dropdown-menu">
+                  <button 
+                    className="task-dropdown-item" 
+                    onClick={() => {
+                      onEdit(task);
+                      setOpenDropdown(null);
+                    }}
+                  >
+                    <Edit2 size={16} />
+                    Edit
+                  </button>
+                  <button 
+                    className="task-dropdown-item task-dropdown-item-danger" 
+                    onClick={() => {
+                      setOpenDropdown(null);
+                      handleDelete(task.id, task.title);
+                    }}
+                    disabled={deletingId === task.id}
+                  >
+                    <Trash2 size={16} />
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {task.description && (
+            <div className="task-card-description">
+              <p className="task-description">{task.description}</p>
+            </div>
+          )}
+
+          <div className="task-card-row-2">
+            <span 
+              className="context-badge" 
+              style={{ backgroundColor: task.contextColor, color: '#000000' }}
+            >
+              {task.contextName}
+            </span>
+            <span>
+              <Calendar size={12} /> {task.recurrencePattern}
+            </span>
+            <span>
+              <Clock size={12} /> {task.estimatedMinutes}min
+            </span>
+            {getPriorityBadge(task.priority)}
+            <span className="badge" style={{ backgroundColor: '#e3f2fd', color: '#1976d2', fontSize: '0.75rem' }}>
+              {task.instanceCount}
+            </span>
           </div>
         </div>
       ))}

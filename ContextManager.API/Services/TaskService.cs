@@ -124,15 +124,43 @@ namespace ContextManager.API.Services
                 throw new InvalidOperationException("Task not found");
             }
 
+            var oldDueDate = task.DueDate;
+            var newDueDate = request.DueDate.HasValue 
+                ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc) 
+                : (DateTime?)null;
+
+            // Check if task is in a session plan and if due date change makes it overdue for that session
+            if (oldDueDate != newDueDate && newDueDate.HasValue)
+            {
+                var sessionPlanItem = await _db.SessionPlanItems
+                    .Include(spi => spi.SessionPlan)
+                    .FirstOrDefaultAsync(spi => spi.TaskId == taskId 
+                        && spi.SessionPlan.UserId == userId);
+
+                if (sessionPlanItem != null)
+                {
+                    var sessionDate = sessionPlanItem.SessionPlan.PlanDate.Date;
+                    var newDueDateValue = newDueDate.Value.Date;
+
+                    // If new due date is before the session date, task is now overdue for that session
+                    if (newDueDateValue < sessionDate)
+                    {
+                        // Remove task from session plan
+                        _db.SessionPlanItems.Remove(sessionPlanItem);
+                        
+                        // Note: We don't throw an exception here, we just remove it
+                        // The frontend should handle notifying the user
+                    }
+                }
+            }
+
             task.ContextId = request.ContextId;
             task.Title = request.Title;
             task.Description = request.Description;
             task.EstimatedMinutes = request.EstimatedMinutes;
             task.Priority = request.Priority;
             task.Status = request.Status;
-            task.DueDate = request.DueDate.HasValue 
-                ? DateTime.SpecifyKind(request.DueDate.Value, DateTimeKind.Utc) 
-                : (DateTime?)null;
+            task.DueDate = newDueDate;
 
             if (request.Status == Models.TaskStatus.Completed && task.CompletedAt == null)
             {

@@ -2,7 +2,6 @@
   display: flex;
   gap: var(--space-sm);
   flex-wrap: wrap;
-  margin-bottom: var(--space-lg);
   padding-bottom: var(--space-md);
   border-bottom: 2px solid var(--black);
 }

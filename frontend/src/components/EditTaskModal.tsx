@@ -18,6 +18,20 @@ export function EditTaskModal({ task, contexts, onClose, onSubmit }: EditTaskMod
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    
+    // Check if due date changed to an earlier date
+    const oldDueDate = task.dueDate ? new Date(task.dueDate) : null;
+    const newDueDate = formData.dueDate ? new Date(formData.dueDate) : null;
+    
+    if (oldDueDate && newDueDate && newDueDate < oldDueDate) {
+      const confirmed = confirm(
+        'Warning: Changing the due date to an earlier date may remove this task from its scheduled session if the new date is before the session date. Do you want to continue?'
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+    
     setLoading(true);
     try {
       await onSubmit(task.id, formData as UpdateTaskRequest);
