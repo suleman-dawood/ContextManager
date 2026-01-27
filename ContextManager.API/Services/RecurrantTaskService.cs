@@ -31,12 +31,24 @@ namespace ContextManager.API.Services
                 throw new ArgumentException("Title is required");
             }
 
+            var context = await _db.Contexts.FindAsync(request.ContextId);
+            if (context == null)
+            {
+                throw new ArgumentException("Invalid context ID");
+            }
+
+            if (context.UserId != userId)
+            {
+                throw new ArgumentException("Context does not belong to the current user");
+            }
+
             string recurrenceDaysString = request.RecurrenceDays != null && request.RecurrenceDays.Any()
                 ? string.Join(",", request.RecurrenceDays)
                 : string.Empty;
 
             var recurringTask = new RecurrantTask
             {
+                Id = Guid.NewGuid(),
                 UserId = userId,
                 ContextId = request.ContextId,
                 Title = request.Title,
@@ -84,6 +96,17 @@ namespace ContextManager.API.Services
             if (string.IsNullOrWhiteSpace(request.Title))
             {
                 throw new ArgumentException("Title is required");
+            }
+
+            var context = await _db.Contexts.FindAsync(request.ContextId);
+            if (context == null)
+            {
+                throw new ArgumentException("Invalid context ID");
+            }
+
+            if (context.UserId != userId)
+            {
+                throw new ArgumentException("Context does not belong to the current user");
             }
             
             string recurrenceDaysString = request.RecurrenceDays != null && request.RecurrenceDays.Any()

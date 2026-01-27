@@ -32,9 +32,19 @@ namespace ContextManager.API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Failed to create recurring task", error = ex.Message });
+                // Include inner exception details for better debugging
+                var errorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    errorMessage += $" Inner exception: {ex.InnerException.Message}";
+                }
+                return StatusCode(500, new { message = "Failed to create recurring task", error = errorMessage });
             }
         }
 
@@ -47,13 +57,23 @@ namespace ContextManager.API.Controllers
                 var recurrantTask = await _recurrantTaskService.UpdateRecurrantTaskAsync(userId, id, request);
                 return Ok(recurrantTask);
             }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
             catch (InvalidOperationException ex)
             {
                 return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Failed to update recurring task", error = ex.Message });
+                // Include inner exception details for better debugging
+                var errorMessage = ex.Message;
+                if (ex.InnerException != null)
+                {
+                    errorMessage += $" Inner exception: {ex.InnerException.Message}";
+                }
+                return StatusCode(500, new { message = "Failed to update recurring task", error = errorMessage });
             }
         }
 
