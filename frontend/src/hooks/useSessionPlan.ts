@@ -81,19 +81,24 @@ export function useSessionPlan(date: Date) {
       }
       
       const updatedItems = sessionPlan.items.filter(item => item.task.id !== taskId);
-      
-      if (updatedItems.length === 0) {
-        console.log('All tasks removed, deleting session plan');
-        setSessionPlan(null);
-        await loadPendingTasksCount();
-        return;
-      }
-      
       const taskIds = updatedItems.map(item => item.task.id);
+      
       console.log('Updating session plan order, removing task:', taskId);
       console.log('Remaining task IDs:', taskIds);
-      await sessionPlanApi.updateSessionPlanOrder(sessionPlan.id, { taskIds });
-      await loadSessionPlan();
+      
+      // Call the API to update the session plan
+      // If taskIds is empty, the backend will delete the entire session plan
+      const response = await sessionPlanApi.updateSessionPlanOrder(sessionPlan.id, { taskIds });
+      
+      // Check if the session plan was deleted (response will have a message instead of plan data)
+      if (response && 'message' in response) {
+        console.log('Session plan deleted - all tasks removed');
+        setSessionPlan(null);
+      } else {
+        // Reload the session plan to get the updated state
+        await loadSessionPlan();
+      }
+      
       await loadPendingTasksCount();
       console.log('Task removed successfully');
     } catch (err: any) {

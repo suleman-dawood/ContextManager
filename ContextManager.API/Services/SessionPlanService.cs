@@ -213,7 +213,7 @@ namespace ContextManager.API.Services
         }
 
         /// updates the order of tasks in a session plan based on user drag-and-drop
-        public async Task<SessionPlanResponse> UpdateSessionPlanOrderAsync(Guid userId, Guid sessionPlanId, List<Guid> taskIds)
+        public async Task<SessionPlanResponse?> UpdateSessionPlanOrderAsync(Guid userId, Guid sessionPlanId, List<Guid> taskIds)
         {
             var sessionPlan = await _context.SessionPlans
                 .Include(sp => sp.Items)
@@ -223,6 +223,14 @@ namespace ContextManager.API.Services
             if (sessionPlan == null)
             {
                 throw new InvalidOperationException("Session plan not found");
+            }
+            
+            // If taskIds is empty, delete the entire session plan and return null
+            if (taskIds.Count == 0)
+            {
+                _context.SessionPlans.Remove(sessionPlan);
+                await _context.SaveChangesAsync();
+                return null;
             }
             
             // remove items that are not in the taskIds list (user removed them)

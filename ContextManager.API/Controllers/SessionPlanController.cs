@@ -107,6 +107,13 @@ namespace ContextManager.API.Controllers
             {
                 var userId = GetCurrentUserId();
                 var sessionPlan = await _sessionPlanService.UpdateSessionPlanOrderAsync(userId, id, request.TaskIds);
+                
+                // If null is returned, all tasks were removed and session plan was deleted
+                if (sessionPlan == null)
+                {
+                    return Ok(new { message = "Session plan deleted - all tasks removed" });
+                }
+                
                 return Ok(sessionPlan);
             }
             catch (InvalidOperationException ex)
